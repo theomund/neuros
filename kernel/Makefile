@@ -9,10 +9,9 @@ ifneq ($(PROFILE),dev)
 endif
 
 .PHONY: all
-all: build
+all: kernel.elf
 
-.PHONY: build
-build:
+kernel.elf:
 	cargo build --target $(TARGET) --profile $(PROFILE)
 	cp target/$(TARGET)/$(SUBDIR)/kernel kernel.elf
 
