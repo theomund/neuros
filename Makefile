@@ -1,8 +1,9 @@
 SHELL := /bin/sh
 
-NAME := NeurOS
+ISO := NeurOS.iso
+OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 
-$(NAME).iso: limine kernel
+$(ISO): limine kernel
 	mkdir -p iso_root/EFI/BOOT
 	cp -v bootloader/limine.cfg kernel/kernel.elf limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
 	cp -v limine/BOOTX64.EFI limine/BOOTIA32.EFI iso_root/EFI/BOOT/
@@ -10,8 +11,8 @@ $(NAME).iso: limine kernel
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o $(NAME).iso
-	./limine/limine bios-install $(NAME).iso
+		iso_root -o $(ISO)
+	limine/limine bios-install $(ISO)
 	rm -rf iso_root
 
 limine:
@@ -19,16 +20,16 @@ limine:
 	$(MAKE) -C limine
 
 .PHONY: all
-all: $(NAME).iso
+all: $(ISO)
 
 .PHONY: clean
 clean:
 	$(MAKE) -C kernel clean
-	rm -f $(NAME).iso
+	rm -f $(ISO)
 
 .PHONY: distclean
 distclean: clean
-	rm -rf limine ovmf
+	rm -rf limine
 
 .PHONY: format
 format:
@@ -43,5 +44,9 @@ lint:
 	$(MAKE) -C kernel lint
 
 .PHONY: run
-run: $(NAME).iso
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(NAME).iso -boot d
+run: $(ISO)
+	qemu-system-x86_64 -M q35 -m 2G -cdrom $(ISO) -boot d
+
+.PHONY: run-uefi
+run-uefi: $(ISO) $(OVMF)
+	qemu-system-x86_64 -M q35 -m 2G -bios $(OVMF) -cdrom $(ISO) -boot d
