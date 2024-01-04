@@ -27,4 +27,4 @@ format:
 
 .PHONY: lint
 lint:
-	cargo clippy
+	cargo clippy --target $(TARGET) --profile $(PROFILE)
