@@ -1,5 +1,5 @@
 # NeurOS - Hobbyist operating system written in Rust.
-# Copyright (C) 2023 Theomund
+# Copyright (C) 2024 Theomund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
