@@ -16,7 +16,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 
-# ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/4516b27b-f11f-4f3e-a354-d0f140ce03b6)
+# ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/7b2e911a-429b-4d44-a4bb-131a8037cb97)
 
 ![GitHub License](https://img.shields.io/github/license/Theomund/NeurOS)
 
