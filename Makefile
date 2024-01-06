@@ -43,6 +43,10 @@ clean:
 	$(MAKE) -C kernel clean
 	rm -f $(ISO)
 
+.PHONY: container
+container:
+	$(MAKE) -C container run
+
 .PHONY: distclean
 distclean: clean
 	rm -rf limine
@@ -50,6 +54,10 @@ distclean: clean
 .PHONY: format
 format:
 	$(MAKE) -C kernel format
+
+.PHONY: image
+image:
+	$(MAKE) -C container build
 
 .PHONY: kernel
 kernel:
