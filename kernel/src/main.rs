@@ -22,12 +22,8 @@ mod vga;
 use core::arch::asm;
 use vga::VGA;
 
-static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
-static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
-
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    assert!(BASE_REVISION.is_supported());
     let vga = VGA::new();
     vga.draw();
     hcf();

@@ -16,6 +16,7 @@
 
 use limine::{Framebuffer, NonNullPtr};
 
+static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
 static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
 
 pub struct VGA {
@@ -24,6 +25,7 @@ pub struct VGA {
 
 impl VGA {
     pub fn new() -> VGA {
+        assert!(BASE_REVISION.is_supported());
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response().get() {
             if framebuffer_response.framebuffer_count < 1 {
                 panic!("Failed to retrieve framebuffer.");
