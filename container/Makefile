@@ -24,6 +24,10 @@ TAG := $(NAME)
 build:
 	$(RUNTIME) build -t $(TAG) .
 
+.PHONY: lint
+lint:
+	hadolint Dockerfile
+
 .PHONY: run
 run: build
 	$(RUNTIME) run -it --rm --name $(NAME) $(TAG)

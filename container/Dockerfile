@@ -16,8 +16,9 @@
 
 FROM registry.fedoraproject.org/fedora:39
 RUN dnf install -y \
-    edk2-ovmf \
-    git \
-    make \
-    xorriso \
+    edk2-ovmf-20231122 \
+    git-2.43.0 \
+    hadolint-2.12.0 \
+    make-4.4.1 \
+    xorriso-1.5.6 \
     && dnf clean all

@@ -65,6 +65,7 @@ kernel:
 
 .PHONY: lint
 lint:
+	$(MAKE) -C container lint
 	$(MAKE) -C kernel lint
 
 .PHONY: run
