@@ -23,7 +23,6 @@ static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequ
 #[derive(Clone, Copy)]
 pub enum Color {
     Black = 0x0,
-    Red = 0xFF0000,
     Yellow = 0xFFFF00,
 }
 
@@ -68,7 +67,7 @@ impl Vga {
         for cy in 0..16 {
             for cx in 0..8 {
                 let color = if glyph[cy] & mask[cx] == 0 { bg } else { fg };
-                self.draw_pixel(x + cx, y + cy, color);
+                self.draw_pixel(x + cx, y + cy - 12, color);
             }
         }
     }

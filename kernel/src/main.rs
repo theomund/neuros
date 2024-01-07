@@ -26,7 +26,8 @@ use vga::Vga;
 #[no_mangle]
 extern "C" fn _start() -> ! {
     let vga = Vga::new();
-    vga.write("Hello, world!", 0, 0);
+    vga.write("Version 0.1.0", 8, 792);
+    vga.write("Copyright (C) 2024 Theomund", 1056, 792);
     hcf();
 }
 
