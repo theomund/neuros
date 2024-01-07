@@ -38,7 +38,7 @@ clean:
 	rm -f kernel.elf
 
 .PHONY: debug
-debug:
+debug: kernel.elf
 	rust-gdb -ex "file kernel.elf" -ex "target remote localhost:1234"
 
 .PHONY: format
