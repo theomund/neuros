@@ -17,6 +17,7 @@
 SHELL := /bin/sh
 
 PROFILE := dev
+SOURCE := $(wildcard src/*.rs)
 SUBDIR := debug
 TARGET := x86_64-unknown-none
 
@@ -27,7 +28,7 @@ endif
 .PHONY: all
 all: kernel.elf
 
-kernel.elf:
+kernel.elf: $(SOURCE)
 	cargo build --target $(TARGET) --profile $(PROFILE)
 	cp target/$(TARGET)/$(SUBDIR)/kernel kernel.elf
 

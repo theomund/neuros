@@ -20,13 +20,17 @@ use limine::{Framebuffer, NonNullPtr};
 static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
 static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
 
-pub struct VGA {
+pub enum Color {
+    Red = 0xFF0000,
+}
+
+pub struct Vga {
     font: Font,
     framebuffer: &'static NonNullPtr<Framebuffer>,
 }
 
-impl VGA {
-    pub fn new() -> VGA {
+impl Vga {
+    pub fn new() -> Vga {
         assert!(BASE_REVISION.is_supported());
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response().get() {
             if framebuffer_response.framebuffer_count < 1 {
@@ -34,24 +38,22 @@ impl VGA {
             }
             let font = Font::new();
             let framebuffer = &framebuffer_response.framebuffers()[0];
-            VGA { font, framebuffer }
+            Vga { font, framebuffer }
         } else {
             panic!("Failed to initialize VGA module.");
         }
     }
 
-    pub fn draw(&self) {
-        for i in 0..100_usize {
-            let pixel_offset = i * self.framebuffer.pitch as usize + i * 4;
-            let address = self
-                .framebuffer
-                .address
-                .as_ptr()
-                .unwrap()
-                .wrapping_add(pixel_offset) as *mut u32;
-            unsafe {
-                *(address) = 0xFFFFFFFF;
-            }
+    pub fn draw(&self, x: usize, y: usize, color: Color) {
+        let pixel_offset = y * self.framebuffer.pitch as usize + x * 4;
+        let address = self
+            .framebuffer
+            .address
+            .as_ptr()
+            .unwrap()
+            .wrapping_add(pixel_offset) as *mut u32;
+        unsafe {
+            *(address) = color as u32;
         }
     }
 }

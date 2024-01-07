@@ -21,12 +21,16 @@ mod font;
 mod vga;
 
 use core::arch::asm;
-use vga::VGA;
+use vga::{Color, Vga};
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    let vga = VGA::new();
-    vga.draw();
+    let vga = Vga::new();
+    for y in 0..128 {
+        for x in 0..128 {
+            vga.draw(x, y, Color::Red);
+        }
+    }
     hcf();
 }
 
