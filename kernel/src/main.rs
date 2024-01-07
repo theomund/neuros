@@ -21,16 +21,12 @@ mod font;
 mod vga;
 
 use core::arch::asm;
-use vga::{Color, Vga};
+use vga::Vga;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
     let vga = Vga::new();
-    for y in 0..128 {
-        for x in 0..128 {
-            vga.draw(x, y, Color::Red);
-        }
-    }
+    vga.write("Hello, world!", 0, 0);
     hcf();
 }
 

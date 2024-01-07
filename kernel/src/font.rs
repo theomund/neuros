@@ -4376,4 +4376,8 @@ impl Font {
         ];
         Font { data }
     }
+
+    pub fn get_data(&self) -> [u8; 4096] {
+        self.data
+    }
 }

@@ -20,8 +20,11 @@ use limine::{Framebuffer, NonNullPtr};
 static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
 static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
 
+#[derive(Clone, Copy)]
 pub enum Color {
+    Black = 0x0,
     Red = 0xFF0000,
+    Yellow = 0xFFFF00,
 }
 
 pub struct Vga {
@@ -44,7 +47,7 @@ impl Vga {
         }
     }
 
-    pub fn draw(&self, x: usize, y: usize, color: Color) {
+    pub fn draw_pixel(&self, x: usize, y: usize, color: Color) {
         let pixel_offset = y * self.framebuffer.pitch as usize + x * 4;
         let address = self
             .framebuffer
@@ -54,6 +57,25 @@ impl Vga {
             .wrapping_add(pixel_offset) as *mut u32;
         unsafe {
             *(address) = color as u32;
+        }
+    }
+
+    pub fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
+        let mask = [128, 64, 32, 16, 8, 4, 2, 1];
+        let position = character as usize * 16;
+        let glyph = &self.font.get_data()[position..];
+
+        for cy in 0..16 {
+            for cx in 0..8 {
+                let color = if glyph[cy] & mask[cx] == 0 { bg } else { fg };
+                self.draw_pixel(x + cx, y + cy, color);
+            }
+        }
+    }
+
+    pub fn write(&self, message: &str, x: usize, y: usize) {
+        for (position, character) in message.chars().enumerate() {
+            self.draw_character(character, x + 8 * position, y, Color::Yellow, Color::Black);
         }
     }
 }
