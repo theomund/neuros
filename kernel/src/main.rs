@@ -17,6 +17,7 @@
 #![no_std]
 #![no_main]
 
+mod font;
 mod vga;
 
 use core::arch::asm;

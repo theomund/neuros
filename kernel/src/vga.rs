@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::font::Font;
 use limine::{Framebuffer, NonNullPtr};
 
 static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
 static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
 
 pub struct VGA {
+    font: Font,
     framebuffer: &'static NonNullPtr<Framebuffer>,
 }
 
@@ -30,8 +32,9 @@ impl VGA {
             if framebuffer_response.framebuffer_count < 1 {
                 panic!("Failed to retrieve framebuffer.");
             }
+            let font = Font::new();
             let framebuffer = &framebuffer_response.framebuffers()[0];
-            VGA { framebuffer }
+            VGA { font, framebuffer }
         } else {
             panic!("Failed to initialize VGA module.");
         }
