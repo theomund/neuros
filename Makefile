@@ -19,6 +19,10 @@ SHELL := /bin/sh
 ISO := NeurOS.iso
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 
+ifeq ($(DEBUG),true)
+  DEBUG_FLAGS := -s -S
+endif
+
 $(ISO): limine kernel
 	mkdir -p iso_root/EFI/BOOT
 	cp -v bootloader/limine.cfg kernel/kernel.elf limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
@@ -47,6 +51,10 @@ clean:
 container:
 	$(MAKE) -C container run
 
+.PHONY: debug
+debug:
+	$(MAKE) -C kernel debug
+
 .PHONY: distclean
 distclean: clean
 	rm -rf limine
@@ -70,8 +78,8 @@ lint:
 
 .PHONY: run
 run: $(ISO)
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(ISO) -boot d
+	qemu-system-x86_64 $(DEBUG_FLAGS) -M q35 -m 2G -cdrom $(ISO) -boot d
 
 .PHONY: run-uefi
 run-uefi: $(ISO) $(OVMF)
-	qemu-system-x86_64 -M q35 -m 2G -bios $(OVMF) -cdrom $(ISO) -boot d
+	qemu-system-x86_64 $(DEBUG_FLAGS) -M q35 -m 2G -bios $(OVMF) -cdrom $(ISO) -boot d

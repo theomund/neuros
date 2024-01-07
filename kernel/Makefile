@@ -37,6 +37,10 @@ clean:
 	cargo clean
 	rm -f kernel.elf
 
+.PHONY: debug
+debug:
+	rust-gdb -ex "file kernel.elf" -ex "target remote localhost:1234"
+
 .PHONY: format
 format:
 	cargo fmt
