@@ -14,8 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#[derive(Clone, Copy)]
 pub struct Font {
     data: [u8; 4096],
+    width: usize,
+    height: usize,
 }
 
 impl Font {
@@ -4374,10 +4377,24 @@ impl Font {
             0x00, /* 00000000 */
             0x00, /* 00000000 */
         ];
-        Font { data }
+        let width = 8;
+        let height = 16;
+        Font {
+            data,
+            width,
+            height,
+        }
     }
 
     pub fn get_data(&self) -> [u8; 4096] {
         self.data
+    }
+
+    pub fn get_width(&self) -> usize {
+        self.width
+    }
+
+    pub fn get_height(&self) -> usize {
+        self.height
     }
 }

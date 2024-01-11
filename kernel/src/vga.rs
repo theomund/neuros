@@ -32,13 +32,12 @@ pub struct Vga {
 }
 
 impl Vga {
-    pub fn new() -> Vga {
+    pub fn new(font: Font) -> Vga {
         assert!(BASE_REVISION.is_supported());
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response().get() {
             if framebuffer_response.framebuffer_count < 1 {
                 panic!("Failed to retrieve framebuffer.");
             }
-            let font = Font::new();
             let framebuffer = &framebuffer_response.framebuffers()[0];
             Vga { font, framebuffer }
         } else {
@@ -76,5 +75,13 @@ impl Vga {
         for (position, character) in message.chars().enumerate() {
             self.draw_character(character, x + 8 * position, y, Color::Yellow, Color::Black);
         }
+    }
+
+    pub fn get_height(&self) -> usize {
+        self.framebuffer.height as usize
+    }
+
+    pub fn get_width(&self) -> usize {
+        self.framebuffer.width as usize
     }
 }

@@ -21,13 +21,25 @@ mod font;
 mod vga;
 
 use core::arch::asm;
+use font::Font;
 use vga::Vga;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    let vga = Vga::new();
-    vga.write("Version 0.1.0", 8, 792);
-    vga.write("Copyright (C) 2024 Theomund", 1056, 792);
+    let font = Font::new();
+    let vga = Vga::new(font);
+    let version = "Version 0.1.0";
+    vga.write(
+        version,
+        font.get_width(),
+        vga.get_height() - font.get_width(),
+    );
+    let copyright = "Copyright (C) 2024 Theomund";
+    vga.write(
+        copyright,
+        vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
+        vga.get_height() - font.get_width(),
+    );
     hcf();
 }
 
