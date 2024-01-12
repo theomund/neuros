@@ -14,31 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#![no_std]
-#![no_main]
+use crate::font::Font;
+use crate::vga::Vga;
 
-mod font;
-mod init;
-mod vga;
-
-use core::arch::asm;
-
-#[no_mangle]
-extern "C" fn _start() -> ! {
-    init::run();
-    hcf();
-}
-
-#[panic_handler]
-fn rust_panic(_info: &core::panic::PanicInfo) -> ! {
-    hcf();
-}
-
-fn hcf() -> ! {
-    unsafe {
-        asm!("cli");
-        loop {
-            asm!("hlt");
-        }
-    }
+pub fn run() {
+    let font = Font::new();
+    let vga = Vga::new(font);
+    let version = "Version 0.1.0";
+    vga.write(
+        version,
+        font.get_width(),
+        vga.get_height() - font.get_width(),
+    );
+    let copyright = "Copyright (C) 2024 Theomund";
+    vga.write(
+        copyright,
+        vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
+        vga.get_height() - font.get_width(),
+    )
 }
