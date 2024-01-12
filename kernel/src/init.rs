@@ -32,7 +32,7 @@ pub fn run() {
         font.get_width(),
         vga.get_height() - font.get_width(),
     );
-    let copyright = "Copyright (C) 2024 Theomund";
+    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
     vga.write(
         copyright,
         vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
