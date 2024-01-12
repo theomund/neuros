@@ -17,27 +17,34 @@
 SHELL := /bin/sh
 
 ISO := NeurOS.iso
+KERNEL := kernel/kernel.elf
+LIMINE := vendor/limine/limine
+LIMINE_BIN := $(addprefix vendor/limine/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
+LIMINE_EFI := $(addprefix vendor/limine/,BOOTX64.EFI BOOTIA32.EFI)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 
 ifeq ($(DEBUG),true)
   DEBUG_FLAGS := -s -S
 endif
 
-$(ISO): limine kernel
+$(ISO): $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI) $(KERNEL)
 	mkdir -p iso_root/EFI/BOOT
-	cp -v bootloader/limine.cfg kernel/kernel.elf limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
-	cp -v limine/BOOTX64.EFI limine/BOOTIA32.EFI iso_root/EFI/BOOT/
+	cp -v bootloader/limine.cfg $(KERNEL) $(LIMINE_BIN) iso_root/
+	cp -v $(LIMINE_EFI) iso_root/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o $(ISO)
-	limine/limine bios-install $(ISO)
+	$(LIMINE) bios-install $(ISO)
 	rm -rf iso_root
 
-limine:
-	git clone https://github.com/limine-bootloader/limine.git --branch=v6.x-branch-binary --depth=1
-	$(MAKE) -C limine
+$(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI):
+	git submodule update --init
+	$(MAKE) -C vendor/limine
+
+$(KERNEL):
+	$(MAKE) -C kernel
 
 .PHONY: all
 all: $(ISO)
@@ -55,10 +62,6 @@ container:
 debug:
 	$(MAKE) -C kernel debug
 
-.PHONY: distclean
-distclean: clean
-	rm -rf limine
-
 .PHONY: format
 format:
 	$(MAKE) -C kernel format
@@ -66,10 +69,6 @@ format:
 .PHONY: image
 image:
 	$(MAKE) -C container build
-
-.PHONY: kernel
-kernel:
-	$(MAKE) -C kernel
 
 .PHONY: lint
 lint:
