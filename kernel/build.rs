@@ -14,7 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use std::process::Command;
+
 fn main() {
     println!("cargo:rustc-link-arg=-Tlinker.ld");
     println!("cargo:rerun-if-changed=linker.ld");
+    let output = Command::new("git")
+        .args(["rev-parse", "--short", "HEAD"])
+        .output()
+        .unwrap();
+    let hash = String::from_utf8(output.stdout).unwrap();
+    println!("cargo:rustc-env=COMMIT_HASH={}", hash);
+    println!("cargo:rerun-if-changed=.git/HEAD");
 }

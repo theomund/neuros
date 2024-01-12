@@ -20,7 +20,13 @@ use crate::vga::Vga;
 pub fn run() {
     let font = Font::new();
     let vga = Vga::new(font);
-    let version = "Version 0.1.0";
+    let version = concat!(
+        "Version ",
+        env!("CARGO_PKG_VERSION"),
+        " (",
+        env!("COMMIT_HASH"),
+        ")"
+    );
     vga.write(
         version,
         font.get_width(),
