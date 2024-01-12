@@ -59,13 +59,13 @@ impl Vga {
     }
 
     pub fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
-        let mask = [128, 64, 32, 16, 8, 4, 2, 1];
+        let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let position = character as usize * 16;
-        let glyph = &self.font.get_data()[position..];
+        let glyphs = &self.font.get_data()[position..];
 
-        for cy in 0..16 {
-            for cx in 0..8 {
-                let color = if glyph[cy] & mask[cx] == 0 { bg } else { fg };
+        for (cy, glyph) in glyphs.iter().enumerate().take(self.font.get_height()) {
+            for (cx, mask) in masks.iter().enumerate().take(self.font.get_width()) {
+                let color = if glyph & mask == 0 { bg } else { fg };
                 self.draw_pixel(x + cx, y + cy - 12, color);
             }
         }
