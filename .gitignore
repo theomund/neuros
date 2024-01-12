@@ -17,6 +17,4 @@
 *.elf
 *.iso
 .idea/
-limine/
-ovmf/
 target/
