@@ -22,6 +22,7 @@ LIMINE := vendor/limine/limine
 LIMINE_BIN := $(addprefix vendor/limine/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 LIMINE_EFI := $(addprefix vendor/limine/,BOOTX64.EFI BOOTIA32.EFI)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
+STYLE := .vale/styles/RedHat
 
 ifeq ($(DEBUG),true)
   DEBUG_FLAGS := -s -S
@@ -45,6 +46,9 @@ $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI):
 
 $(KERNEL):
 	$(MAKE) -C kernel
+
+$(STYLE):
+	vale sync
 
 .PHONY: all
 all: $(ISO)
@@ -71,9 +75,10 @@ image:
 	$(MAKE) -C container build
 
 .PHONY: lint
-lint:
+lint: $(STYLE)
 	$(MAKE) -C container lint
 	$(MAKE) -C kernel lint
+	vale README.md
 
 .PHONY: run
 run: $(ISO)

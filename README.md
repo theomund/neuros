@@ -20,7 +20,7 @@
 
 ![GitHub License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge)
 ![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version)
-![Toolchain](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain)
+![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain)
 
 Hobbyist operating system written in Rust.
 
@@ -28,4 +28,6 @@ Hobbyist operating system written in Rust.
 
 ![GPL Logo](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)
 
-This project is licensed under the [GNU General Public License v3.0](COPYING) (or later).
+This project uses the [GNU General Public License v3.0](COPYING) (or later).
+
+You can find the detailed terms of the license in the [COPYING](COPYING) file.
