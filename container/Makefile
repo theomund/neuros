@@ -29,4 +29,4 @@ lint:
 
 .PHONY: run
 run: build
-	cd .. && podman run -it -v $$(pwd):/usr/src/app:z --rm --name $(NAME) $(TAG)
+	podman run -it -v $(shell pwd)/..:/usr/src/app:z --rm --name $(NAME) $(TAG)
