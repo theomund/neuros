@@ -29,7 +29,39 @@
 > system is not yet stable for production use. Use it at your own discretion,
 > and prepare for potential issues.
 
-Hobbyist operating system written in Rust.
+## Overview
+
+This project aims to create a lightweight, modular, and extensible operating
+system based on the microkernel architecture. The microkernel design minimizes
+the kernel's complexity by delegating most tasks to userspace services,
+resulting in improved reliability, security, and maintainability.
+
+## Architecture
+
+```mermaid
+graph BT
+    subgraph Userspace
+        style Userspace fill: #2980b9
+        subgraph Servers
+            direction BT
+            style Servers fill: #2980b9
+            app_ipc(Application IPC)
+            device(Device Driver)
+            file(File Server)
+            unix(UNIX Server)
+        end
+        Application
+    end
+    subgraph Kernel
+        direction BT
+        style Kernel fill: #c0392b
+        basic_ipc(Basic IPC)
+        memory(Virtual Memory)
+        scheduler(Scheduling)
+    end
+    Servers <--> Application
+    Kernel <--> Servers
+```
 
 ## License
 
