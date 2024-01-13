@@ -36,7 +36,7 @@ system based on the microkernel architecture. The microkernel design minimizes
 the kernel's complexity by delegating most tasks to userspace services,
 resulting in improved reliability, security, and maintainability.
 
-## Architecture
+# Architecture
 
 ```mermaid
 graph BT
