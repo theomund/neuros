@@ -29,7 +29,7 @@
 > system is not yet stable for production use. Use it at your own discretion,
 > and prepare for potential issues.
 
-## Overview
+# Overview
 
 This project aims to create a lightweight, modular, and extensible operating
 system based on the microkernel architecture. The microkernel design minimizes
@@ -63,7 +63,72 @@ graph BT
     Kernel <--> Servers
 ```
 
-## License
+# Building
+
+> [!NOTE]
+> Building on Windows or MacOS is currently not supported at this time.
+
+To build and compile the operating system from source, follow the outlined
+steps. Make sure you have the necessary tools and dependencies installed on
+your system.
+
+## Prerequisites
+
+Before building the operating system, ensure you have the following prerequisites installed:
+
+* `edk2-ovmf`
+* `gcc`
+* `make`
+* `qemu`
+* `rustup`
+* `xorriso`
+
+## Cloning
+
+Clone the repository to your local machine by using the following command:
+
+```bash
+git clone https://github.com/Theomund/NeurOS.git
+```
+
+## Compiling
+
+Run the following command to generate an ISO image:
+
+```bash
+make all
+```
+
+This command will start the build process based on the configured settings
+and source code.
+
+## Testing
+
+To test the compiled operating system in a virtual environment, run this
+command:
+
+```bash
+make run
+```
+
+This command will start QEMU and run the operating system in BIOS mode. To
+switch the mode to UEFI, run the following command:
+
+```bash
+make run-uefi
+```
+
+## Cleaning
+
+To clean the build artifacts and start fresh, use the following command:
+
+```bash
+make clean 
+```
+
+This command removes compiled binaries and temporary files.
+
+# License
 
 ![GPL Logo](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)
 
