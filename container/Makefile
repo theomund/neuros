@@ -16,13 +16,12 @@
 
 SHELL := /bin/sh
 
-NAME := development-container
-RUNTIME := $(shell command -v podman 2> /dev/null || command -v docker 2> /dev/null)
+NAME := builder
 TAG := $(NAME)
 
 .PHONY: build
 build:
-	$(RUNTIME) build -t $(TAG) .
+	podman build --format docker -t $(TAG) .
 
 .PHONY: lint
 lint:
@@ -30,4 +29,4 @@ lint:
 
 .PHONY: run
 run: build
-	$(RUNTIME) run -it --rm --name $(NAME) $(TAG)
+	cd .. && podman run -it -v $$(pwd):/usr/src/app:z --rm --name $(NAME) $(TAG)

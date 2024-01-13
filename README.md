@@ -66,7 +66,7 @@ graph BT
 # Building
 
 > [!NOTE]
-> Building on Windows or MacOS is currently not supported at this time.
+> Building on Windows or macOS is currently not supported at this time.
 
 To build and compile the operating system from source, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on

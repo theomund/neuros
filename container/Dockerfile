@@ -15,10 +15,18 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 FROM registry.fedoraproject.org/fedora:39
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN dnf install -y \
+    dnf-plugins-core-4.4.4 \
     edk2-ovmf-20231122 \
+    gcc-13.2.1 \
     git-2.43.0 \
     hadolint-2.12.0 \
     make-4.4.1 \
     xorriso-1.5.6 \
     && dnf clean all
+RUN dnf copr enable -y mczernek/vale \
+    && dnf install -y vale-2.29.6 \
+    && dnf clean all
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+WORKDIR /usr/src/app
