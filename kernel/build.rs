@@ -17,8 +17,8 @@
 use std::process::Command;
 
 fn main() {
-    println!("cargo:rustc-link-arg=-Tlinker.ld");
-    println!("cargo:rerun-if-changed=linker.ld");
+    println!("cargo:rustc-link-arg=-Tkernel/linker.ld");
+    println!("cargo:rerun-if-changed=kernel/linker.ld");
     let output = Command::new("git")
         .args(["rev-parse", "--short", "HEAD"])
         .output()

@@ -14,37 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-SHELL := /bin/sh
-
-PROFILE := dev
-SOURCE := $(wildcard src/*.rs)
-SUBDIR := debug
-TARGET := x86_64-unknown-none
-
-ifneq ($(PROFILE),dev)
-  SUBDIR := $(PROFILE)
-endif
-
-.PHONY: all
-all: kernel.elf
-
-kernel.elf: $(SOURCE)
-	cargo build --target $(TARGET) --profile $(PROFILE)
-	cp target/$(TARGET)/$(SUBDIR)/kernel kernel.elf
-
-.PHONY: clean
-clean:
-	cargo clean
-	rm -f kernel.elf
-
-.PHONY: debug
-debug: kernel.elf
-	rust-gdb -ex "file kernel.elf" -ex "target remote localhost:1234"
-
-.PHONY: format
-format:
-	cargo fmt
-
-.PHONY: lint
-lint:
-	cargo clippy --target $(TARGET) --profile $(PROFILE)
+[workspace]
+members = ["kernel"]
+resolver = "2"

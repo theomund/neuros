@@ -16,36 +16,48 @@
 
 SHELL := /bin/sh
 
-ISO := NeurOS.iso
-KERNEL := kernel/kernel.elf
+DEBUG := false
+ISO := target/NeurOS.iso
+ISO_ROOT := target/iso_root
+KERNEL := target/kernel.elf
 LIMINE := vendor/limine/limine
 LIMINE_BIN := $(addprefix vendor/limine/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 LIMINE_EFI := $(addprefix vendor/limine/,BOOTX64.EFI BOOTIA32.EFI)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
+PROFILE := dev
 STYLE := .vale/styles/RedHat
+TAG := builder
+TARGET := x86_64-unknown-none
+
+ifeq ($(PROFILE),dev)
+    SUBDIR := debug
+else
+    SUBDIR := $(PROFILE)
+endif
 
 ifeq ($(DEBUG),true)
-  DEBUG_FLAGS := -s -S
+    DEBUG_FLAGS := -s -S
 endif
 
 $(ISO): $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI) $(KERNEL)
-	mkdir -p iso_root/EFI/BOOT
-	cp -v bootloader/limine.cfg $(KERNEL) $(LIMINE_BIN) iso_root/
-	cp -v $(LIMINE_EFI) iso_root/EFI/BOOT/
+	mkdir -p $(ISO_ROOT)/EFI/BOOT
+	cp -v bootloader/limine.cfg $(KERNEL) $(LIMINE_BIN) $(ISO_ROOT)
+	cp -v $(LIMINE_EFI) $(ISO_ROOT)/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o $(ISO)
+		$(ISO_ROOT) -o $(ISO)
 	$(LIMINE) bios-install $(ISO)
-	rm -rf iso_root
+	rm -rf $(ISO_ROOT)
 
 $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI):
 	git submodule update --init
 	$(MAKE) -C vendor/limine
 
 $(KERNEL):
-	$(MAKE) -C kernel
+	cargo build --target $(TARGET) --profile $(PROFILE)
+	cp target/$(TARGET)/$(SUBDIR)/kernel $(KERNEL)
 
 $(STYLE):
 	vale sync
@@ -55,16 +67,15 @@ all: $(ISO)
 
 .PHONY: clean
 clean:
-	$(MAKE) -C kernel clean
-	rm -f $(ISO)
+	cargo clean
 
 .PHONY: container
-container:
-	$(MAKE) -C container run
+container: image
+	podman run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG)
 
 .PHONY: debug
 debug:
-	$(MAKE) -C kernel debug
+	rust-gdb -ex "file $(KERNEL)" -ex "target remote localhost:1234"
 
 .PHONY: distclean
 distclean: clean
@@ -72,16 +83,16 @@ distclean: clean
 
 .PHONY: format
 format:
-	$(MAKE) -C kernel format
+	cargo fmt
 
 .PHONY: image
 image:
-	$(MAKE) -C container build
+	podman build --format docker -t $(TAG) .
 
 .PHONY: lint
 lint: $(STYLE)
-	$(MAKE) -C container lint
-	$(MAKE) -C kernel lint
+	cargo clippy --target $(TARGET) --profile $(PROFILE)
+	hadolint Dockerfile
 	vale README.md
 
 .PHONY: run
