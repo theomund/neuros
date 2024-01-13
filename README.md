@@ -22,6 +22,13 @@
 ![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version)
 ![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain)
 
+> [!WARNING]
+> This project is currently in its early development stage. As a result, you
+> might find bugs, incomplete features, and unexpected behavior. We appreciate
+> your interest and encourage you to offer feedback, but be aware that the
+> system is not yet stable for production use. Use it at your own discretion,
+> and prepare for potential issues.
+
 Hobbyist operating system written in Rust.
 
 ## License
