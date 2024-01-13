@@ -66,6 +66,10 @@ container:
 debug:
 	$(MAKE) -C kernel debug
 
+.PHONY: distclean
+distclean: clean
+	rm -rf .vale
+
 .PHONY: format
 format:
 	$(MAKE) -C kernel format
