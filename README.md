@@ -24,10 +24,9 @@
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
-> might find bugs, incomplete features, and unexpected behavior. We appreciate
-> your interest and encourage you to offer feedback, but be aware that the
-> system is not yet stable for production use. Use it at your own discretion,
-> and prepare for potential issues.
+> might find bugs, incomplete features, and unexpected behavior. Be aware that
+> the system is not yet stable for production use. Use it at your own
+> discretion, and prepare for potential issues.
 
 # Overview
 
