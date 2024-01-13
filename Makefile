@@ -74,7 +74,7 @@ container: image
 	podman run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG)
 
 .PHONY: debug
-debug:
+debug: $(KERNEL)
 	rust-gdb -ex "file $(KERNEL)" -ex "target remote localhost:1234"
 
 .PHONY: distclean
