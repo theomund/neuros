@@ -30,13 +30,13 @@ TAG := builder
 TARGET := x86_64-unknown-none
 
 ifeq ($(PROFILE),dev)
-    SUBDIR := debug
+  SUBDIR := debug
 else
-    SUBDIR := $(PROFILE)
+  SUBDIR := $(PROFILE)
 endif
 
 ifeq ($(DEBUG),true)
-    DEBUG_FLAGS := -s -S
+  DEBUG_FLAGS := -s -S
 endif
 
 $(ISO): $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI) $(KERNEL)
