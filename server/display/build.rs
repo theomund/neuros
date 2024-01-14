@@ -14,18 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#![no_std]
-#![no_main]
+use std::process::Command;
 
-use core::panic::PanicInfo;
-use syscall::hcf;
-
-#[no_mangle]
-extern "C" fn _start() -> ! {
-    hcf();
-}
-
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    hcf();
+fn main() {
+    let output = Command::new("git")
+        .args(["rev-parse", "--short", "HEAD"])
+        .output()
+        .unwrap();
+    let hash = String::from_utf8(output.stdout).unwrap();
+    println!("cargo:rustc-env=COMMIT_HASH={}", hash);
+    println!("cargo:rerun-if-changed=.git/HEAD");
 }

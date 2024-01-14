@@ -17,6 +17,7 @@
 SHELL := /bin/sh
 
 DEBUG := false
+DISPLAY := target/display.elf
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/kernel.elf
@@ -30,18 +31,18 @@ TAG := builder
 TARGET := x86_64-unknown-none
 
 ifeq ($(PROFILE),dev)
-  SUBDIR := debug
+    SUBDIR := debug
 else
-  SUBDIR := $(PROFILE)
+    SUBDIR := $(PROFILE)
 endif
 
 ifeq ($(DEBUG),true)
-  DEBUG_FLAGS := -s -S
+    DEBUG_FLAGS := -s -S
 endif
 
-$(ISO): $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI) $(KERNEL)
+$(ISO): $(DISPLAY) $(KERNEL) $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
-	cp -v bootloader/limine.cfg $(KERNEL) $(LIMINE_BIN) $(ISO_ROOT)
+	cp -v bootloader/limine.cfg $(DISPLAY) $(KERNEL) $(LIMINE_BIN) $(ISO_ROOT)
 	cp -v $(LIMINE_EFI) $(ISO_ROOT)/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
@@ -55,8 +56,9 @@ $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI):
 	git submodule update --init
 	$(MAKE) -C vendor/limine
 
-$(KERNEL):
+$(DISPLAY) $(KERNEL):
 	cargo build --target $(TARGET) --profile $(PROFILE)
+	cp target/$(TARGET)/$(SUBDIR)/display $(DISPLAY)
 	cp target/$(TARGET)/$(SUBDIR)/kernel $(KERNEL)
 
 $(STYLE):

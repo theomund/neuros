@@ -14,28 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::font::Font;
-use crate::vga::Vga;
+#![no_std]
 
-pub fn run() {
-    let font = Font::new();
-    let vga = Vga::new(font);
-    let version = concat!(
-        "Version ",
-        env!("CARGO_PKG_VERSION"),
-        " (",
-        env!("COMMIT_HASH"),
-        ")"
-    );
-    vga.write(
-        version,
-        font.get_width(),
-        vga.get_height() - font.get_width(),
-    );
-    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
-    vga.write(
-        copyright,
-        vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
-        vga.get_height() - font.get_width(),
-    )
+use core::arch::asm;
+
+pub fn hcf() -> ! {
+    unsafe {
+        asm!("cli");
+        loop {
+            asm!("hlt");
+        }
+    }
 }

@@ -3,10 +3,19 @@
 version = 3
 
 [[package]]
+name = "display"
+version = "0.1.0"
+dependencies = [
+ "limine",
+ "syscall",
+]
+
+[[package]]
 name = "kernel"
 version = "0.1.0"
 dependencies = [
  "limine",
+ "syscall",
 ]
 
 [[package]]
@@ -14,3 +23,7 @@ name = "limine"
 version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "02034f8f6b3e7bf050f310fbaf6db0018b8e54b75598d0a4c97172054752fede"
+
+[[package]]
+name = "syscall"
+version = "0.1.0"
