@@ -13,23 +13,3 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-#![no_std]
-#![no_main]
-
-mod ipc;
-mod memory;
-mod process;
-
-use core::panic::PanicInfo;
-use syscall::hcf;
-
-#[no_mangle]
-extern "C" fn _start() -> ! {
-    hcf();
-}
-
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    hcf();
-}
