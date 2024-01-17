@@ -39,27 +39,20 @@ resulting in improved reliability, security, and maintainability.
 
 ```mermaid
 graph BT
+    classDef node font-size:24px,padding:64px,color:#f5f6fa,stroke-width:0px
+    style Application fill:#0097e6
+    style Drivers fill:#8c7ae6
+    style Hardware fill:#e1b12c
+    style Kernel fill:#c23616
+    style Servers fill:#44bd32
+    style Userspace color:#f5f6fa,fill:#2f3640
+    Hardware <==> Kernel
+    Kernel <==> Drivers
+    Kernel <==> Servers
     subgraph Userspace
-        style Userspace fill: #2980b9
-        subgraph Servers
-            direction BT
-            style Servers fill: #2980b9
-            app_ipc(Application IPC)
-            device(Device Driver)
-            file(File Server)
-            unix(UNIX Server)
-        end
-        Application
+        Drivers <==> Application
+        Servers <==> Application
     end
-    subgraph Kernel
-        direction BT
-        style Kernel fill: #c0392b
-        basic_ipc(Basic IPC)
-        memory(Virtual Memory)
-        scheduler(Scheduling)
-    end
-    Servers <--> Application
-    Kernel <--> Servers
 ```
 
 # Building
