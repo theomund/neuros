@@ -24,7 +24,7 @@
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
-> might find bugs, incomplete features, and unexpected behavior. Be aware that
+> might find bugs, incomplete features, and breaking changes. Be aware that
 > the system is not yet stable for production use. Use it at your own
 > discretion, and prepare for potential issues.
 
@@ -62,7 +62,7 @@ graph BT
 
 To build and compile the operating system from source, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on
-your system.
+your Linux system.
 
 ## Prerequisites
 
@@ -103,8 +103,8 @@ command:
 make run
 ```
 
-This command will start QEMU and run the operating system in BIOS mode. To
-switch the mode to UEFI, run the following command:
+This command will start QEMU and run the operating system with BIOS firmware.
+To switch the firmware to UEFI, run the following command:
 
 ```bash
 make run-uefi
