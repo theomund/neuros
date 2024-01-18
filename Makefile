@@ -24,6 +24,7 @@ DEBUG := false
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/kernel.elf
+KERNEL_SRC := $(wildcard kernel/src/*.rs) $(addprefix kernel/,Cargo.toml build.rs linker.ld)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 PROFILE := dev
 STYLE := .vale/styles/RedHat
@@ -56,7 +57,7 @@ $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
 	$(MAKE) -C bootloader/src
 
-$(KERNEL):
+$(KERNEL): $(KERNEL_SRC)
 	cargo build --target $(TARGET) --profile $(PROFILE)
 	cp target/$(TARGET)/$(SUBDIR)/kernel $(KERNEL)
 
