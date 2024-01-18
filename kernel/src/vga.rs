@@ -73,7 +73,13 @@ impl Vga {
 
     pub fn write(&self, message: &str, x: usize, y: usize) {
         for (position, character) in message.chars().enumerate() {
-            self.draw_character(character, x + 8 * position, y, Color::Yellow, Color::Black);
+            self.draw_character(
+                character,
+                x + self.font.get_width() * position,
+                y,
+                Color::Yellow,
+                Color::Black,
+            );
         }
     }
 
