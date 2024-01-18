@@ -70,6 +70,7 @@ Before building the operating system, ensure you have the following prerequisite
 
 * `edk2-ovmf`
 * `gcc`
+* `git`
 * `make`
 * `qemu`
 * `rustup`
