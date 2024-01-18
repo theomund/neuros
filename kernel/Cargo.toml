@@ -23,4 +23,3 @@ authors = ["Theomund"]
 
 [dependencies]
 limine = "0.1.12"
-syscall = { path = "../syscall" }

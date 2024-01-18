@@ -16,14 +16,14 @@
 
 SHELL := /bin/sh
 
+BOOTLOADER := bootloader/src/limine
+BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
+BOOTLOADER_CFG := bootloader/limine.cfg
+BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
 DEBUG := false
-DISPLAY_SERVER := target/display.elf
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/kernel.elf
-LIMINE := vendor/limine/limine
-LIMINE_BIN := $(addprefix vendor/limine/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
-LIMINE_EFI := $(addprefix vendor/limine/,BOOTX64.EFI BOOTIA32.EFI)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 PROFILE := dev
 STYLE := .vale/styles/RedHat
@@ -40,25 +40,24 @@ ifeq ($(DEBUG),true)
     DEBUG_FLAGS := -s -S
 endif
 
-$(ISO): $(DISPLAY_SERVER) $(KERNEL) $(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI)
+$(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
-	cp -v bootloader/limine.cfg $(DISPLAY_SERVER) $(KERNEL) $(LIMINE_BIN) $(ISO_ROOT)
-	cp -v $(LIMINE_EFI) $(ISO_ROOT)/EFI/BOOT/
+	cp -v $(BOOTLOADER_BIN) $(BOOTLOADER_CFG) $(KERNEL) $(ISO_ROOT)
+	cp -v $(BOOTLOADER_EFI) $(ISO_ROOT)/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_ROOT) -o $(ISO)
-	$(LIMINE) bios-install $(ISO)
+	$(BOOTLOADER) bios-install $(ISO)
 	rm -rf $(ISO_ROOT)
 
-$(LIMINE) $(LIMINE_BIN) $(LIMINE_EFI):
+$(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
-	$(MAKE) -C vendor/limine
+	$(MAKE) -C bootloader/src
 
-$(DISPLAY_SERVER) $(KERNEL):
+$(KERNEL):
 	cargo build --target $(TARGET) --profile $(PROFILE)
-	cp target/$(TARGET)/$(SUBDIR)/display $(DISPLAY_SERVER)
 	cp target/$(TARGET)/$(SUBDIR)/kernel $(KERNEL)
 
 $(STYLE):

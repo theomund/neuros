@@ -15,5 +15,5 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = ["kernel", "server/display", "syscall"]
+members = ["kernel"]
 resolver = "2"

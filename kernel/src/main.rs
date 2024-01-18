@@ -17,19 +17,49 @@
 #![no_std]
 #![no_main]
 
-mod ipc;
-mod memory;
-mod process;
+mod font;
+mod vga;
 
+use core::arch::asm;
 use core::panic::PanicInfo;
-use syscall::hcf;
+use font::Font;
+use vga::Vga;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    hcf();
+    let font = Font::new();
+    let vga = Vga::new(font);
+    let version = concat!(
+        "Version ",
+        env!("CARGO_PKG_VERSION"),
+        " (",
+        env!("COMMIT_HASH"),
+        ")"
+    );
+    vga.write(
+        version,
+        font.get_width(),
+        vga.get_height() - font.get_width(),
+    );
+    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
+    vga.write(
+        copyright,
+        vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
+        vga.get_height() - font.get_width(),
+    );
+    hcf()
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     hcf();
+}
+
+pub fn hcf() -> ! {
+    unsafe {
+        asm!("cli");
+        loop {
+            asm!("hlt");
+        }
+    }
 }
