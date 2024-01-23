@@ -23,7 +23,7 @@ mod vga;
 use core::arch::asm;
 use core::panic::PanicInfo;
 use font::Font;
-use vga::Vga;
+use vga::{Color, Vga};
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
@@ -40,12 +40,16 @@ extern "C" fn _start() -> ! {
         version,
         font.get_width(),
         vga.get_height() - font.get_width(),
+        Color::Red,
+        Color::Black,
     );
     let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
     vga.write(
         copyright,
         vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
         vga.get_height() - font.get_width(),
+        Color::Blue,
+        Color::Black,
     );
     hcf()
 }

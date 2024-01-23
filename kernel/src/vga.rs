@@ -23,7 +23,8 @@ static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequ
 #[derive(Clone, Copy)]
 pub enum Color {
     Black = 0x0,
-    Yellow = 0xFFFF00,
+    Blue = 0x0097E6,
+    Red = 0xE84118,
 }
 
 pub struct Vga {
@@ -71,15 +72,9 @@ impl Vga {
         }
     }
 
-    pub fn write(&self, message: &str, x: usize, y: usize) {
+    pub fn write(&self, message: &str, x: usize, y: usize, fg: Color, bg: Color) {
         for (position, character) in message.chars().enumerate() {
-            self.draw_character(
-                character,
-                x + self.font.get_width() * position,
-                y,
-                Color::Yellow,
-                Color::Black,
-            );
+            self.draw_character(character, x + self.font.get_width() * position, y, fg, bg);
         }
     }
 
