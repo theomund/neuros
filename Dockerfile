@@ -26,7 +26,7 @@ RUN dnf install -y \
     xorriso-1.5.6 \
     && dnf clean all
 RUN dnf copr enable -y mczernek/vale \
-    && dnf install -y vale-2.29.6 \
+    && dnf install -y vale-3.0.5 \
     && dnf clean all
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 WORKDIR /usr/src/app
