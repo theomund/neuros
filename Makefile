@@ -16,30 +16,31 @@
 
 SHELL := /bin/sh
 
-BOOTLOADER := bootloader/src/limine
-BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
-BOOTLOADER_CFG := bootloader/limine.cfg
-BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
 DEBUG := false
-ISO := target/NeurOS.iso
-ISO_ROOT := target/iso_root
-KERNEL := target/kernel.elf
-KERNEL_SRC := $(wildcard kernel/src/*.rs) $(addprefix kernel/,Cargo.toml build.rs linker.ld)
-OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 PROFILE := dev
-STYLE := .vale/styles/RedHat
-TAG := builder
 TARGET := x86_64-unknown-none
-
-ifeq ($(PROFILE),dev)
-    SUBDIR := debug
-else
-    SUBDIR := $(PROFILE)
-endif
 
 ifeq ($(DEBUG),true)
     DEBUG_FLAGS := -s -S
 endif
+
+ifeq ($(PROFILE),dev)
+    SUBDIR := $(TARGET)/debug
+else
+    SUBDIR := $(TARGET)/$(PROFILE)
+endif
+
+BOOTLOADER := bootloader/src/limine
+BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
+BOOTLOADER_CFG := bootloader/limine.cfg
+BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
+ISO := target/NeurOS.iso
+ISO_ROOT := target/iso_root
+KERNEL := target/$(SUBDIR)/kernel
+KERNEL_SRC := $(wildcard kernel/src/*.rs) $(addprefix kernel/,Cargo.toml build.rs linker.ld)
+OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
+STYLE := .vale/styles/RedHat
+TAG := builder
 
 $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
@@ -59,7 +60,6 @@ $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 
 $(KERNEL): $(KERNEL_SRC)
 	cargo build --target $(TARGET) --profile $(PROFILE)
-	cp target/$(TARGET)/$(SUBDIR)/kernel $(KERNEL)
 
 $(STYLE):
 	vale sync
