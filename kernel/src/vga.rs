@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::font::Font;
+use crate::image::Image;
 use limine::{Framebuffer, NonNullPtr};
 
 static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
@@ -25,6 +26,7 @@ pub enum Color {
     Black = 0x0,
     Blue = 0x0097E6,
     Red = 0xE84118,
+    White = 0xF5F6FA,
 }
 
 pub struct Vga {
@@ -61,7 +63,7 @@ impl Vga {
 
     pub fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
-        let position = character as usize * 16;
+        let position = character as usize * self.font.get_height();
         let glyphs = &self.font.get_data()[position..];
 
         for (cy, glyph) in glyphs.iter().enumerate().take(self.font.get_height()) {
@@ -75,6 +77,26 @@ impl Vga {
     pub fn write(&self, message: &str, x: usize, y: usize, fg: Color, bg: Color) {
         for (position, character) in message.chars().enumerate() {
             self.draw_character(character, x + self.font.get_width() * position, y, fg, bg);
+        }
+    }
+
+    pub fn draw_image(&self, image: Image, x: usize, y: usize) {
+        let masks = [128, 64, 32, 16, 8, 4, 2, 1];
+        let height = image.get_height();
+        let byte_width = image.get_byte_width();
+        let data = image.get_data();
+
+        for (iy, row) in data.iter().enumerate().take(height) {
+            for (ix, column) in row.iter().enumerate().take(byte_width) {
+                for (mx, mask) in masks.iter().enumerate() {
+                    let color = if column & mask == 0 {
+                        Color::White
+                    } else {
+                        Color::Black
+                    };
+                    self.draw_pixel(x + (ix * masks.len()) + mx, y + iy, color);
+                }
+            }
         }
     }
 

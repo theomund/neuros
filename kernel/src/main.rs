@@ -18,17 +18,23 @@
 #![no_main]
 
 mod font;
+mod image;
+mod memory;
 mod vga;
 
 use core::arch::asm;
 use core::panic::PanicInfo;
 use font::Font;
+use image::Image;
 use vga::{Color, Vga};
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
+    memory::expand();
     let font = Font::new();
+    let image = Image::new();
     let vga = Vga::new(font);
+    vga.draw_image(image, 128, 256);
     let version = concat!(
         "Version ",
         env!("CARGO_PKG_VERSION"),
