@@ -63,6 +63,13 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    VGA.write(
+        "The kernel has panicked.",
+        VGA.get_font_width(),
+        VGA.get_font_height() + VGA.get_font_width(),
+        Color::Red,
+        Color::Black,
+    );
     hcf();
 }
 
