@@ -19,8 +19,9 @@
 #![no_main]
 
 mod font;
+mod gdt;
+mod idt;
 mod image;
-mod interrupts;
 mod memory;
 mod vga;
 
@@ -32,8 +33,9 @@ use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
+    gdt::initialize();
+    idt::initialize();
     memory::initialize();
-    interrupts::initialize();
     let image = Image::new();
     VGA.draw_image(image, 128, 256);
     let version = concat!(
