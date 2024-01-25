@@ -17,9 +17,15 @@
 use crate::font::Font;
 use crate::image::Image;
 use limine::{Framebuffer, NonNullPtr};
+use spin::Lazy;
 
 static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
 static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
+
+pub static VGA: Lazy<Vga> = Lazy::new(|| {
+    let font = Font::new();
+    Vga::new(font)
+});
 
 #[derive(Clone, Copy)]
 pub enum Color {
@@ -100,11 +106,19 @@ impl Vga {
         }
     }
 
+    pub fn get_width(&self) -> usize {
+        self.framebuffer.width as usize
+    }
+
     pub fn get_height(&self) -> usize {
         self.framebuffer.height as usize
     }
 
-    pub fn get_width(&self) -> usize {
-        self.framebuffer.width as usize
+    pub fn get_font_width(&self) -> usize {
+        self.font.get_width()
+    }
+
+    pub fn get_font_height(&self) -> usize {
+        self.font.get_height()
     }
 }

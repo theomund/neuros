@@ -25,19 +25,17 @@ mod memory;
 mod vga;
 
 use core::panic::PanicInfo;
-use font::Font;
 use image::Image;
-use vga::{Color, Vga};
+use vga::Color;
+use vga::VGA;
 use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
     memory::initialize();
     interrupts::initialize();
-    let font = Font::new();
     let image = Image::new();
-    let vga = Vga::new(font);
-    vga.draw_image(image, 128, 256);
+    VGA.draw_image(image, 128, 256);
     let version = concat!(
         "Version ",
         env!("CARGO_PKG_VERSION"),
@@ -45,18 +43,18 @@ extern "C" fn _start() -> ! {
         env!("COMMIT_HASH"),
         ")"
     );
-    vga.write(
+    VGA.write(
         version,
-        font.get_width(),
-        vga.get_height() - font.get_width(),
+        VGA.get_font_width(),
+        VGA.get_height() - VGA.get_font_width(),
         Color::Red,
         Color::Black,
     );
     let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
-    vga.write(
+    VGA.write(
         copyright,
-        vga.get_width() - (copyright.len() * font.get_width() + font.get_width()),
-        vga.get_height() - font.get_width(),
+        VGA.get_width() - (copyright.len() * VGA.get_font_width() + VGA.get_font_width()),
+        VGA.get_height() - VGA.get_font_width(),
         Color::Blue,
         Color::Black,
     );
