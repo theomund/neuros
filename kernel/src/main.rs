@@ -22,11 +22,11 @@ mod image;
 mod memory;
 mod vga;
 
-use core::arch::asm;
 use core::panic::PanicInfo;
 use font::Font;
 use image::Image;
 use vga::{Color, Vga};
+use x86_64::instructions::{hlt, interrupts};
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
@@ -66,10 +66,8 @@ fn panic(_info: &PanicInfo) -> ! {
 }
 
 pub fn hcf() -> ! {
-    unsafe {
-        asm!("cli");
-        loop {
-            asm!("hlt");
-        }
+    interrupts::disable();
+    loop {
+        hlt();
     }
 }

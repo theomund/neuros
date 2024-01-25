@@ -23,3 +23,4 @@ authors = ["Theomund"]
 
 [dependencies]
 limine = "0.1.12"
+x86_64 = "0.14.11"
