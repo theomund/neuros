@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use limine::StackSizeRequest;
+use spin::Lazy;
+use x86_64::structures::idt::InterruptDescriptorTable;
 
-static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new(0).stack_size(1048576);
+static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(InterruptDescriptorTable::new);
 
 pub fn initialize() {
-    STACK_SIZE_REQUEST.get_response();
+    IDT.load();
 }

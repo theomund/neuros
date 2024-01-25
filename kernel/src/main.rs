@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#![feature(abi_x86_interrupt)]
 #![no_std]
 #![no_main]
 
 mod font;
 mod image;
+mod interrupts;
 mod memory;
 mod vga;
 
@@ -26,11 +28,12 @@ use core::panic::PanicInfo;
 use font::Font;
 use image::Image;
 use vga::{Color, Vga};
-use x86_64::instructions::{hlt, interrupts};
+use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    memory::expand();
+    memory::initialize();
+    interrupts::initialize();
     let font = Font::new();
     let image = Image::new();
     let vga = Vga::new(font);
@@ -66,8 +69,8 @@ fn panic(_info: &PanicInfo) -> ! {
 }
 
 pub fn hcf() -> ! {
-    interrupts::disable();
+    instructions::interrupts::disable();
     loop {
-        hlt();
+        instructions::hlt();
     }
 }
