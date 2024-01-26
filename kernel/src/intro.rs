@@ -22,7 +22,7 @@ use x86_64::instructions;
 
 pub fn initialize() {
     let image = Image::new();
-    VGA.draw_image(image, 128, 256);
+    VGA.draw_image(image, VGA.get_width() / 10, VGA.get_height() / 4);
     let version = concat!(
         "Version ",
         env!("CARGO_PKG_VERSION"),

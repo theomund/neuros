@@ -80,14 +80,14 @@ impl Logger {
         VGA.write(
             label,
             VGA.get_width() / 3,
-            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 4,
+            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 3,
             label_color,
             Color::Black,
         );
         VGA.write(
             message,
             VGA.get_width() / 3 + label.len() * VGA.get_font_width(),
-            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 4,
+            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 3,
             Color::White,
             Color::Black,
         );
