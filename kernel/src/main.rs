@@ -22,20 +22,22 @@ mod font;
 mod gdt;
 mod idt;
 mod image;
+mod logger;
 mod memory;
 mod vga;
 
 use core::panic::PanicInfo;
 use image::Image;
+use logger::LOGGER;
 use vga::Color;
 use vga::VGA;
 use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    gdt::initialize();
     idt::initialize();
     memory::initialize();
+    instructions::interrupts::int3();
     let image = Image::new();
     VGA.draw_image(image, 128, 256);
     let version = concat!(
@@ -65,13 +67,7 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    VGA.write(
-        "The kernel has panicked.",
-        VGA.get_font_width(),
-        VGA.get_font_height() + VGA.get_font_width(),
-        Color::Red,
-        Color::Black,
-    );
+    LOGGER.lock().error("The kernel has panicked.");
     hcf();
 }
 

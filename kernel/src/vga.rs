@@ -33,6 +33,7 @@ pub enum Color {
     Blue = 0x0097E6,
     Red = 0xE84118,
     White = 0xF5F6FA,
+    Yellow = 0xFBC531,
 }
 
 pub struct Vga {

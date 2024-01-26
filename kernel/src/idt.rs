@@ -14,11 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::logger::LOGGER;
 use spin::Lazy;
-use x86_64::structures::idt::InterruptDescriptorTable;
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
-static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(InterruptDescriptorTable::new);
+static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
+    let mut idt = InterruptDescriptorTable::new();
+    idt.breakpoint.set_handler_fn(breakpoint_handler);
+    idt
+});
 
 pub fn initialize() {
     IDT.load();
+}
+
+extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
+    LOGGER.lock().warning("Breakpoint exception was thrown.");
 }
