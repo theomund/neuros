@@ -79,15 +79,15 @@ impl Logger {
     fn log(&mut self, label: &str, message: &str, label_color: Color) {
         VGA.write(
             label,
-            VGA.get_font_width(),
-            VGA.get_font_height() * self.line_number + VGA.get_font_width(),
+            VGA.get_width() / 3,
+            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 4,
             label_color,
             Color::Black,
         );
         VGA.write(
             message,
-            VGA.get_font_width() + (label.len() * VGA.get_font_width()),
-            VGA.get_font_height() * self.line_number + VGA.get_font_width(),
+            VGA.get_width() / 3 + label.len() * VGA.get_font_width(),
+            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 4,
             Color::White,
             Color::Black,
         );
