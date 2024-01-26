@@ -42,7 +42,7 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    LOGGER.lock().error("The kernel has panicked.");
+    error!("The kernel has panicked.");
     halt();
 }
 

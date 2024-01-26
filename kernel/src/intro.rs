@@ -15,7 +15,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::image::Image;
+use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
+use crate::{debug, info};
 use x86_64::instructions;
 
 pub fn initialize() {
@@ -44,4 +46,6 @@ pub fn initialize() {
         Color::Black,
     );
     instructions::interrupts::int3();
+    debug!("This is a sample debug message.");
+    info!("The operating system has been successfully initialized.");
 }

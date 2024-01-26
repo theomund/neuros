@@ -22,6 +22,34 @@ pub static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| {
     Mutex::new(logger)
 });
 
+#[macro_export]
+macro_rules! debug {
+    ($message:literal) => {
+        LOGGER.lock().debug($message);
+    };
+}
+
+#[macro_export]
+macro_rules! error {
+    ($message:literal) => {
+        LOGGER.lock().error($message);
+    };
+}
+
+#[macro_export]
+macro_rules! info {
+    ($message:literal) => {
+        LOGGER.lock().info($message);
+    };
+}
+
+#[macro_export]
+macro_rules! warn {
+    ($message:literal) => {
+        LOGGER.lock().warn($message);
+    };
+}
+
 pub struct Logger {
     line_number: usize,
 }
@@ -32,8 +60,20 @@ impl Logger {
         Logger { line_number }
     }
 
+    pub fn debug(&mut self, message: &str) {
+        self.log("[DEBUG] ", message, Color::Purple);
+    }
+
     pub fn error(&mut self, message: &str) {
         self.log("[ERROR] ", message, Color::Red);
+    }
+
+    pub fn info(&mut self, message: &str) {
+        self.log("[INFO] ", message, Color::Blue);
+    }
+
+    pub fn warn(&mut self, message: &str) {
+        self.log("[WARN] ", message, Color::Yellow);
     }
 
     fn log(&mut self, label: &str, message: &str, label_color: Color) {
@@ -52,9 +92,5 @@ impl Logger {
             Color::Black,
         );
         self.line_number += 1;
-    }
-
-    pub fn warning(&mut self, message: &str) {
-        self.log("[WARNING] ", message, Color::Yellow);
     }
 }

@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::logger::LOGGER;
+use crate::warn;
 use spin::Lazy;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
@@ -29,5 +30,5 @@ pub fn initialize() {
 }
 
 extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
-    LOGGER.lock().warning("Breakpoint exception was thrown.");
+    warn!("Breakpoint exception was thrown.");
 }
