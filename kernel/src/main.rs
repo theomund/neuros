@@ -25,6 +25,7 @@ mod image;
 mod intro;
 mod logger;
 mod memory;
+mod serial;
 mod vga;
 
 use core::panic::PanicInfo;
