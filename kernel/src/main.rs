@@ -22,56 +22,30 @@ mod font;
 mod gdt;
 mod idt;
 mod image;
+mod intro;
 mod logger;
 mod memory;
 mod vga;
 
 use core::panic::PanicInfo;
-use image::Image;
 use logger::LOGGER;
-use vga::Color;
-use vga::VGA;
 use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
     idt::initialize();
     memory::initialize();
-    instructions::interrupts::int3();
-    let image = Image::new();
-    VGA.draw_image(image, 128, 256);
-    let version = concat!(
-        "Version ",
-        env!("CARGO_PKG_VERSION"),
-        " (",
-        env!("COMMIT_HASH"),
-        ")"
-    );
-    VGA.write(
-        version,
-        VGA.get_font_width(),
-        VGA.get_height() - VGA.get_font_width(),
-        Color::Red,
-        Color::Black,
-    );
-    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
-    VGA.write(
-        copyright,
-        VGA.get_width() - (copyright.len() * VGA.get_font_width() + VGA.get_font_width()),
-        VGA.get_height() - VGA.get_font_width(),
-        Color::Blue,
-        Color::Black,
-    );
-    hcf()
+    intro::initialize();
+    halt();
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     LOGGER.lock().error("The kernel has panicked.");
-    hcf();
+    halt();
 }
 
-pub fn hcf() -> ! {
+fn halt() -> ! {
     instructions::interrupts::disable();
     loop {
         instructions::hlt();
