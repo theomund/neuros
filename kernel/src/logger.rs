@@ -44,6 +44,13 @@ macro_rules! info {
 }
 
 #[macro_export]
+macro_rules! trace {
+    ($message:literal) => {
+        LOGGER.lock().trace($message);
+    };
+}
+
+#[macro_export]
 macro_rules! warn {
     ($message:literal) => {
         LOGGER.lock().warn($message);
@@ -61,7 +68,7 @@ impl Logger {
     }
 
     pub fn debug(&mut self, message: &str) {
-        self.log("[DEBUG] ", message, Color::Purple);
+        self.log("[DEBUG] ", message, Color::Green);
     }
 
     pub fn error(&mut self, message: &str) {
@@ -70,6 +77,10 @@ impl Logger {
 
     pub fn info(&mut self, message: &str) {
         self.log("[INFO] ", message, Color::Blue);
+    }
+
+    pub fn trace(&mut self, message: &str) {
+        self.log("[TRACE] ", message, Color::Purple);
     }
 
     pub fn warn(&mut self, message: &str) {

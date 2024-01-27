@@ -31,6 +31,7 @@ pub static VGA: Lazy<Vga> = Lazy::new(|| {
 pub enum Color {
     Black = 0x0,
     Blue = 0x0097E6,
+    Green = 0x44BD32,
     Purple = 0x8C7AE6,
     Red = 0xE84118,
     White = 0xF5F6FA,

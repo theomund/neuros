@@ -17,7 +17,7 @@
 use crate::image::Image;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
-use crate::{debug, info};
+use crate::{debug, info, trace};
 use x86_64::instructions;
 
 pub fn initialize() {
@@ -47,5 +47,6 @@ pub fn initialize() {
     );
     instructions::interrupts::int3();
     debug!("This is a sample debug message.");
+    trace!("This is a sample trace message.");
     info!("The operating system has been successfully initialized.");
 }

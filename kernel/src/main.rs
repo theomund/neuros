@@ -28,8 +28,8 @@ mod memory;
 mod serial;
 mod vga;
 
+use crate::logger::LOGGER;
 use core::panic::PanicInfo;
-use logger::LOGGER;
 use x86_64::instructions;
 
 #[no_mangle]
