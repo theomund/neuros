@@ -16,7 +16,6 @@
 
 use crate::font::Font;
 use crate::image::Image;
-use limine::framebuffer::Framebuffer;
 use limine::request::FramebufferRequest;
 use spin::Lazy;
 
@@ -52,7 +51,7 @@ unsafe impl Sync for Vga {}
 impl Vga {
     pub fn new(font: Font) -> Vga {
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response() {
-            let framebuffer: Framebuffer = framebuffer_response.framebuffers().next().unwrap();
+            let framebuffer = framebuffer_response.framebuffers().next().unwrap();
             Vga {
                 address: framebuffer.addr(),
                 font,
