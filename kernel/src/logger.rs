@@ -63,8 +63,7 @@ pub struct Logger {
 
 impl Logger {
     pub fn new() -> Logger {
-        let line_number = 1;
-        Logger { line_number }
+        Logger { line_number: 1 }
     }
 
     pub fn debug(&mut self, message: &str) {

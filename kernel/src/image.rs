@@ -32,13 +32,10 @@ pub struct Image {
 impl Image {
     pub fn new() -> Image {
         let pbm = include_bytes!("resource/logo.pbm");
-        let magic = u16::from_be_bytes([pbm[0], pbm[1]]);
-        let width = WIDTH;
-        let height = HEIGHT;
         let header = Header {
-            magic,
-            width,
-            height,
+            magic: u16::from_be_bytes([pbm[0], pbm[1]]),
+            width: WIDTH,
+            height: HEIGHT,
         };
         assert_eq!(header.magic, 0x5034);
         let mut data = [[0u8; BYTE_WIDTH]; HEIGHT];

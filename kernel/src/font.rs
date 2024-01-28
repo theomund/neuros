@@ -28,13 +28,10 @@ struct Header {
 impl Font {
     pub fn new() -> Font {
         let psf = include_bytes!("resource/ter-i16n.psf");
-        let magic = u16::from_le_bytes([psf[0], psf[1]]);
-        let font_mode = psf[2];
-        let glyph_size = psf[3];
         let header = Header {
-            magic,
-            font_mode,
-            glyph_size,
+            magic: u16::from_le_bytes([psf[0], psf[1]]),
+            font_mode: psf[2],
+            glyph_size: psf[3],
         };
         let data = &psf[4..4100];
         assert_eq!(header.magic, u16::from_le_bytes([0x36, 0x04]));

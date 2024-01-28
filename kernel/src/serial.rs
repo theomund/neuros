@@ -18,15 +18,20 @@ use limine::request::HhdmRequest;
 
 static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
-pub struct Port {
+pub struct Serial {
     address: usize,
 }
 
-impl Port {
-    pub fn new(address: usize) -> Port {
+pub enum Port {
+    COM1 = 0x3F8,
+}
+
+impl Serial {
+    pub fn new(port: Port) -> Serial {
         if let Some(hhdm_response) = HHDM_REQUEST.get_response() {
-            let location = address + hhdm_response.offset() as usize;
-            Port { address: location }
+            Serial {
+                address: port as usize + hhdm_response.offset() as usize,
+            }
         } else {
             panic!("Failed to construct serial port.");
         }
