@@ -16,6 +16,7 @@
 
 use crate::image::Image;
 use crate::logger::LOGGER;
+use crate::serial::SERIAL;
 use crate::vga::{Color, VGA};
 use crate::{debug, info, trace};
 use x86_64::instructions;
@@ -45,6 +46,7 @@ pub fn initialize() {
         Color::Blue,
         Color::Black,
     );
+    SERIAL.write(b'>');
     instructions::interrupts::int3();
     debug!("This is a sample debug message.");
     trace!("This is a sample trace message.");

@@ -14,12 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use limine::request::HhdmRequest;
+use core::arch::asm;
+use spin::Lazy;
 
-static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+pub static SERIAL: Lazy<Serial> = Lazy::new(|| {
+    let serial = Serial::new(Port::COM1);
+    serial.initialize();
+    serial
+});
 
 pub struct Serial {
-    address: usize,
+    address: u16,
 }
 
 pub enum Port {
@@ -28,12 +33,8 @@ pub enum Port {
 
 impl Serial {
     pub fn new(port: Port) -> Serial {
-        if let Some(hhdm_response) = HHDM_REQUEST.get_response() {
-            Serial {
-                address: port as usize + hhdm_response.offset() as usize,
-            }
-        } else {
-            panic!("Failed to construct serial port.");
+        Serial {
+            address: port as u16,
         }
     }
 
@@ -55,15 +56,37 @@ impl Serial {
         self.outb(4, 0x0F);
     }
 
-    fn inb(&self, offset: usize) -> usize {
-        let location = (self.address + offset) as *mut usize;
-        unsafe { *(location) }
+    fn inb(&self, offset: u16) -> u8 {
+        let port = self.address + offset;
+        let value: u8;
+        unsafe {
+            asm!("inb %dx, %al", in("dx") port, out("al") value, options(att_syntax));
+        }
+        value
     }
 
-    fn outb(&self, offset: usize, value: usize) {
-        let location = (self.address + offset) as *mut usize;
+    fn outb(&self, offset: u16, value: u8) {
+        let port = self.address + offset;
         unsafe {
-            *(location) = value;
+            asm!("outb %al, %dx", in("al") value, in("dx") port, options(att_syntax));
         }
+    }
+
+    fn transmit_empty(&self) -> u8 {
+        self.inb(5) & 0x20
+    }
+
+    pub fn write(&self, value: u8) {
+        while self.transmit_empty() == 0 {}
+        self.outb(0, value);
+    }
+
+    fn received(&self) -> u8 {
+        self.inb(5) & 0x1
+    }
+
+    pub fn read(&self) -> u8 {
+        while self.received() == 0 {}
+        self.inb(0)
     }
 }
