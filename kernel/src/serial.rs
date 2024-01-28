@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use limine::HhdmRequest;
+use limine::request::HhdmRequest;
 
-static HHDM_REQUEST: HhdmRequest = HhdmRequest::new(0);
+static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 
 pub struct Port {
     address: usize,
@@ -24,8 +24,8 @@ pub struct Port {
 
 impl Port {
     pub fn new(address: usize) -> Port {
-        if let Some(hhdm_response) = HHDM_REQUEST.get_response().get() {
-            let location = address + hhdm_response.offset as usize;
+        if let Some(hhdm_response) = HHDM_REQUEST.get_response() {
+            let location = address + hhdm_response.offset() as usize;
             Port { address: location }
         } else {
             panic!("Failed to construct serial port.");
@@ -50,12 +50,12 @@ impl Port {
         self.outb(4, 0x0F);
     }
 
-    pub fn inb(&self, offset: usize) -> usize {
+    fn inb(&self, offset: usize) -> usize {
         let location = (self.address + offset) as *mut usize;
         unsafe { *(location) }
     }
 
-    pub fn outb(&self, offset: usize, value: usize) {
+    fn outb(&self, offset: usize, value: usize) {
         let location = (self.address + offset) as *mut usize;
         unsafe {
             *(location) = value;

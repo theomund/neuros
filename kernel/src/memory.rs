@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use limine::StackSizeRequest;
+use limine::request::StackSizeRequest;
 
-static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new(0).stack_size(1048576);
+static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(0x32000);
 
 pub fn initialize() {
     STACK_SIZE_REQUEST.get_response();

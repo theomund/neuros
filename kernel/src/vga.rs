@@ -16,11 +16,11 @@
 
 use crate::font::Font;
 use crate::image::Image;
-use limine::{Framebuffer, NonNullPtr};
+use limine::framebuffer::Framebuffer;
+use limine::request::FramebufferRequest;
 use spin::Lazy;
 
-static BASE_REVISION: limine::BaseRevision = limine::BaseRevision::new(0);
-static FRAMEBUFFER_REQUEST: limine::FramebufferRequest = limine::FramebufferRequest::new(0);
+static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
 pub static VGA: Lazy<Vga> = Lazy::new(|| {
     let font = Font::new();
@@ -39,38 +39,41 @@ pub enum Color {
 }
 
 pub struct Vga {
+    address: *mut u8,
     font: Font,
-    framebuffer: &'static NonNullPtr<Framebuffer>,
+    height: u64,
+    pitch: u64,
+    width: u64,
 }
+
+unsafe impl Send for Vga {}
+unsafe impl Sync for Vga {}
 
 impl Vga {
     pub fn new(font: Font) -> Vga {
-        assert!(BASE_REVISION.is_supported());
-        if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response().get() {
-            if framebuffer_response.framebuffer_count < 1 {
-                panic!("Failed to retrieve framebuffer.");
+        if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response() {
+            let framebuffer: Framebuffer = framebuffer_response.framebuffers().next().unwrap();
+            Vga {
+                address: framebuffer.addr(),
+                font,
+                height: framebuffer.height(),
+                pitch: framebuffer.pitch(),
+                width: framebuffer.width(),
             }
-            let framebuffer = &framebuffer_response.framebuffers()[0];
-            Vga { font, framebuffer }
         } else {
             panic!("Failed to initialize VGA module.");
         }
     }
 
-    pub fn draw_pixel(&self, x: usize, y: usize, color: Color) {
-        let pixel_offset = y * self.framebuffer.pitch as usize + x * 4;
-        let address = self
-            .framebuffer
-            .address
-            .as_ptr()
-            .unwrap()
-            .wrapping_add(pixel_offset) as *mut u32;
+    fn draw_pixel(&self, x: usize, y: usize, color: Color) {
+        let offset = y * self.pitch as usize + x * 4;
+        let pixel = self.address.wrapping_add(offset) as *mut u32;
         unsafe {
-            *(address) = color as u32;
+            *(pixel) = color as u32;
         }
     }
 
-    pub fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
+    fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let position = character as usize * self.font.get_height();
         let glyphs = &self.font.get_data()[position..];
@@ -110,11 +113,11 @@ impl Vga {
     }
 
     pub fn get_width(&self) -> usize {
-        self.framebuffer.width as usize
+        self.width as usize
     }
 
     pub fn get_height(&self) -> usize {
-        self.framebuffer.height as usize
+        self.height as usize
     }
 
     pub fn get_font_width(&self) -> usize {
