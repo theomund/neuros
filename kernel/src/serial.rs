@@ -89,4 +89,10 @@ impl Serial {
         while self.received() == 0 {}
         self.inb(0)
     }
+
+    pub fn print(&self, message: &str) {
+        for byte in message.as_bytes() {
+            self.write(*byte);
+        }
+    }
 }

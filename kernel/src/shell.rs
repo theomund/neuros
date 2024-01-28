@@ -14,43 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#![feature(abi_x86_interrupt)]
-#![no_std]
-#![no_main]
+use crate::serial::SERIAL;
 
-mod font;
-mod gdt;
-mod idt;
-mod image;
-mod intro;
-mod logger;
-mod memory;
-mod serial;
-mod shell;
-mod vga;
-
-use crate::logger::LOGGER;
-use core::panic::PanicInfo;
-use x86_64::instructions;
-
-#[no_mangle]
-extern "C" fn _start() -> ! {
-    idt::initialize();
-    memory::initialize();
-    intro::initialize();
-    shell::initialize();
-    halt();
-}
-
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    error!("The kernel has panicked.");
-    halt();
-}
-
-fn halt() -> ! {
-    instructions::interrupts::disable();
+pub fn initialize() {
+    let title = concat!("NeurOS v", env!("CARGO_PKG_VERSION"), " (x86_64)\n\r");
+    SERIAL.print(title);
+    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"), "\n\n\r");
+    SERIAL.print(copyright);
+    SERIAL.print("> ");
     loop {
-        instructions::hlt();
+        let character = SERIAL.read();
+        match character {
+            b'\r' => SERIAL.print("\n\r> "),
+            _ => SERIAL.write(character),
+        }
     }
 }
