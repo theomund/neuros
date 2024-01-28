@@ -17,11 +17,21 @@
 use crate::serial::SERIAL;
 
 pub fn initialize() {
-    let title = concat!("NeurOS v", env!("CARGO_PKG_VERSION"), " (x86_64)\n\r");
+    let title = concat!(
+        "\x1b[1;91m",
+        "NeurOS v",
+        env!("CARGO_PKG_VERSION"),
+        " (x86_64)\n\r"
+    );
     SERIAL.print(title);
-    let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"), "\n\n\r");
+    let copyright = concat!(
+        "\x1b[1;94m",
+        "Copyright (C) 2024 ",
+        env!("CARGO_PKG_AUTHORS"),
+        "\n\n\r"
+    );
     SERIAL.print(copyright);
-    SERIAL.print("> ");
+    SERIAL.print("\x1b[1;39m> ");
     loop {
         let character = SERIAL.read();
         match character {
