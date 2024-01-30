@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::serial::SERIAL;
+use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 
 const BLUE: &str = "\x1b[38;2;0;151;230m";
@@ -29,14 +30,27 @@ pub fn initialize() -> Result {
     write!(SERIAL.lock(), "{}NeurOS v{} (x86_64)\n\r", RED, version)?;
     write!(SERIAL.lock(), "{}Copyright (C) 2024 {}\n\n\r", BLUE, author)?;
     write!(SERIAL.lock(), "{}> ", DEFAULT)?;
+    let mut buffer: Vec<char> = Vec::new();
     loop {
-        let character = SERIAL.lock().read();
+        let character = SERIAL.lock().read() as char;
         match character {
-            b'\r' => {
+            '\r' => {
+                buffer.clear();
                 write!(SERIAL.lock(), "\n\r{}ERROR: Command not found.\n\r", RED)?;
                 write!(SERIAL.lock(), "{}> ", DEFAULT)?;
             }
-            _ => write!(SERIAL.lock(), "{}", character as char)?,
+            '\x08' => {
+                if !buffer.is_empty() {
+                    buffer.pop();
+                    write!(SERIAL.lock(), "{}", character)?;
+                    write!(SERIAL.lock(), " ")?;
+                    write!(SERIAL.lock(), "{}", character)?;
+                }
+            }
+            _ => {
+                buffer.push(character);
+                write!(SERIAL.lock(), "{}", character)?
+            }
         }
     }
 }
