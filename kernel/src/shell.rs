@@ -32,7 +32,10 @@ pub fn initialize() -> Result {
     loop {
         let character = SERIAL.lock().read();
         match character {
-            b'\r' => write!(SERIAL.lock(), "\n\r> ")?,
+            b'\r' => {
+                write!(SERIAL.lock(), "\n\r{}ERROR: Command not found.\n\r", RED)?;
+                write!(SERIAL.lock(), "{}> ", DEFAULT)?;
+            },
             _ => write!(SERIAL.lock(), "{}", character as char)?,
         }
     }
