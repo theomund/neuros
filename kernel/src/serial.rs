@@ -14,13 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use alloc::string::ToString;
 use core::arch::asm;
-use spin::Lazy;
+use core::fmt;
+use core::fmt::Arguments;
+use spin::{Lazy, Mutex};
 
-pub static SERIAL: Lazy<Serial> = Lazy::new(|| {
+pub static SERIAL: Lazy<Mutex<Serial>> = Lazy::new(|| {
     let serial = Serial::new(Port::COM1);
     serial.initialize();
-    serial
+    Mutex::new(serial)
 });
 
 pub struct Serial {
@@ -29,6 +32,26 @@ pub struct Serial {
 
 pub enum Port {
     COM1 = 0x3F8,
+}
+
+impl fmt::Write for Serial {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        for character in s.chars() {
+            self.write_char(character)?;
+        }
+        Ok(())
+    }
+
+    fn write_char(&mut self, c: char) -> fmt::Result {
+        while self.transmit_empty() == 0 {}
+        self.outb(0, c as u8);
+        Ok(())
+    }
+
+    fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
+        self.write_str(args.to_string().as_str())?;
+        Ok(())
+    }
 }
 
 impl Serial {
@@ -76,11 +99,6 @@ impl Serial {
         self.inb(5) & 0x20
     }
 
-    pub fn write(&self, value: u8) {
-        while self.transmit_empty() == 0 {}
-        self.outb(0, value);
-    }
-
     fn received(&self) -> u8 {
         self.inb(5) & 0x1
     }
@@ -88,11 +106,5 @@ impl Serial {
     pub fn read(&self) -> u8 {
         while self.received() == 0 {}
         self.inb(0)
-    }
-
-    pub fn print(&self, message: &str) {
-        for byte in message.as_bytes() {
-            self.write(*byte);
-        }
     }
 }

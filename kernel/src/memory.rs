@@ -27,7 +27,10 @@ static ALLOCATOR: LockedHeap = LockedHeap::empty();
 pub fn initialize() {
     STACK_SIZE_REQUEST.get_response();
     let entries = MEMMAP_REQUEST.get_response().unwrap().entries();
-    let entry = entries.iter().find(|x| x.entry_type == EntryType::USABLE).unwrap();
+    let entry = entries
+        .iter()
+        .find(|x| x.entry_type == EntryType::USABLE)
+        .unwrap();
     let start = entry.base;
     let size = entry.length as usize;
     unsafe {

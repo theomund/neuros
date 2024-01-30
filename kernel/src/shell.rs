@@ -15,28 +15,25 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::serial::SERIAL;
+use core::fmt::{Result, Write};
 
-pub fn initialize() {
-    let title = concat!(
-        "\x1b[1;91m",
-        "NeurOS v",
-        env!("CARGO_PKG_VERSION"),
-        " (x86_64)\n\r"
-    );
-    SERIAL.print(title);
-    let copyright = concat!(
-        "\x1b[1;94m",
-        "Copyright (C) 2024 ",
-        env!("CARGO_PKG_AUTHORS"),
-        "\n\n\r"
-    );
-    SERIAL.print(copyright);
-    SERIAL.print("\x1b[1;39m> ");
+const BLUE: &str = "\x1b[38;2;0;151;230m";
+const BOLD: &str = "\x1b[1m";
+const DEFAULT: &str = "\x1b[39m";
+const RED: &str = "\x1b[38;2;232;65;24m";
+
+pub fn initialize() -> Result {
+    let version = env!("CARGO_PKG_VERSION");
+    let author = env!("CARGO_PKG_AUTHORS");
+    write!(SERIAL.lock(), "{}", BOLD)?;
+    write!(SERIAL.lock(), "{}NeurOS v{} (x86_64)\n\r", RED, version)?;
+    write!(SERIAL.lock(), "{}Copyright (C) 2024 {}\n\n\r", BLUE, author)?;
+    write!(SERIAL.lock(), "{}> ", DEFAULT)?;
     loop {
-        let character = SERIAL.read();
+        let character = SERIAL.lock().read();
         match character {
-            b'\r' => SERIAL.print("\n\r> "),
-            _ => SERIAL.write(character),
+            b'\r' => write!(SERIAL.lock(), "\n\r> ")?,
+            _ => write!(SERIAL.lock(), "{}", character as char)?,
         }
     }
 }
