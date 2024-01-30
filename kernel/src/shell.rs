@@ -42,9 +42,7 @@ pub fn initialize() -> Result {
             '\x08' => {
                 if !buffer.is_empty() {
                     buffer.pop();
-                    write!(SERIAL.lock(), "{}", character)?;
-                    write!(SERIAL.lock(), " ")?;
-                    write!(SERIAL.lock(), "{}", character)?;
+                    write!(SERIAL.lock(), "{} {}", character, character)?;
                 }
             }
             _ => {
