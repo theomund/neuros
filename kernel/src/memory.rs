@@ -14,10 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use limine::request::StackSizeRequest;
+use limine::memory_map::EntryType;
+use limine::request::{MemoryMapRequest, StackSizeRequest};
+use linked_list_allocator::LockedHeap;
 
 static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(0x32000);
+static MEMMAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
+
+#[global_allocator]
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 pub fn initialize() {
     STACK_SIZE_REQUEST.get_response();
+    let entries = MEMMAP_REQUEST.get_response().unwrap().entries();
+    let entry = entries.iter().find(|x| x.entry_type == EntryType::USABLE);
+    let start = entry.unwrap().base;
+    let size = entry.unwrap().length as usize;
+    unsafe {
+        ALLOCATOR.lock().init(start as *mut u8, size);
+    }
 }
