@@ -24,35 +24,35 @@ pub static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| {
 
 #[macro_export]
 macro_rules! debug {
-    ($message:literal) => {
+    ($message:expr) => {
         LOGGER.lock().debug($message);
     };
 }
 
 #[macro_export]
 macro_rules! error {
-    ($message:literal) => {
+    ($message:expr) => {
         LOGGER.lock().error($message);
     };
 }
 
 #[macro_export]
 macro_rules! info {
-    ($message:literal) => {
+    ($message:expr) => {
         LOGGER.lock().info($message);
     };
 }
 
 #[macro_export]
 macro_rules! trace {
-    ($message:literal) => {
+    ($message:expr) => {
         LOGGER.lock().trace($message);
     };
 }
 
 #[macro_export]
 macro_rules! warn {
-    ($message:literal) => {
+    ($message:expr) => {
         LOGGER.lock().warn($message);
     };
 }

@@ -14,46 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#![feature(abi_x86_interrupt)]
-#![no_std]
-#![no_main]
-
-extern crate alloc;
-
-mod font;
-mod idt;
-mod image;
-mod intro;
-mod logger;
-mod memory;
-mod serial;
-mod shell;
-mod smp;
-mod vga;
-
+use crate::debug;
 use crate::logger::LOGGER;
-use core::panic::PanicInfo;
-use x86_64::instructions;
+use alloc::format;
+use limine::request::SmpRequest;
 
-#[no_mangle]
-extern "C" fn _start() -> ! {
-    idt::initialize();
-    memory::initialize();
-    smp::initialize();
-    intro::initialize();
-    shell::initialize().expect("Failed to initialize shell.");
-    halt();
-}
+static SMP_REQUEST: SmpRequest = SmpRequest::new();
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    error!("The kernel has panicked.");
-    halt();
-}
-
-fn halt() -> ! {
-    instructions::interrupts::disable();
-    loop {
-        instructions::hlt();
-    }
+pub fn initialize() {
+    let count = SMP_REQUEST.get_response().unwrap().cpus().len();
+    let message = format!("Detected that the processor has {} core(s).", count);
+    debug!(message.as_str());
 }

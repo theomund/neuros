@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::debug;
+use crate::logger::LOGGER;
+use alloc::format;
 use limine::memory_map::EntryType;
 use limine::request::{MemoryMapRequest, StackSizeRequest};
 use linked_list_allocator::LockedHeap;
@@ -36,4 +39,9 @@ pub fn initialize() {
     unsafe {
         ALLOCATOR.lock().init(start as *mut u8, size);
     }
+    let message = format!(
+        "Detected usable memory region of size {} bytes at 0x{:x}.",
+        size, start
+    );
+    debug!(message.as_str());
 }

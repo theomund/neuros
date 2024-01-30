@@ -15,10 +15,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::image::Image;
+use crate::info;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
-use crate::{debug, info, trace};
-use x86_64::instructions;
 
 pub fn initialize() {
     let image = Image::new();
@@ -45,8 +44,5 @@ pub fn initialize() {
         Color::Blue,
         Color::Black,
     );
-    instructions::interrupts::int3();
-    debug!("This is a sample debug message.");
-    trace!("This is a sample trace message.");
     info!("The operating system has been successfully initialized.");
 }

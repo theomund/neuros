@@ -35,7 +35,7 @@ pub fn initialize() -> Result {
             b'\r' => {
                 write!(SERIAL.lock(), "\n\r{}ERROR: Command not found.\n\r", RED)?;
                 write!(SERIAL.lock(), "{}> ", DEFAULT)?;
-            },
+            }
             _ => write!(SERIAL.lock(), "{}", character as char)?,
         }
     }
