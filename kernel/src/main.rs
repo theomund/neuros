@@ -21,7 +21,6 @@
 extern crate alloc;
 
 mod font;
-mod gdt;
 mod idt;
 mod image;
 mod intro;
@@ -40,7 +39,7 @@ extern "C" fn _start() -> ! {
     idt::initialize();
     memory::initialize();
     intro::initialize();
-    shell::initialize();
+    shell::initialize().expect("Failed to initialize shell.");
     halt();
 }
 
