@@ -31,7 +31,16 @@ pub fn initialize() -> Result {
     write!(SERIAL.lock(), "{}", BOLD)?;
     writeln!(SERIAL.lock(), "{}NeurOS v{} (x86_64)", RED, version)?;
     writeln!(SERIAL.lock(), "\r{}Copyright (C) 2024 {}", BLUE, author)?;
-    write!(SERIAL.lock(), "\n\r{}> ", DEFAULT)?;
+    writeln!(
+        SERIAL.lock(),
+        "\n\r{}This is an administrative console shell.",
+        DEFAULT
+    )?;
+    writeln!(
+        SERIAL.lock(),
+        "\rTo get started, type the 'help' command (without quotes)."
+    )?;
+    write!(SERIAL.lock(), "\n\r> ")?;
     let mut buffer: Vec<char> = Vec::new();
     loop {
         let character = SERIAL.lock().read() as char;
