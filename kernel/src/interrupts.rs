@@ -24,9 +24,15 @@ use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 const PIC_1_OFFSET: u8 = 32;
 const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
+#[repr(u8)]
+enum InterruptIndex {
+    Timer = PIC_1_OFFSET,
+}
+
 static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     let mut idt = InterruptDescriptorTable::new();
     idt.breakpoint.set_handler_fn(breakpoint_handler);
+    idt[InterruptIndex::Timer as usize].set_handler_fn(timer_handler);
     idt
 });
 
@@ -43,4 +49,11 @@ pub fn initialize() {
 
 extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
     warn!("Breakpoint exception was thrown.");
+}
+
+extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
+    unsafe {
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Timer as u8);
+    }
 }
