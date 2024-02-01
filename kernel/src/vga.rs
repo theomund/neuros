@@ -16,14 +16,18 @@
 
 use crate::font::Font;
 use crate::image::Image;
+use alloc::string::ToString;
+use core::fmt;
+use core::fmt::Arguments;
 use limine::request::FramebufferRequest;
-use spin::Lazy;
+use spin::{Lazy, Mutex};
 
 static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
-pub static VGA: Lazy<Vga> = Lazy::new(|| {
+pub static VGA: Lazy<Mutex<Vga>> = Lazy::new(|| {
     let font = Font::new();
-    Vga::new(font)
+    let vga = Vga::new(font);
+    Mutex::new(vga)
 });
 
 #[derive(Clone, Copy)]
@@ -37,8 +41,16 @@ pub enum Color {
     Yellow = 0xFBC531,
 }
 
+struct Cursor {
+    x: usize,
+    y: usize,
+    fg: Color,
+    bg: Color,
+}
+
 pub struct Vga {
     address: *mut u8,
+    cursor: Cursor,
     font: Font,
     height: u64,
     pitch: u64,
@@ -48,12 +60,59 @@ pub struct Vga {
 unsafe impl Send for Vga {}
 unsafe impl Sync for Vga {}
 
+impl fmt::Write for Vga {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+        let fg = self.cursor.fg;
+        let bg = self.cursor.bg;
+
+        for (position, character) in s.chars().enumerate() {
+            self.set_cursor(x + self.font.get_width() * position, y, fg, bg);
+            self.write_char(character)?;
+        }
+
+        Ok(())
+    }
+
+    fn write_char(&mut self, c: char) -> fmt::Result {
+        let masks = [128, 64, 32, 16, 8, 4, 2, 1];
+        let position = c as usize * self.font.get_height();
+        let glyphs = &self.font.get_data()[position..];
+
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+        let fg = self.cursor.fg;
+        let bg = self.cursor.bg;
+
+        for (cy, glyph) in glyphs.iter().enumerate().take(self.font.get_height()) {
+            for (cx, mask) in masks.iter().enumerate().take(self.font.get_width()) {
+                let color = if glyph & mask == 0 { bg } else { fg };
+                self.draw_pixel(x + cx, y + cy - 12, color);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
+        self.write_str(args.to_string().as_str())?;
+        Ok(())
+    }
+}
+
 impl Vga {
     pub fn new(font: Font) -> Vga {
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response() {
             let framebuffer = framebuffer_response.framebuffers().next().unwrap();
             Vga {
                 address: framebuffer.addr(),
+                cursor: Cursor {
+                    x: 0,
+                    y: 0,
+                    fg: Color::White,
+                    bg: Color::Black,
+                },
                 font,
                 height: framebuffer.height(),
                 pitch: framebuffer.pitch(),
@@ -64,6 +123,10 @@ impl Vga {
         }
     }
 
+    pub fn set_cursor(&mut self, x: usize, y: usize, fg: Color, bg: Color) {
+        self.cursor = Cursor { x, y, fg, bg }
+    }
+
     fn draw_pixel(&self, x: usize, y: usize, color: Color) {
         let offset = y * self.pitch as usize + x * 4;
         let pixel = self.address.wrapping_add(offset) as *mut u32;
@@ -72,39 +135,21 @@ impl Vga {
         }
     }
 
-    fn draw_character(&self, character: char, x: usize, y: usize, fg: Color, bg: Color) {
-        let masks = [128, 64, 32, 16, 8, 4, 2, 1];
-        let position = character as usize * self.font.get_height();
-        let glyphs = &self.font.get_data()[position..];
-
-        for (cy, glyph) in glyphs.iter().enumerate().take(self.font.get_height()) {
-            for (cx, mask) in masks.iter().enumerate().take(self.font.get_width()) {
-                let color = if glyph & mask == 0 { bg } else { fg };
-                self.draw_pixel(x + cx, y + cy - 12, color);
-            }
-        }
-    }
-
-    pub fn write(&self, message: &str, x: usize, y: usize, fg: Color, bg: Color) {
-        for (position, character) in message.chars().enumerate() {
-            self.draw_character(character, x + self.font.get_width() * position, y, fg, bg);
-        }
-    }
-
-    pub fn draw_image(&self, image: Image, x: usize, y: usize) {
+    pub fn draw_image(&self, image: Image) {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let height = image.get_height();
         let byte_width = image.get_byte_width();
         let data = image.get_data();
 
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+        let fg = self.cursor.fg;
+        let bg = self.cursor.bg;
+
         for (iy, row) in data.iter().enumerate().take(height) {
             for (ix, column) in row.iter().enumerate().take(byte_width) {
                 for (mx, mask) in masks.iter().enumerate() {
-                    let color = if column & mask == 0 {
-                        Color::White
-                    } else {
-                        Color::Black
-                    };
+                    let color = if column & mask == 0 { fg } else { bg };
                     self.draw_pixel(x + (ix * masks.len()) + mx, y + iy, color);
                 }
             }

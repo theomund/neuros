@@ -15,6 +15,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::vga::{Color, VGA};
+use core::fmt;
+use core::fmt::Write;
 use spin::{Lazy, Mutex};
 
 pub static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| {
@@ -67,40 +69,54 @@ impl Logger {
     }
 
     pub fn debug(&mut self, message: &str) {
-        self.log("[DEBUG] ", message, Color::Green);
+        self.log("[DEBUG] ", message, Color::Green)
+            .expect("Failed to log debug message.");
     }
 
     pub fn error(&mut self, message: &str) {
-        self.log("[ERROR] ", message, Color::Red);
+        self.log("[ERROR] ", message, Color::Red)
+            .expect("Failed to log error message.");
     }
 
     pub fn info(&mut self, message: &str) {
-        self.log("[INFO] ", message, Color::Blue);
+        self.log("[INFO] ", message, Color::Blue)
+            .expect("Failed to log info message.");
     }
 
     pub fn trace(&mut self, message: &str) {
-        self.log("[TRACE] ", message, Color::Purple);
+        self.log("[TRACE] ", message, Color::Purple)
+            .expect("Failed to log trace message.");
     }
 
     pub fn warn(&mut self, message: &str) {
-        self.log("[WARN] ", message, Color::Yellow);
+        self.log("[WARN] ", message, Color::Yellow)
+            .expect("Failed to log warning message.");
     }
 
-    fn log(&mut self, label: &str, message: &str, label_color: Color) {
-        VGA.write(
-            label,
-            VGA.get_width() / 3,
-            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 3,
+    fn log(&mut self, label: &str, message: &str, label_color: Color) -> fmt::Result {
+        let width = VGA.lock().get_width();
+        let height = VGA.lock().get_height();
+        let font_width = VGA.lock().get_font_width();
+        let font_height = VGA.lock().get_font_height();
+
+        VGA.lock().set_cursor(
+            width / 3,
+            font_height * self.line_number + height - height / 3,
             label_color,
             Color::Black,
         );
-        VGA.write(
-            message,
-            VGA.get_width() / 3 + label.len() * VGA.get_font_width(),
-            VGA.get_font_height() * self.line_number + VGA.get_height() - VGA.get_height() / 3,
+        write!(VGA.lock(), "{}", label)?;
+
+        VGA.lock().set_cursor(
+            width / 3 + label.len() * font_width,
+            font_height * self.line_number + height - height / 3,
             Color::White,
             Color::Black,
         );
+        write!(VGA.lock(), "{}", message)?;
+
         self.line_number += 1;
+
+        Ok(())
     }
 }

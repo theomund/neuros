@@ -18,31 +18,37 @@ use crate::image::Image;
 use crate::info;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
+use core::fmt::{Result, Write};
 
-pub fn initialize() {
+pub fn initialize() -> Result {
     let image = Image::new();
-    VGA.draw_image(image, VGA.get_width() / 10, VGA.get_height() / 4);
-    let version = concat!(
-        "Version ",
+    let width = VGA.lock().get_width();
+    let height = VGA.lock().get_height();
+    let font_width = VGA.lock().get_font_width();
+
+    VGA.lock()
+        .set_cursor(width / 10, height / 4, Color::White, Color::Black);
+    VGA.lock().draw_image(image);
+
+    VGA.lock()
+        .set_cursor(font_width, height - font_width, Color::Red, Color::Black);
+    write!(
+        VGA.lock(),
+        "Version {} ({})",
         env!("CARGO_PKG_VERSION"),
-        " (",
-        env!("COMMIT_HASH"),
-        ")"
-    );
-    VGA.write(
-        version,
-        VGA.get_font_width(),
-        VGA.get_height() - VGA.get_font_width(),
-        Color::Red,
-        Color::Black,
-    );
+        env!("COMMIT_HASH")
+    )?;
+
     let copyright = concat!("Copyright (C) 2024 ", env!("CARGO_PKG_AUTHORS"));
-    VGA.write(
-        copyright,
-        VGA.get_width() - (copyright.len() * VGA.get_font_width() + VGA.get_font_width()),
-        VGA.get_height() - VGA.get_font_width(),
+    VGA.lock().set_cursor(
+        width - (copyright.len() * font_width + font_width),
+        height - font_width,
         Color::Blue,
         Color::Black,
     );
+    write!(VGA.lock(), "{}", copyright)?;
+
     info!("The operating system has been successfully initialized.");
+
+    Ok(())
 }

@@ -40,7 +40,7 @@ extern "C" fn _start() -> ! {
     idt::initialize();
     memory::initialize();
     smp::initialize();
-    intro::initialize();
+    intro::initialize().expect("Failed to initialize intro.");
     shell::initialize().expect("Failed to initialize shell.");
     halt();
 }
