@@ -44,6 +44,7 @@ extern "C" fn _start() -> ! {
     intro::initialize().expect("Failed to initialize intro.");
     let mut shell = Shell::new();
     shell.display().expect("Failed to display shell.");
+    info!("The operating system has been successfully initialized.");
     shell.interpret().expect("Failed to interpret shell input.");
     halt();
 }

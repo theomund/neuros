@@ -21,12 +21,14 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 
-const BLUE: &str = "\x1b[38;2;0;151;230m";
-const BOLD: &str = "\x1b[1m";
-const DEFAULT: &str = "\x1b[39m";
-const GREEN: &str = "\x1b[38;2;68;189;50m";
-const NORMAL: &str = "\x1b[0m";
-const RED: &str = "\x1b[38;2;232;65;24m";
+pub const BLUE: &str = "\x1b[38;2;0;151;230m";
+pub const BOLD: &str = "\x1b[1m";
+pub const DEFAULT: &str = "\x1b[39m";
+pub const GREEN: &str = "\x1b[38;2;68;189;50m";
+pub const NORMAL: &str = "\x1b[0m";
+pub const PURPLE: &str = "\x1b[38;2;140;122;230m";
+pub const RED: &str = "\x1b[38;2;232;65;24m";
+pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 
 pub struct Shell {
     buffer: Vec<char>,
@@ -105,7 +107,7 @@ impl Shell {
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
-                                writeln!(serial, "\r{:?}", log)?;
+                                writeln!(serial, "\r{}", log)?;
                             }
                         }
                         "pwd" => {

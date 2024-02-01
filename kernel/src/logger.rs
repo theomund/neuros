@@ -14,8 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::shell::{BLUE, DEFAULT, GREEN, PURPLE, RED, YELLOW};
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::fmt::{Display, Formatter, Result};
 use spin::{Lazy, Mutex};
 
 pub static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| {
@@ -58,7 +61,6 @@ macro_rules! warn {
     };
 }
 
-#[derive(Debug)]
 enum Level {
     Error,
     Warn,
@@ -67,10 +69,23 @@ enum Level {
     Trace,
 }
 
-#[derive(Debug)]
 pub struct Log {
     level: Level,
     message: String,
+}
+
+impl Display for Log {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        let label = match self.level {
+            Level::Debug => format!("{}[DEBUG]{}", GREEN, DEFAULT),
+            Level::Error => format!("{}[ERROR]{}", RED, DEFAULT),
+            Level::Info => format!("{}[INFO]{}", BLUE, DEFAULT),
+            Level::Trace => format!("{}[TRACE]{}", PURPLE, DEFAULT),
+            Level::Warn => format!("{}[WARN]{}", YELLOW, DEFAULT),
+        };
+        write!(f, "{} {}", label, self.message)?;
+        Ok(())
+    }
 }
 
 pub struct Logger {
