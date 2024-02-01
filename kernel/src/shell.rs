@@ -102,7 +102,7 @@ impl Shell {
                             writeln!(serial, "\r\tlogs -- Retrieve the system logs.")?;
                             writeln!(
                                 serial,
-                                "\r\tpwd -- Print name of current working directory."
+                                "\r\tpwd  -- Print the name of the current working directory."
                             )?;
                         }
                         "logs" => {
