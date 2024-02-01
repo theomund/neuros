@@ -17,8 +17,7 @@
 use crate::font::Font;
 use crate::image::Image;
 use alloc::string::ToString;
-use core::fmt;
-use core::fmt::Arguments;
+use core::fmt::{Arguments, Result, Write};
 use limine::request::FramebufferRequest;
 use spin::{Lazy, Mutex};
 
@@ -60,8 +59,8 @@ pub struct Vga {
 unsafe impl Send for Vga {}
 unsafe impl Sync for Vga {}
 
-impl fmt::Write for Vga {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+impl Write for Vga {
+    fn write_str(&mut self, s: &str) -> Result {
         let x = self.cursor.x;
         let y = self.cursor.y;
         let fg = self.cursor.fg;
@@ -75,7 +74,7 @@ impl fmt::Write for Vga {
         Ok(())
     }
 
-    fn write_char(&mut self, c: char) -> fmt::Result {
+    fn write_char(&mut self, c: char) -> Result {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let position = c as usize * self.font.get_height();
         let glyphs = &self.font.get_data()[position..];
@@ -95,7 +94,7 @@ impl fmt::Write for Vga {
         Ok(())
     }
 
-    fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
+    fn write_fmt(&mut self, args: Arguments<'_>) -> Result {
         self.write_str(args.to_string().as_str())?;
         Ok(())
     }

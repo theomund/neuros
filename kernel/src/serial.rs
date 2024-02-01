@@ -16,8 +16,7 @@
 
 use alloc::string::ToString;
 use core::arch::asm;
-use core::fmt;
-use core::fmt::Arguments;
+use core::fmt::{Arguments, Result, Write};
 use spin::{Lazy, Mutex};
 
 pub static SERIAL: Lazy<Mutex<Serial>> = Lazy::new(|| {
@@ -34,21 +33,21 @@ pub enum Port {
     COM1 = 0x3F8,
 }
 
-impl fmt::Write for Serial {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+impl Write for Serial {
+    fn write_str(&mut self, s: &str) -> Result {
         for character in s.chars() {
             self.write_char(character)?;
         }
         Ok(())
     }
 
-    fn write_char(&mut self, c: char) -> fmt::Result {
+    fn write_char(&mut self, c: char) -> Result {
         while self.transmit_empty() == 0 {}
         self.outb(0, c as u8);
         Ok(())
     }
 
-    fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
+    fn write_fmt(&mut self, args: Arguments<'_>) -> Result {
         self.write_str(args.to_string().as_str())?;
         Ok(())
     }
