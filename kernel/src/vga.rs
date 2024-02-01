@@ -122,15 +122,11 @@ impl Vga {
         }
     }
 
-    pub fn set_cursor(&mut self, x: usize, y: usize, fg: Color, bg: Color) {
-        self.cursor = Cursor { x, y, fg, bg }
-    }
-
-    fn draw_pixel(&self, x: usize, y: usize, color: Color) {
-        let offset = y * self.pitch as usize + x * 4;
-        let pixel = self.address.wrapping_add(offset) as *mut u32;
-        unsafe {
-            *(pixel) = color as u32;
+    pub fn clear(&self) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                self.draw_pixel(x as usize, y as usize, Color::Black);
+            }
         }
     }
 
@@ -155,6 +151,14 @@ impl Vga {
         }
     }
 
+    fn draw_pixel(&self, x: usize, y: usize, color: Color) {
+        let offset = y * self.pitch as usize + x * 4;
+        let pixel = self.address.wrapping_add(offset) as *mut u32;
+        unsafe {
+            *(pixel) = color as u32;
+        }
+    }
+
     pub fn get_width(&self) -> usize {
         self.width as usize
     }
@@ -169,5 +173,9 @@ impl Vga {
 
     pub fn get_font_height(&self) -> usize {
         self.font.get_height()
+    }
+
+    pub fn set_cursor(&mut self, x: usize, y: usize, fg: Color, bg: Color) {
+        self.cursor = Cursor { x, y, fg, bg }
     }
 }
