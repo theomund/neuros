@@ -18,9 +18,10 @@ use crate::image::Image;
 use crate::info;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
-use core::fmt::{Result, Write};
+use core::fmt;
+use core::fmt::Write;
 
-pub fn initialize() -> Result {
+pub fn initialize() -> fmt::Result {
     let image = Image::new();
     let width = VGA.lock().get_width();
     let height = VGA.lock().get_height();
