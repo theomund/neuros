@@ -32,6 +32,7 @@ mod smp;
 mod vga;
 
 use crate::logger::LOGGER;
+use crate::shell::Shell;
 use core::panic::PanicInfo;
 use x86_64::instructions;
 
@@ -41,7 +42,9 @@ extern "C" fn _start() -> ! {
     memory::initialize();
     smp::initialize();
     intro::initialize().expect("Failed to initialize intro.");
-    shell::initialize().expect("Failed to initialize shell.");
+    let mut shell = Shell::new();
+    shell.display().expect("Failed to display shell.");
+    shell.interpret().expect("Failed to interpret shell input.");
     halt();
 }
 

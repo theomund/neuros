@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::info;
 use crate::logger::LOGGER;
 use crate::serial::SERIAL;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
@@ -24,68 +24,110 @@ use core::fmt::{Result, Write};
 const BLUE: &str = "\x1b[38;2;0;151;230m";
 const BOLD: &str = "\x1b[1m";
 const DEFAULT: &str = "\x1b[39m";
+const GREEN: &str = "\x1b[38;2;68;189;50m";
 const NORMAL: &str = "\x1b[0m";
 const RED: &str = "\x1b[38;2;232;65;24m";
 
-pub fn initialize() -> Result {
-    let version = env!("CARGO_PKG_VERSION");
-    let author = env!("CARGO_PKG_AUTHORS");
-    let mut serial = SERIAL.lock();
-    write!(serial, "{}", BOLD)?;
-    writeln!(serial, "{}NeurOS v{} (x86_64)", RED, version)?;
-    writeln!(serial, "\r{}Copyright (C) 2024 {}", BLUE, author)?;
-    writeln!(
-        serial,
-        "\n\r{}This is an administrative console shell.",
-        DEFAULT
-    )?;
-    writeln!(
-        serial,
-        "\rTo get started, type the 'help' command (without quotes)."
-    )?;
-    write!(serial, "\n\r> ")?;
-    let mut buffer: Vec<char> = Vec::new();
-    info!("The operating system has been successfully initialized.");
-    loop {
-        let character = serial.read() as char;
-        match character {
-            '\r' => {
-                let line: String = buffer.iter().collect();
-                let input = line.split_once(char::is_whitespace);
-                let command = match input {
-                    Some(pair) => pair.0,
-                    None => line.as_str(),
-                };
-                writeln!(serial, "{}", NORMAL)?;
-                match command {
-                    "echo" => {
-                        let argument = match input {
-                            Some(pair) => pair.1,
-                            None => "",
-                        };
-                        writeln!(serial, "\r{}", argument)?;
+pub struct Shell {
+    buffer: Vec<char>,
+    prompt: String,
+}
+
+impl Shell {
+    pub fn new() -> Shell {
+        Shell {
+            buffer: Vec::new(),
+            prompt: format!(
+                "\r{}[{}root@localhost {}/{}]# ",
+                DEFAULT, GREEN, BLUE, DEFAULT
+            ),
+        }
+    }
+
+    pub fn display(&self) -> Result {
+        let mut serial = SERIAL.lock();
+        write!(serial, "{}", BOLD)?;
+        writeln!(
+            serial,
+            "{}NeurOS v{} (x86_64)",
+            RED,
+            env!("CARGO_PKG_VERSION")
+        )?;
+        writeln!(
+            serial,
+            "\r{}Copyright (C) 2024 {}",
+            BLUE,
+            env!("CARGO_PKG_AUTHORS")
+        )?;
+        writeln!(
+            serial,
+            "\n\r{}This is an administrative console shell.",
+            DEFAULT
+        )?;
+        writeln!(
+            serial,
+            "\rTo get started, type the 'help' command (without quotes)."
+        )?;
+        Ok(())
+    }
+
+    pub fn interpret(&mut self) -> Result {
+        let mut serial = SERIAL.lock();
+        write!(serial, "\n{}", self.prompt)?;
+        loop {
+            let character = serial.read() as char;
+            match character {
+                '\r' => {
+                    let line: String = self.buffer.iter().collect();
+                    let input = line.split_once(char::is_whitespace);
+                    let command = match input {
+                        Some(pair) => pair.0,
+                        None => line.as_str(),
+                    };
+                    writeln!(serial, "{}", NORMAL)?;
+                    match command {
+                        "echo" => {
+                            let argument = match input {
+                                Some(pair) => pair.1,
+                                None => "",
+                            };
+                            writeln!(serial, "\r{}", argument)?;
+                        }
+                        "help" => {
+                            writeln!(serial, "\rAvailable commands:")?;
+                            writeln!(serial, "\r\techo -- Display a line of text.")?;
+                            writeln!(serial, "\r\thelp -- Print a list of commands.")?;
+                            writeln!(serial, "\r\tlogs -- Retrieve the system logs.")?;
+                            writeln!(
+                                serial,
+                                "\r\tpwd -- Print name of current working directory."
+                            )?;
+                        }
+                        "logs" => {
+                            for log in LOGGER.lock().get_logs() {
+                                writeln!(serial, "\r{:?}", log)?;
+                            }
+                        }
+                        "pwd" => {
+                            writeln!(serial, "\r/")?;
+                        }
+                        _ => {
+                            writeln!(serial, "\r{}ERROR: Command not found.", RED)?;
+                        }
                     }
-                    "help" => {
-                        writeln!(serial, "\rAvailable commands:")?;
-                        writeln!(serial, "\r\techo -- Display a line of text.")?;
-                        writeln!(serial, "\r\thelp -- Print a list of commands.")?;
-                    }
-                    _ => {
-                        writeln!(serial, "\r{}ERROR: Command not found.", RED)?;
+                    write!(serial, "{}{}", BOLD, self.prompt)?;
+                    self.buffer.clear();
+                }
+                '\x08' => {
+                    if !self.buffer.is_empty() {
+                        self.buffer.pop();
+                        write!(serial, "{} {}", character, character)?;
                     }
                 }
-                write!(serial, "\r{}{}> ", BOLD, DEFAULT)?;
-                buffer.clear();
-            }
-            '\x08' => {
-                if !buffer.is_empty() {
-                    buffer.pop();
-                    write!(serial, "{} {}", character, character)?;
+                _ => {
+                    self.buffer.push(character);
+                    write!(serial, "{}", character)?
                 }
-            }
-            _ => {
-                buffer.push(character);
-                write!(serial, "{}", character)?
             }
         }
     }
