@@ -21,12 +21,18 @@ use core::fmt::Write;
 
 pub fn initialize() -> fmt::Result {
     let image = Image::new();
+    let image_width = image.get_width();
     let mut vga = VGA.lock();
     let width = vga.get_width();
     let height = vga.get_height();
     let font_width = vga.get_font_width();
 
-    vga.set_cursor(width / 10, height / 4, Color::White, Color::Black);
+    vga.set_cursor(
+        (width / 2) - (image_width / 2),
+        height / 4,
+        Color::White,
+        Color::Black,
+    );
     vga.draw_image(image);
 
     vga.set_cursor(font_width, height - font_width, Color::Red, Color::Black);
@@ -45,6 +51,15 @@ pub fn initialize() -> fmt::Result {
         Color::Black,
     );
     write!(vga, "{}", copyright)?;
+
+    let instruction = "Press ENTER to continue.";
+    vga.set_cursor(
+        (width / 2) - (instruction.len() * font_width / 2),
+        height - (height / 4),
+        Color::White,
+        Color::Black,
+    );
+    write!(vga, "Press ENTER to continue.")?;
 
     Ok(())
 }
