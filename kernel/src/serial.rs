@@ -15,12 +15,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use alloc::string::ToString;
-use core::arch::asm;
 use core::fmt::{Arguments, Result, Write};
 use spin::{Lazy, Mutex};
+use x86_64::instructions::port::Port;
 
 pub static SERIAL: Lazy<Mutex<Serial>> = Lazy::new(|| {
-    let serial = Serial::new(Port::COM1);
+    let serial = Serial::new(Ports::COM1);
     serial.initialize();
     Mutex::new(serial)
 });
@@ -29,7 +29,7 @@ pub struct Serial {
     address: u16,
 }
 
-pub enum Port {
+pub enum Ports {
     COM1 = 0x3F8,
 }
 
@@ -54,7 +54,7 @@ impl Write for Serial {
 }
 
 impl Serial {
-    pub fn new(port: Port) -> Serial {
+    pub fn new(port: Ports) -> Serial {
         Serial {
             address: port as u16,
         }
@@ -79,18 +79,14 @@ impl Serial {
     }
 
     fn inb(&self, offset: u16) -> u8 {
-        let port = self.address + offset;
-        let value: u8;
-        unsafe {
-            asm!("inb %dx, %al", in("dx") port, out("al") value, options(att_syntax));
-        }
-        value
+        let mut port: Port<u8> = Port::new(self.address + offset);
+        unsafe { port.read() }
     }
 
     fn outb(&self, offset: u16, value: u8) {
-        let port = self.address + offset;
+        let mut port: Port<u8> = Port::new(self.address + offset);
         unsafe {
-            asm!("outb %al, %dx", in("al") value, in("dx") port, options(att_syntax));
+            port.write(value);
         }
     }
 
