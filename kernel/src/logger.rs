@@ -94,26 +94,27 @@ impl Logger {
     }
 
     fn log(&mut self, label: &str, message: &str, label_color: Color) -> fmt::Result {
-        let width = VGA.lock().get_width();
-        let height = VGA.lock().get_height();
-        let font_width = VGA.lock().get_font_width();
-        let font_height = VGA.lock().get_font_height();
+        let mut vga = VGA.lock();
+        let width = vga.get_width();
+        let height = vga.get_height();
+        let font_width = vga.get_font_width();
+        let font_height = vga.get_font_height();
 
-        VGA.lock().set_cursor(
+        vga.set_cursor(
             width / 3,
             font_height * self.line_number + height - height / 3,
             label_color,
             Color::Black,
         );
-        write!(VGA.lock(), "{}", label)?;
+        write!(vga, "{}", label)?;
 
-        VGA.lock().set_cursor(
+        vga.set_cursor(
             width / 3 + label.len() * font_width,
             font_height * self.line_number + height - height / 3,
             Color::White,
             Color::Black,
         );
-        write!(VGA.lock(), "{}", message)?;
+        write!(vga, "{}", message)?;
 
         self.line_number += 1;
 

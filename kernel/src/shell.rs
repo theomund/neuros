@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::info;
+use crate::logger::LOGGER;
 use crate::serial::SERIAL;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -28,22 +30,24 @@ const RED: &str = "\x1b[38;2;232;65;24m";
 pub fn initialize() -> Result {
     let version = env!("CARGO_PKG_VERSION");
     let author = env!("CARGO_PKG_AUTHORS");
-    write!(SERIAL.lock(), "{}", BOLD)?;
-    writeln!(SERIAL.lock(), "{}NeurOS v{} (x86_64)", RED, version)?;
-    writeln!(SERIAL.lock(), "\r{}Copyright (C) 2024 {}", BLUE, author)?;
+    let mut serial = SERIAL.lock();
+    write!(serial, "{}", BOLD)?;
+    writeln!(serial, "{}NeurOS v{} (x86_64)", RED, version)?;
+    writeln!(serial, "\r{}Copyright (C) 2024 {}", BLUE, author)?;
     writeln!(
-        SERIAL.lock(),
+        serial,
         "\n\r{}This is an administrative console shell.",
         DEFAULT
     )?;
     writeln!(
-        SERIAL.lock(),
+        serial,
         "\rTo get started, type the 'help' command (without quotes)."
     )?;
-    write!(SERIAL.lock(), "\n\r> ")?;
+    write!(serial, "\n\r> ")?;
     let mut buffer: Vec<char> = Vec::new();
+    info!("The operating system has been successfully initialized.");
     loop {
-        let character = SERIAL.lock().read() as char;
+        let character = serial.read() as char;
         match character {
             '\r' => {
                 let line: String = buffer.iter().collect();
@@ -52,36 +56,36 @@ pub fn initialize() -> Result {
                     Some(pair) => pair.0,
                     None => line.as_str(),
                 };
-                writeln!(SERIAL.lock(), "{}", NORMAL)?;
+                writeln!(serial, "{}", NORMAL)?;
                 match command {
                     "echo" => {
                         let argument = match input {
                             Some(pair) => pair.1,
                             None => "",
                         };
-                        writeln!(SERIAL.lock(), "\r{}", argument)?;
+                        writeln!(serial, "\r{}", argument)?;
                     }
                     "help" => {
-                        writeln!(SERIAL.lock(), "\rAvailable commands:")?;
-                        writeln!(SERIAL.lock(), "\r\techo -- Display a line of text.")?;
-                        writeln!(SERIAL.lock(), "\r\thelp -- Print a list of commands.")?;
+                        writeln!(serial, "\rAvailable commands:")?;
+                        writeln!(serial, "\r\techo -- Display a line of text.")?;
+                        writeln!(serial, "\r\thelp -- Print a list of commands.")?;
                     }
                     _ => {
-                        writeln!(SERIAL.lock(), "\r{}ERROR: Command not found.", RED)?;
+                        writeln!(serial, "\r{}ERROR: Command not found.", RED)?;
                     }
                 }
-                write!(SERIAL.lock(), "\r{}{}> ", BOLD, DEFAULT)?;
+                write!(serial, "\r{}{}> ", BOLD, DEFAULT)?;
                 buffer.clear();
             }
             '\x08' => {
                 if !buffer.is_empty() {
                     buffer.pop();
-                    write!(SERIAL.lock(), "{} {}", character, character)?;
+                    write!(serial, "{} {}", character, character)?;
                 }
             }
             _ => {
                 buffer.push(character);
-                write!(SERIAL.lock(), "{}", character)?
+                write!(serial, "{}", character)?
             }
         }
     }
