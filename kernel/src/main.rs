@@ -21,8 +21,8 @@
 extern crate alloc;
 
 mod font;
-mod idt;
 mod image;
+mod interrupts;
 mod intro;
 mod logger;
 mod memory;
@@ -38,7 +38,7 @@ use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    idt::initialize();
+    interrupts::initialize();
     memory::initialize();
     smp::initialize();
     intro::initialize().expect("Failed to initialize intro.");
