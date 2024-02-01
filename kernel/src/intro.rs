@@ -59,7 +59,7 @@ pub fn initialize() -> fmt::Result {
         Color::White,
         Color::Black,
     );
-    write!(vga, "Press ENTER to continue.")?;
+    write!(vga, "{}", instruction)?;
 
     Ok(())
 }
