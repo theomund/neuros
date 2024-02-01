@@ -58,6 +58,7 @@ macro_rules! warn {
     };
 }
 
+#[derive(Debug)]
 enum Level {
     Error,
     Warn,
@@ -66,7 +67,8 @@ enum Level {
     Trace,
 }
 
-struct Log {
+#[derive(Debug)]
+pub struct Log {
     level: Level,
     message: String,
 }
@@ -118,5 +120,9 @@ impl Logger {
             message: message.to_string(),
         };
         self.logs.push(log);
+    }
+
+    pub fn get_logs(&self) -> &Vec<Log> {
+        &self.logs
     }
 }
