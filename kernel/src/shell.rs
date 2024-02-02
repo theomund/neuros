@@ -16,6 +16,7 @@
 
 use crate::logger::LOGGER;
 use crate::serial::SERIAL;
+use crate::timer::TIMER;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -100,6 +101,7 @@ impl Shell {
                             writeln!(serial, "\r\techo -- Display a line of text.")?;
                             writeln!(serial, "\r\thelp -- Print a list of commands.")?;
                             writeln!(serial, "\r\tlogs -- Retrieve the system logs.")?;
+                            writeln!(serial, "\r\ttime -- Display the elapsed time.")?;
                             writeln!(
                                 serial,
                                 "\r\tpwd  -- Print the name of the current working directory."
@@ -112,6 +114,9 @@ impl Shell {
                         }
                         "pwd" => {
                             writeln!(serial, "\r/")?;
+                        }
+                        "time" => {
+                            writeln!(serial, "\r{}", TIMER.lock().get_elapsed())?;
                         }
                         _ => {
                             writeln!(serial, "\r{}ERROR: Command not found.", RED)?;
