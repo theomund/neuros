@@ -29,6 +29,7 @@ mod memory;
 mod serial;
 mod shell;
 mod smp;
+mod timer;
 mod vga;
 
 use crate::logger::LOGGER;
@@ -38,8 +39,8 @@ use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    interrupts::initialize();
     memory::initialize();
+    interrupts::initialize();
     smp::initialize();
     intro::initialize().expect("Failed to initialize intro.");
     let mut shell = Shell::new();

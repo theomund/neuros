@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::logger::LOGGER;
+use crate::timer::TIMER;
 use crate::warn;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
@@ -43,6 +44,7 @@ pub fn initialize() {
     IDT.load();
     unsafe {
         PICS.lock().initialize();
+        PICS.lock().write_masks(0b11111110, 0b11111111);
     }
     instructions::interrupts::enable();
 }
@@ -52,6 +54,9 @@ extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
+    let mut timer = TIMER.lock();
+    let elapsed = timer.get_elapsed();
+    timer.set_elapsed(elapsed + 1);
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer as u8);
