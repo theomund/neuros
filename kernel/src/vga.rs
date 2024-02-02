@@ -43,8 +43,8 @@ pub enum Color {
 struct Cursor {
     x: usize,
     y: usize,
-    fg: Color,
-    bg: Color,
+    fg: u32,
+    bg: u32,
 }
 
 pub struct Vga {
@@ -109,8 +109,8 @@ impl Vga {
                 cursor: Cursor {
                     x: 0,
                     y: 0,
-                    fg: Color::White,
-                    bg: Color::Black,
+                    fg: Color::White as u32,
+                    bg: Color::Black as u32,
                 },
                 font,
                 height: framebuffer.height(),
@@ -125,7 +125,7 @@ impl Vga {
     pub fn clear(&self) {
         for y in 0..self.height {
             for x in 0..self.width {
-                self.draw_pixel(x as usize, y as usize, Color::Black);
+                self.draw_pixel(x as usize, y as usize, Color::Black as u32);
             }
         }
     }
@@ -151,11 +151,11 @@ impl Vga {
         }
     }
 
-    fn draw_pixel(&self, x: usize, y: usize, color: Color) {
+    pub fn draw_pixel(&self, x: usize, y: usize, color: u32) {
         let offset = y * self.pitch as usize + x * 4;
         let pixel = self.address.wrapping_add(offset) as *mut u32;
         unsafe {
-            *(pixel) = color as u32;
+            *(pixel) = color;
         }
     }
 
@@ -175,7 +175,7 @@ impl Vga {
         self.font.get_height()
     }
 
-    pub fn set_cursor(&mut self, x: usize, y: usize, fg: Color, bg: Color) {
+    pub fn set_cursor(&mut self, x: usize, y: usize, fg: u32, bg: u32) {
         self.cursor = Cursor { x, y, fg, bg }
     }
 }

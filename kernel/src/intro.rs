@@ -30,12 +30,17 @@ pub fn initialize() -> fmt::Result {
     vga.set_cursor(
         (width / 2) - (image_width / 2),
         height / 4,
-        Color::White,
-        Color::Black,
+        Color::White as u32,
+        Color::Black as u32,
     );
     vga.draw_image(image);
 
-    vga.set_cursor(font_width, height - font_width, Color::Red, Color::Black);
+    vga.set_cursor(
+        font_width,
+        height - font_width,
+        Color::Red as u32,
+        Color::Black as u32,
+    );
     write!(
         vga,
         "Version {} ({})",
@@ -47,19 +52,10 @@ pub fn initialize() -> fmt::Result {
     vga.set_cursor(
         width - (copyright.len() * font_width + font_width),
         height - font_width,
-        Color::Blue,
-        Color::Black,
+        Color::Blue as u32,
+        Color::Black as u32,
     );
     write!(vga, "{}", copyright)?;
-
-    let instruction = "Press ENTER to continue.";
-    vga.set_cursor(
-        (width / 2) - (instruction.len() * font_width / 2),
-        height - (height / 4),
-        Color::White,
-        Color::Black,
-    );
-    write!(vga, "{}", instruction)?;
 
     Ok(())
 }

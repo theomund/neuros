@@ -16,10 +16,11 @@
 
 use crate::logger::LOGGER;
 use crate::timer::TIMER;
+use crate::vga::{Color, VGA};
 use crate::warn;
+use core::fmt::Write;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
-use x86_64::instructions;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 const PIC_1_OFFSET: u8 = 32;
@@ -46,7 +47,6 @@ pub fn initialize() {
         PICS.lock().initialize();
         PICS.lock().write_masks(0b11111110, 0b11111111);
     }
-    instructions::interrupts::enable();
 }
 
 extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
@@ -56,7 +56,23 @@ extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
     let mut timer = TIMER.lock();
     let elapsed = timer.get_elapsed();
+    let clamp = elapsed.clamp(0, 0xFF);
     timer.set_elapsed(elapsed + 1);
+
+    let mut vga = VGA.lock();
+    let width = vga.get_width();
+    let height = vga.get_height();
+    let font_width = vga.get_font_width();
+
+    let instruction = "Press ENTER to continue.";
+    vga.set_cursor(
+        (width / 2) - (instruction.len() * font_width / 2),
+        height - (height / 4),
+        clamp << 16 | clamp << 8 | clamp,
+        Color::Black as u32,
+    );
+    write!(vga, "{}", instruction).expect("Failed to write instruction.");
+
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer as u8);
