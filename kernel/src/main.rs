@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #![feature(abi_x86_interrupt)]
+#![feature(int_roundings)]
 #![no_std]
 #![no_main]
 
@@ -22,6 +23,7 @@ extern crate alloc;
 
 mod font;
 mod image;
+mod initrd;
 mod interrupts;
 mod intro;
 mod logger;
@@ -32,8 +34,10 @@ mod smp;
 mod timer;
 mod vga;
 
+use crate::initrd::INITRD;
 use crate::logger::LOGGER;
 use crate::shell::Shell;
+use alloc::format;
 use core::panic::PanicInfo;
 use x86_64::instructions;
 
@@ -42,6 +46,11 @@ extern "C" fn _start() -> ! {
     memory::initialize();
     interrupts::initialize();
     smp::initialize();
+    let log = format!(
+        "Loaded {} files from the initial ramdisk.",
+        INITRD.get_files().len()
+    );
+    debug!(log.as_str());
     intro::initialize().expect("Failed to initialize intro.");
     let mut shell = Shell::new();
     shell.display().expect("Failed to display shell.");

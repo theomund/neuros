@@ -34,6 +34,7 @@ BOOTLOADER := bootloader/src/limine
 BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOTLOADER_CFG := bootloader/limine.cfg
 BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
+INITRD := target/initrd.tar
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/$(SUBDIR)/kernel
@@ -42,9 +43,9 @@ OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .vale/styles/RedHat
 TAG := builder
 
-$(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL)
+$(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
-	cp -v $(BOOTLOADER_BIN) $(BOOTLOADER_CFG) $(KERNEL) $(ISO_ROOT)
+	cp -v $(BOOTLOADER_BIN) $(BOOTLOADER_CFG) $(INITRD) $(KERNEL) $(ISO_ROOT)
 	cp -v $(BOOTLOADER_EFI) $(ISO_ROOT)/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
@@ -57,6 +58,9 @@ $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL)
 $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
 	$(MAKE) -C bootloader/src
+
+$(INITRD):
+	tar -H ustar -c -f $(INITRD) initrd
 
 $(KERNEL): $(KERNEL_SRC)
 	cargo build --target $(TARGET) --profile $(PROFILE)

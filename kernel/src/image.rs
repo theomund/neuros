@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::initrd::INITRD;
+
 const WIDTH: usize = 1024;
 const HEIGHT: usize = 254;
 const BYTE_WIDTH: usize = WIDTH / 8;
@@ -31,7 +33,7 @@ pub struct Image {
 
 impl Image {
     pub fn new() -> Image {
-        let pbm = include_bytes!("resource/logo.pbm");
+        let pbm = INITRD.get_data("initrd/usr/share/images/logo.pbm");
         let header = Header {
             magic: u16::from_be_bytes([pbm[0], pbm[1]]),
             width: WIDTH,

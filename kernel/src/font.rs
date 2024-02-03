@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::initrd::INITRD;
+
 pub struct Font {
     header: Header,
     data: &'static [u8],
@@ -27,7 +29,7 @@ struct Header {
 
 impl Font {
     pub fn new() -> Font {
-        let psf = include_bytes!("resource/ter-i16n.psf");
+        let psf = INITRD.get_data("initrd/usr/share/fonts/ter-i16n.psf");
         let header = Header {
             magic: u16::from_le_bytes([psf[0], psf[1]]),
             font_mode: psf[2],
