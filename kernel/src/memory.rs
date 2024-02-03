@@ -22,26 +22,27 @@ use limine::request::{MemoryMapRequest, StackSizeRequest};
 use linked_list_allocator::LockedHeap;
 
 static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(0x32000);
-static MEMMAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
+static MEMORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 pub fn initialize() {
     STACK_SIZE_REQUEST.get_response();
-    let entries = MEMMAP_REQUEST.get_response().unwrap().entries();
+    let entries = MEMORY_MAP_REQUEST.get_response().unwrap().entries();
     let entry = entries
         .iter()
-        .find(|x| x.entry_type == EntryType::USABLE)
+        .filter(|x| x.entry_type == EntryType::USABLE)
+        .max_by_key(|x| x.length)
         .unwrap();
     let start = entry.base;
     let size = entry.length as usize;
     unsafe {
         ALLOCATOR.lock().init(start as *mut u8, size);
     }
-    let message = format!(
-        "Detected usable memory region of size {} bytes at 0x{:x}.",
-        size, start
+    let log = format!(
+        "Reserved memory region at 0x{:x} ({} bytes) for heap allocation.",
+        start, size
     );
-    debug!(message.as_str());
+    debug!(log.as_str());
 }
