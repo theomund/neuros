@@ -24,7 +24,7 @@ use spin::{Lazy, Mutex};
 static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
 pub static VGA: Lazy<Mutex<Vga>> = Lazy::new(|| {
-    let font = Font::new();
+    let font = Font::new("initrd/usr/share/fonts/ter-i16n.psf");
     let vga = Vga::new(font);
     Mutex::new(vga)
 });

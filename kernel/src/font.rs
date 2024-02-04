@@ -28,8 +28,8 @@ struct Header {
 }
 
 impl Font {
-    pub fn new() -> Font {
-        let psf = INITRD.get_data("initrd/usr/share/fonts/ter-i16n.psf");
+    pub fn new(path: &str) -> Font {
+        let psf = INITRD.get_data(path);
         let header = Header {
             magic: u16::from_le_bytes([psf[0], psf[1]]),
             font_mode: psf[2],

@@ -32,8 +32,8 @@ pub struct Image {
 }
 
 impl Image {
-    pub fn new() -> Image {
-        let pbm = INITRD.get_data("initrd/usr/share/images/logo.pbm");
+    pub fn new(path: &str) -> Image {
+        let pbm = INITRD.get_data(path);
         let header = Header {
             magic: u16::from_be_bytes([pbm[0], pbm[1]]),
             width: WIDTH,

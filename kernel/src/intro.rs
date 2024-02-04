@@ -20,8 +20,9 @@ use core::fmt;
 use core::fmt::Write;
 
 pub fn initialize() -> fmt::Result {
-    let image = Image::new();
+    let image = Image::new("initrd/usr/share/images/logo.pbm");
     let image_width = image.get_width();
+
     let mut vga = VGA.lock();
     let width = vga.get_width();
     let height = vga.get_height();
