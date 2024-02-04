@@ -27,6 +27,7 @@ mod image;
 mod initrd;
 mod interrupts;
 mod intro;
+mod keyboard;
 mod logger;
 mod memory;
 mod serial;

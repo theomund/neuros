@@ -58,5 +58,14 @@ pub fn initialize() -> fmt::Result {
     );
     write!(vga, "{copyright}")?;
 
+    let instruction = "Press ENTER to continue.";
+    vga.set_cursor(
+        (width / 2) - (instruction.len() * font_width / 2),
+        height - (height / 4),
+        Color::White as u32,
+        Color::Black as u32,
+    );
+    write!(vga, "{instruction}").expect("Failed to write instruction.");
+
     Ok(())
 }
