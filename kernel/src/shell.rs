@@ -21,6 +21,7 @@ use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
+use spin::{Lazy, Mutex};
 
 pub const BLUE: &str = "\x1b[38;2;0;151;230m";
 pub const BOLD: &str = "\x1b[1m";
@@ -44,27 +45,27 @@ impl Shell {
         }
     }
 
-    pub fn display() -> Result {
-        let mut serial = SERIAL.lock();
-        write!(serial, "{BOLD}")?;
+    pub fn display<T: Write>(writer: &Lazy<Mutex<T>>) -> Result {
+        let mut lock = writer.lock();
+        write!(lock, "{BOLD}")?;
         writeln!(
-            serial,
+            lock,
             "{}NeurOS v{} (x86_64)",
             RED,
             env!("CARGO_PKG_VERSION")
         )?;
         writeln!(
-            serial,
+            lock,
             "\r{}Copyright (C) 2024 {}",
             BLUE,
             env!("CARGO_PKG_AUTHORS")
         )?;
         writeln!(
-            serial,
+            lock,
             "\n\r{DEFAULT}This is an administrative console shell.",
         )?;
         writeln!(
-            serial,
+            lock,
             "\rTo get started, type the 'help' command (without quotes)."
         )?;
         Ok(())

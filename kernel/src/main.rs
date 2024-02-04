@@ -38,6 +38,7 @@ mod vga;
 
 use crate::initrd::INITRD;
 use crate::logger::LOGGER;
+use crate::serial::SERIAL;
 use crate::shell::Shell;
 use alloc::format;
 use core::panic::PanicInfo;
@@ -55,7 +56,7 @@ extern "C" fn _start() -> ! {
     debug!(log.as_str());
     intro::initialize().expect("Failed to initialize intro.");
     let mut shell = Shell::new();
-    Shell::display().expect("Failed to display shell.");
+    Shell::display(&SERIAL).expect("Failed to display shell.");
     info!("The operating system has been successfully initialized.");
     instructions::interrupts::enable();
     shell.interpret().expect("Failed to interpret shell input.");
