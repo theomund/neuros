@@ -18,8 +18,9 @@ use crate::keyboard::ScanCode::Enter;
 use crate::keyboard::KEYBOARD;
 use crate::logger::LOGGER;
 use crate::timer::TIMER;
-use crate::vga::VGA;
+use crate::vga::{Color, VGA};
 use crate::warn;
+use core::fmt::Write;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
@@ -46,9 +47,10 @@ static PICS: Mutex<ChainedPics> =
 
 pub fn initialize() {
     IDT.load();
+    let mut pics = PICS.lock();
     unsafe {
-        PICS.lock().initialize();
-        PICS.lock().write_masks(0b1111_1100, 0b1111_1111);
+        pics.initialize();
+        pics.write_masks(0b1111_1100, 0b1111_1111);
     }
 }
 
@@ -61,22 +63,24 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
     let elapsed = timer.get_elapsed();
     timer.set_elapsed(elapsed + 1);
 
-    let mut pics = PICS.lock();
     unsafe {
-        pics.notify_end_of_interrupt(InterruptIndex::Timer as u8);
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Timer as u8);
     }
 }
 
 extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
-    let mut keyboard = KEYBOARD.lock();
-    let vga = VGA.lock();
-
-    if keyboard.read() == Enter as u8 {
+    if KEYBOARD.lock().read() == Enter as u8 {
+        let mut vga = VGA.lock();
+        let x = vga.get_font_width();
+        let y = vga.get_font_height() + x;
         vga.clear();
+        vga.set_cursor(x, y, Color::Yellow as u32, Color::Black as u32);
+        write!(vga, "Hello, world!").expect("Failed to write message.");
     }
 
-    let mut pics = PICS.lock();
     unsafe {
-        pics.notify_end_of_interrupt(InterruptIndex::Keyboard as u8);
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Keyboard as u8);
     }
 }
