@@ -77,11 +77,11 @@ pub struct Log {
 impl Display for Log {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let label = match self.level {
-            Level::Debug => format!("{}[DEBUG]{}", GREEN, DEFAULT),
-            Level::Error => format!("{}[ERROR]{}", RED, DEFAULT),
-            Level::Info => format!("{}[INFO]{}", BLUE, DEFAULT),
-            Level::Trace => format!("{}[TRACE]{}", PURPLE, DEFAULT),
-            Level::Warn => format!("{}[WARN]{}", YELLOW, DEFAULT),
+            Level::Debug => format!("{GREEN}[DEBUG]{DEFAULT}"),
+            Level::Error => format!("{RED}[ERROR]{DEFAULT}"),
+            Level::Info => format!("{BLUE}[INFO]{DEFAULT}"),
+            Level::Trace => format!("{PURPLE}[TRACE]{DEFAULT}"),
+            Level::Warn => format!("{YELLOW}[WARN]{DEFAULT}"),
         };
         write!(f, "{} {}", label, self.message)?;
         Ok(())

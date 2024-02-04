@@ -71,9 +71,7 @@ impl Serial {
         self.outb(4, 0x1E);
         self.outb(0, 0xAE);
 
-        if self.inb(0) != 0xAE {
-            panic!("Failed to initialize serial port.");
-        }
+        assert_eq!(self.inb(0), 0xAE, "Failed to initialize serial port.");
 
         self.outb(4, 0x0F);
     }

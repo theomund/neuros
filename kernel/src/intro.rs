@@ -34,7 +34,7 @@ pub fn initialize() -> fmt::Result {
         Color::White as u32,
         Color::Black as u32,
     );
-    vga.draw_image(image);
+    vga.draw_image(&image);
 
     vga.set_cursor(
         font_width,
@@ -56,7 +56,7 @@ pub fn initialize() -> fmt::Result {
         Color::Blue as u32,
         Color::Black as u32,
     );
-    write!(vga, "{}", copyright)?;
+    write!(vga, "{copyright}")?;
 
     Ok(())
 }

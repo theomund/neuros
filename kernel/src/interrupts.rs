@@ -45,7 +45,7 @@ pub fn initialize() {
     IDT.load();
     unsafe {
         PICS.lock().initialize();
-        PICS.lock().write_masks(0b11111110, 0b11111111);
+        PICS.lock().write_masks(0b1111_1110, 0b1111_1111);
     }
 }
 
@@ -71,7 +71,7 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
         clamp << 16 | clamp << 8 | clamp,
         Color::Black as u32,
     );
-    write!(vga, "{}", instruction).expect("Failed to write instruction.");
+    write!(vga, "{instruction}").expect("Failed to write instruction.");
 
     unsafe {
         PICS.lock()

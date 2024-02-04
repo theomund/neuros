@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#![warn(clippy::pedantic)]
 #![feature(abi_x86_interrupt)]
 #![feature(int_roundings)]
 #![no_std]
@@ -53,7 +54,7 @@ extern "C" fn _start() -> ! {
     debug!(log.as_str());
     intro::initialize().expect("Failed to initialize intro.");
     let mut shell = Shell::new();
-    shell.display().expect("Failed to display shell.");
+    Shell::display().expect("Failed to display shell.");
     info!("The operating system has been successfully initialized.");
     instructions::interrupts::enable();
     shell.interpret().expect("Failed to interpret shell input.");

@@ -18,6 +18,7 @@ use crate::font::Font;
 use crate::image::Image;
 use alloc::string::ToString;
 use core::fmt::{Arguments, Result, Write};
+use core::ptr;
 use limine::request::FramebufferRequest;
 use spin::{Lazy, Mutex};
 
@@ -32,12 +33,12 @@ pub static VGA: Lazy<Mutex<Vga>> = Lazy::new(|| {
 #[derive(Clone, Copy)]
 pub enum Color {
     Black = 0x0,
-    Blue = 0x0097E6,
-    Green = 0x44BD32,
-    Purple = 0x8C7AE6,
-    Red = 0xE84118,
-    White = 0xF5F6FA,
-    Yellow = 0xFBC531,
+    Blue = 0x0000_97E6,
+    Green = 0x0044_BD32,
+    Purple = 0x008C_7AE6,
+    Red = 0x00E8_4118,
+    White = 0x00F5_F6FA,
+    Yellow = 0x00FB_C531,
 }
 
 struct Cursor {
@@ -125,12 +126,16 @@ impl Vga {
     pub fn clear(&self) {
         for y in 0..self.height {
             for x in 0..self.width {
-                self.draw_pixel(x as usize, y as usize, Color::Black as u32);
+                self.draw_pixel(
+                    usize::try_from(x).unwrap(),
+                    usize::try_from(y).unwrap(),
+                    Color::Black as u32,
+                );
             }
         }
     }
 
-    pub fn draw_image(&self, image: Image) {
+    pub fn draw_image(&self, image: &Image) {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let height = image.get_height();
         let byte_width = image.get_byte_width();
@@ -152,19 +157,19 @@ impl Vga {
     }
 
     pub fn draw_pixel(&self, x: usize, y: usize, color: u32) {
-        let offset = y * self.pitch as usize + x * 4;
-        let pixel = self.address.wrapping_add(offset) as *mut u32;
+        let offset = y * usize::try_from(self.pitch).unwrap() + x * 4;
+        let pixel = self.address.wrapping_add(offset).cast::<u32>();
         unsafe {
-            *(pixel) = color;
+            ptr::write(pixel, color);
         }
     }
 
     pub fn get_width(&self) -> usize {
-        self.width as usize
+        usize::try_from(self.width).unwrap()
     }
 
     pub fn get_height(&self) -> usize {
-        self.height as usize
+        usize::try_from(self.height).unwrap()
     }
 
     pub fn get_font_width(&self) -> usize {

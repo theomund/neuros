@@ -36,13 +36,10 @@ pub fn initialize() {
         .max_by_key(|x| x.length)
         .unwrap();
     let start = entry.base;
-    let size = entry.length as usize;
+    let size = usize::try_from(entry.length).unwrap();
     unsafe {
         ALLOCATOR.lock().init(start as *mut u8, size);
     }
-    let log = format!(
-        "Reserved memory region at 0x{:x} ({} bytes) for heap allocation.",
-        start, size
-    );
+    let log = format!("Reserved memory region at 0x{start:x} ({size} bytes) for heap allocation.");
     debug!(log.as_str());
 }

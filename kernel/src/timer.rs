@@ -35,6 +35,6 @@ impl Timer {
     }
 
     pub fn set_elapsed(&mut self, value: u32) {
-        self.elapsed = value
+        self.elapsed = value;
     }
 }

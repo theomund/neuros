@@ -40,16 +40,13 @@ impl Shell {
     pub fn new() -> Shell {
         Shell {
             buffer: Vec::new(),
-            prompt: format!(
-                "\r{}[{}root@localhost {}/{}]# ",
-                DEFAULT, GREEN, BLUE, DEFAULT
-            ),
+            prompt: format!("\r{DEFAULT}[{GREEN}root@localhost {BLUE}/{DEFAULT}]# "),
         }
     }
 
-    pub fn display(&self) -> Result {
+    pub fn display() -> Result {
         let mut serial = SERIAL.lock();
-        write!(serial, "{}", BOLD)?;
+        write!(serial, "{BOLD}")?;
         writeln!(
             serial,
             "{}NeurOS v{} (x86_64)",
@@ -64,8 +61,7 @@ impl Shell {
         )?;
         writeln!(
             serial,
-            "\n\r{}This is an administrative console shell.",
-            DEFAULT
+            "\n\r{DEFAULT}This is an administrative console shell.",
         )?;
         writeln!(
             serial,
@@ -87,14 +83,14 @@ impl Shell {
                         Some(pair) => pair.0,
                         None => line.as_str(),
                     };
-                    writeln!(serial, "{}", NORMAL)?;
+                    writeln!(serial, "{NORMAL}")?;
                     match command {
                         "echo" => {
                             let argument = match input {
                                 Some(pair) => pair.1,
                                 None => "",
                             };
-                            writeln!(serial, "\r{}", argument)?;
+                            writeln!(serial, "\r{argument}")?;
                         }
                         "help" => {
                             writeln!(serial, "\rAvailable commands:")?;
@@ -109,7 +105,7 @@ impl Shell {
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
-                                writeln!(serial, "\r{}", log)?;
+                                writeln!(serial, "\r{log}")?;
                             }
                         }
                         "pwd" => {
@@ -119,7 +115,7 @@ impl Shell {
                             writeln!(serial, "\r{}", TIMER.lock().get_elapsed())?;
                         }
                         _ => {
-                            writeln!(serial, "\r{}ERROR: Command not found.", RED)?;
+                            writeln!(serial, "\r{RED}ERROR: Command not found.")?;
                         }
                     }
                     write!(serial, "{}{}", BOLD, self.prompt)?;
@@ -128,12 +124,12 @@ impl Shell {
                 '\x08' => {
                     if !self.buffer.is_empty() {
                         self.buffer.pop();
-                        write!(serial, "{} {}", character, character)?;
+                        write!(serial, "{character} {character}")?;
                     }
                 }
                 _ => {
                     self.buffer.push(character);
-                    write!(serial, "{}", character)?
+                    write!(serial, "{character}")?;
                 }
             }
         }
