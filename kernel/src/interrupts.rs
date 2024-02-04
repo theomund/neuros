@@ -29,12 +29,14 @@ const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 #[repr(u8)]
 enum InterruptIndex {
     Timer = PIC_1_OFFSET,
+    Keyboard,
 }
 
 static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     let mut idt = InterruptDescriptorTable::new();
     idt.breakpoint.set_handler_fn(breakpoint_handler);
     idt[InterruptIndex::Timer as usize].set_handler_fn(timer_handler);
+    idt[InterruptIndex::Keyboard as usize].set_handler_fn(keyboard_handler);
     idt
 });
 
@@ -45,7 +47,7 @@ pub fn initialize() {
     IDT.load();
     unsafe {
         PICS.lock().initialize();
-        PICS.lock().write_masks(0b1111_1110, 0b1111_1111);
+        PICS.lock().write_masks(0b1111_1100, 0b1111_1111);
     }
 }
 
@@ -73,8 +75,19 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
     );
     write!(vga, "{instruction}").expect("Failed to write instruction.");
 
+    let mut pics = PICS.lock();
     unsafe {
-        PICS.lock()
-            .notify_end_of_interrupt(InterruptIndex::Timer as u8);
+        pics.notify_end_of_interrupt(InterruptIndex::Timer as u8);
+    }
+}
+
+extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
+    let vga = VGA.lock();
+    vga.clear();
+
+    let mut pics = PICS.lock();
+    unsafe {
+        pics.write_masks(0b1111_1101, 0b1111_1111);
+        pics.notify_end_of_interrupt(InterruptIndex::Keyboard as u8);
     }
 }
