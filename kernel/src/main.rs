@@ -38,7 +38,8 @@ mod smp;
 mod timer;
 mod vga;
 
-use crate::logger::LOGGER;
+use crate::logger::Logger;
+use alloc::format;
 use core::panic::PanicInfo;
 use x86_64::instructions;
 
@@ -55,8 +56,13 @@ extern "C" fn _start() -> ! {
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    error!("The kernel has panicked.");
+fn panic(info: &PanicInfo) -> ! {
+    if let Some(payload) = info.payload().downcast_ref::<&str>() {
+        let log = format!("The kernel has panicked: {payload:?}");
+        fatal!(log.as_str());
+    } else {
+        fatal!("The kernel has panicked.");
+    }
     halt();
 }
 

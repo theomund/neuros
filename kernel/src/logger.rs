@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::shell::{BLUE, DEFAULT, GREEN, PURPLE, RED, YELLOW};
+use crate::serial::SERIAL;
+use crate::shell::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::fmt::Write;
 use core::fmt::{Display, Formatter, Result};
 use spin::{Lazy, Mutex};
 
@@ -37,6 +39,13 @@ macro_rules! debug {
 macro_rules! error {
     ($message:expr) => {
         LOGGER.lock().error($message);
+    };
+}
+
+#[macro_export]
+macro_rules! fatal {
+    ($message:expr) => {
+        Logger::fatal($message);
     };
 }
 
@@ -62,6 +71,7 @@ macro_rules! warn {
 }
 
 enum Level {
+    Fatal,
     Error,
     Warn,
     Info,
@@ -79,6 +89,7 @@ impl Display for Log {
         let label = match self.level {
             Level::Debug => format!("{GREEN}[DEBUG]{DEFAULT}"),
             Level::Error => format!("{RED}[ERROR]{DEFAULT}"),
+            Level::Fatal => format!("{ORANGE}[FATAL]{DEFAULT}"),
             Level::Info => format!("{BLUE}[INFO]{DEFAULT}"),
             Level::Trace => format!("{PURPLE}[TRACE]{DEFAULT}"),
             Level::Warn => format!("{YELLOW}[WARN]{DEFAULT}"),
@@ -111,6 +122,14 @@ impl Logger {
             message: message.to_string(),
         };
         self.logs.push(log);
+    }
+
+    pub fn fatal(message: &str) {
+        let log = Log {
+            level: Level::Fatal,
+            message: message.to_string(),
+        };
+        write!(SERIAL.lock(), "{log}").unwrap();
     }
 
     pub fn info(&mut self, message: &str) {
