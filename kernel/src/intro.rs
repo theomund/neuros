@@ -15,6 +15,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::image::Image;
+use crate::info;
+use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
 use core::fmt;
 use core::fmt::Write;
@@ -66,6 +68,8 @@ pub fn initialize() -> fmt::Result {
         Color::Black as u32,
     );
     write!(vga, "{instruction}").expect("Failed to write instruction.");
+
+    info!("The operating system has been successfully initialized.");
 
     Ok(())
 }

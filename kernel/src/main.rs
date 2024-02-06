@@ -30,17 +30,15 @@ mod intro;
 mod keyboard;
 mod logger;
 mod memory;
+mod process;
+mod scheduler;
 mod serial;
 mod shell;
 mod smp;
 mod timer;
 mod vga;
 
-use crate::initrd::INITRD;
 use crate::logger::LOGGER;
-use crate::serial::SERIAL;
-use crate::shell::Shell;
-use alloc::format;
 use core::panic::PanicInfo;
 use x86_64::instructions;
 
@@ -49,17 +47,10 @@ extern "C" fn _start() -> ! {
     memory::initialize();
     interrupts::initialize();
     smp::initialize();
-    let log = format!(
-        "Loaded {} files from the initial ramdisk.",
-        INITRD.get_files().len()
-    );
-    debug!(log.as_str());
+    initrd::initialize();
+    scheduler::initialize();
     intro::initialize().expect("Failed to initialize intro.");
-    let mut shell = Shell::new();
-    Shell::display(&SERIAL).expect("Failed to display shell.");
-    info!("The operating system has been successfully initialized.");
-    instructions::interrupts::enable();
-    shell.interpret().expect("Failed to interpret shell input.");
+    shell::initialize();
     halt();
 }
 

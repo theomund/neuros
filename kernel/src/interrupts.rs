@@ -17,12 +17,14 @@
 use crate::keyboard::ScanCode::Enter;
 use crate::keyboard::KEYBOARD;
 use crate::logger::LOGGER;
+use crate::scheduler::SCHEDULER;
 use crate::timer::TIMER;
 use crate::vga::{Color, VGA};
 use crate::warn;
 use core::fmt::Write;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
+use x86_64::instructions;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 const PIC_1_OFFSET: u8 = 32;
@@ -45,15 +47,6 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
 static PICS: Mutex<ChainedPics> =
     Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
-pub fn initialize() {
-    IDT.load();
-    let mut pics = PICS.lock();
-    unsafe {
-        pics.initialize();
-        pics.write_masks(0b1111_1100, 0b1111_1111);
-    }
-}
-
 extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
     warn!("Breakpoint exception was thrown.");
 }
@@ -62,6 +55,8 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
     let mut timer = TIMER.lock();
     let elapsed = timer.get_elapsed();
     timer.set_elapsed(elapsed + 1);
+
+    SCHEDULER.lock().tick();
 
     unsafe {
         PICS.lock()
@@ -83,4 +78,14 @@ extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Keyboard as u8);
     }
+}
+
+pub fn initialize() {
+    IDT.load();
+    let mut pics = PICS.lock();
+    unsafe {
+        pics.initialize();
+        pics.write_masks(0b1111_1100, 0b1111_1111);
+    }
+    instructions::interrupts::enable();
 }

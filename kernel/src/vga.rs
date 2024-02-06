@@ -21,6 +21,7 @@ use core::fmt::{Arguments, Result, Write};
 use core::ptr;
 use limine::request::FramebufferRequest;
 use spin::{Lazy, Mutex};
+use x86_64::instructions::interrupts::without_interrupts;
 
 static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 
@@ -96,8 +97,10 @@ impl Write for Vga {
     }
 
     fn write_fmt(&mut self, args: Arguments<'_>) -> Result {
-        self.write_str(args.to_string().as_str())?;
-        Ok(())
+        without_interrupts(|| {
+            self.write_str(args.to_string().as_str())?;
+            Ok(())
+        })
     }
 }
 

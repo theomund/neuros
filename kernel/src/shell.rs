@@ -32,6 +32,11 @@ pub const PURPLE: &str = "\x1b[38;2;140;122;230m";
 pub const RED: &str = "\x1b[38;2;232;65;24m";
 pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 
+static SHELL: Lazy<Mutex<Shell>> = Lazy::new(|| {
+    let shell = Shell::new();
+    Mutex::new(shell)
+});
+
 pub struct Shell {
     buffer: Vec<char>,
     prompt: String,
@@ -135,4 +140,12 @@ impl Shell {
             }
         }
     }
+}
+
+pub fn initialize() {
+    Shell::display(&SERIAL).expect("Failed to display shell.");
+    SHELL
+        .lock()
+        .interpret()
+        .expect("Failed to interpret shell input.");
 }

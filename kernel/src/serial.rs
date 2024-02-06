@@ -17,6 +17,7 @@
 use alloc::string::ToString;
 use core::fmt::{Arguments, Result, Write};
 use spin::{Lazy, Mutex};
+use x86_64::instructions::interrupts::without_interrupts;
 use x86_64::instructions::port::Port;
 
 pub static SERIAL: Lazy<Mutex<Serial>> = Lazy::new(|| {
@@ -48,8 +49,10 @@ impl Write for Serial {
     }
 
     fn write_fmt(&mut self, args: Arguments<'_>) -> Result {
-        self.write_str(args.to_string().as_str())?;
-        Ok(())
+        without_interrupts(|| {
+            self.write_str(args.to_string().as_str())?;
+            Ok(())
+        })
     }
 }
 
