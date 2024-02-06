@@ -14,14 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::keyboard::ScanCode::Enter;
 use crate::keyboard::KEYBOARD;
 use crate::logger::LOGGER;
 use crate::scheduler::SCHEDULER;
 use crate::timer::TIMER;
-use crate::vga::{Color, VGA};
 use crate::warn;
-use core::fmt::Write;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
 use x86_64::instructions;
@@ -65,14 +62,7 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
 }
 
 extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
-    if KEYBOARD.lock().read() == Enter as u8 {
-        let mut vga = VGA.lock();
-        let x = vga.get_font_width();
-        let y = vga.get_font_height() + x;
-        vga.clear();
-        vga.set_cursor(x, y, Color::Yellow as u32, Color::Black as u32);
-        write!(vga, "Hello, world!").expect("Failed to write message.");
-    }
+    KEYBOARD.lock().interpret();
 
     unsafe {
         PICS.lock()
@@ -83,9 +73,11 @@ extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
 pub fn initialize() {
     IDT.load();
     let mut pics = PICS.lock();
+
     unsafe {
         pics.initialize();
         pics.write_masks(0b1111_1100, 0b1111_1111);
     }
+
     instructions::interrupts::enable();
 }
