@@ -16,6 +16,7 @@
 
 use crate::logger::LOGGER;
 use crate::process::Process;
+use crate::process::State;
 use crate::{debug, trace};
 use alloc::collections::VecDeque;
 use alloc::format;
@@ -49,9 +50,11 @@ impl Scheduler {
 
     pub fn tick(&mut self) {
         if self.remaining == 0 {
-            let current = self.queue.pop_front().unwrap();
+            let mut current = self.queue.pop_front().unwrap();
+            current.set_state(State::Stopped);
             self.queue.push_back(current);
-            let next = self.queue.front().unwrap();
+            let mut next = *self.queue.front().unwrap();
+            next.set_state(State::Running);
             let log = format!(
                 "Time slice for process #{} elapsed; switching to process #{}.",
                 current.get_id(),
@@ -67,6 +70,6 @@ impl Scheduler {
 
 pub fn initialize() {
     let mut scheduler = SCHEDULER.lock();
-    scheduler.add(Process::new(1));
-    scheduler.add(Process::new(2));
+    scheduler.add(Process::new(1, State::Running));
+    scheduler.add(Process::new(2, State::Stopped));
 }

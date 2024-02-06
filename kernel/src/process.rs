@@ -15,16 +15,27 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #[derive(Copy, Clone)]
+pub enum State {
+    Running,
+    Stopped,
+}
+
+#[derive(Copy, Clone)]
 pub struct Process {
     id: u32,
+    state: State,
 }
 
 impl Process {
-    pub fn new(id: u32) -> Process {
-        Process { id }
+    pub fn new(id: u32, state: State) -> Process {
+        Process { id, state }
     }
 
     pub fn get_id(self) -> u32 {
         self.id
+    }
+
+    pub fn set_state(&mut self, state: State) {
+        self.state = state;
     }
 }
