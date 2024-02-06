@@ -49,10 +49,7 @@ extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
-    let mut timer = TIMER.lock();
-    let elapsed = timer.get_elapsed();
-    timer.set_elapsed(elapsed + 1);
-
+    TIMER.lock().increment();
     SCHEDULER.lock().tick();
 
     unsafe {
