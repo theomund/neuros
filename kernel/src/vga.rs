@@ -84,6 +84,10 @@ impl Write for Vga {
                     x = self.font.get_width();
                     self.set_cursor(x, y, fg, bg);
                 }
+                '\t' => {
+                    x += self.font.get_width() * 8;
+                    self.set_cursor(x, y, fg, bg);
+                }
                 '\x1b' => {
                     let mut sequence: String = chars.take_while(|x| *x != 'm').collect();
                     sequence = format!("\x1b{sequence}m");
