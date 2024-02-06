@@ -19,6 +19,7 @@ use crate::{debug, trace};
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::fmt::{Display, Formatter};
 use core::ptr::slice_from_raw_parts;
 use core::str::{from_utf8, FromStr};
 use limine::request::ModuleRequest;
@@ -57,6 +58,46 @@ pub struct File {
     data: Vec<u8>,
 }
 
+impl File {
+    fn parse_permission(digit: u32) -> String {
+        let read = if digit & 0b100 == 0b100 { 'r' } else { '-' };
+        let write = if digit & 0b010 == 0b010 { 'w' } else { '-' };
+        let execute = if digit & 0b001 == 0b001 { 'x' } else { '-' };
+        format!("{read}{write}{execute}")
+    }
+}
+
+impl Display for File {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        let flag = match self.header.flag {
+            5 => 'd',
+            _ => '-',
+        };
+        let digits: Vec<u32> = self
+            .header
+            .mode
+            .to_string()
+            .chars()
+            .map(|x| x.to_digit(10).unwrap())
+            .collect();
+        let owner = File::parse_permission(digits[0]);
+        let group = File::parse_permission(digits[1]);
+        let other = File::parse_permission(digits[2]);
+        let permissions = format!("{flag}{owner}{group}{other}");
+        write!(
+            f,
+            "{} {}/{} {} {} {}",
+            permissions,
+            self.header.username,
+            self.header.group,
+            self.header.size,
+            self.header.mtime,
+            self.header.name
+        )?;
+        Ok(())
+    }
+}
+
 pub struct Initrd {
     files: Vec<File>,
 }
@@ -79,7 +120,7 @@ impl Initrd {
                 address = address.wrapping_add(BLOCK_SIZE);
             }
             let file = File { header, data };
-            let log = format!("{file:?}");
+            let log = format!("{file}");
             trace!(log.as_str());
             files.push(file);
         }
