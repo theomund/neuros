@@ -16,7 +16,9 @@
 
 use crate::font::Font;
 use crate::image::Image;
-use alloc::string::ToString;
+use crate::shell::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
+use alloc::format;
+use alloc::string::{String, ToString};
 use core::fmt::{Arguments, Result, Write};
 use core::ptr;
 use limine::request::FramebufferRequest;
@@ -36,6 +38,7 @@ pub enum Color {
     Black = 0x0,
     Blue = 0x0000_97E6,
     Green = 0x0044_BD32,
+    Orange = 0x00C2_3616,
     Purple = 0x008C_7AE6,
     Red = 0x00E8_4118,
     White = 0x00F5_F6FA,
@@ -63,14 +66,59 @@ unsafe impl Sync for Vga {}
 
 impl Write for Vga {
     fn write_str(&mut self, s: &str) -> Result {
-        let x = self.cursor.x;
-        let y = self.cursor.y;
-        let fg = self.cursor.fg;
+        let mut x = self.cursor.x;
+        let mut y = self.cursor.y;
+        let mut fg = self.cursor.fg;
         let bg = self.cursor.bg;
 
-        for (position, character) in s.chars().enumerate() {
-            self.set_cursor(x + self.font.get_width() * position, y, fg, bg);
-            self.write_char(character)?;
+        let chars = &mut s.chars();
+        let mut position = 0;
+
+        while let Some(character) = chars.next() {
+            match character {
+                '\n' => {
+                    y += self.font.get_height();
+                    self.set_cursor(x, y, fg, bg);
+                }
+                '\r' => {
+                    x = self.font.get_width();
+                    self.set_cursor(x, y, fg, bg);
+                }
+                '\x1b' => {
+                    let mut sequence: String = chars.take_while(|x| *x != 'm').collect();
+                    sequence = format!("\x1b{sequence}m");
+                    match sequence.as_str() {
+                        BLUE => {
+                            fg = Color::Blue as u32;
+                        }
+                        DEFAULT => {
+                            fg = Color::White as u32;
+                        }
+                        GREEN => {
+                            fg = Color::Green as u32;
+                        }
+                        ORANGE => {
+                            fg = Color::Orange as u32;
+                        }
+                        PURPLE => {
+                            fg = Color::Purple as u32;
+                        }
+                        RED => {
+                            fg = Color::Red as u32;
+                        }
+                        YELLOW => {
+                            fg = Color::Yellow as u32;
+                        }
+                        _ => {}
+                    }
+                    self.set_cursor(x, y, fg, bg);
+                }
+                _ => {
+                    self.set_cursor(x + self.font.get_width() * position, y, fg, bg);
+                    self.write_char(character)?;
+                    position += 1;
+                }
+            }
         }
 
         Ok(())
