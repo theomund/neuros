@@ -60,7 +60,8 @@ impl Keyboard {
                 vga.clear();
                 vga.set_cursor(x, y, Color::White as u32, Color::Black as u32);
             }
-            Shell::display(&VGA).expect("Failed to display VGA terminal.");
+            let shell = Shell::new();
+            shell.display(&VGA).expect("Failed to display VGA console.");
         }
     }
 }

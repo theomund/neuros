@@ -33,11 +33,6 @@ pub const PURPLE: &str = "\x1b[38;2;140;122;230m";
 pub const RED: &str = "\x1b[38;2;232;65;24m";
 pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 
-static SHELL: Lazy<Mutex<Shell>> = Lazy::new(|| {
-    let shell = Shell::new();
-    Mutex::new(shell)
-});
-
 pub struct Shell {
     buffer: Vec<char>,
     prompt: String,
@@ -51,7 +46,7 @@ impl Shell {
         }
     }
 
-    pub fn display<T: Write>(writer: &Lazy<Mutex<T>>) -> Result {
+    pub fn display<T: Write>(&self, writer: &Lazy<Mutex<T>>) -> Result {
         let mut lock = writer.lock();
         write!(lock, "{BOLD}")?;
         writeln!(
@@ -74,12 +69,12 @@ impl Shell {
             lock,
             "\rTo get started, type the 'help' command (without quotes)."
         )?;
+        write!(lock, "\n{}", self.prompt)?;
         Ok(())
     }
 
     pub fn interpret(&mut self) -> Result {
         let mut serial = SERIAL.lock();
-        write!(serial, "\n{}", self.prompt)?;
         loop {
             let character = serial.read() as char;
             match character {
@@ -144,9 +139,9 @@ impl Shell {
 }
 
 pub fn initialize() {
-    Shell::display(&SERIAL).expect("Failed to display shell.");
-    SHELL
-        .lock()
-        .interpret()
-        .expect("Failed to interpret shell input.");
+    let mut shell = Shell::new();
+    shell
+        .display(&SERIAL)
+        .expect("Failed to display serial console.");
+    shell.interpret().expect("Failed to interpret shell input.");
 }
