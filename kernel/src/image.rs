@@ -15,43 +15,44 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::initrd::INITRD;
-
-const WIDTH: usize = 1024;
-const HEIGHT: usize = 254;
-const BYTE_WIDTH: usize = WIDTH / 8;
+use alloc::vec;
+use alloc::vec::Vec;
+use core::str;
 
 struct Header {
-    magic: u16,
+    magic: &'static str,
     width: usize,
     height: usize,
 }
 
 pub struct Image {
     header: Header,
-    data: [[u8; BYTE_WIDTH]; HEIGHT],
+    data: Vec<Vec<u8>>,
 }
 
 impl Image {
     pub fn new(path: &str) -> Image {
         let pbm = INITRD.get_data(path);
+        let end = pbm.iter().rposition(|x| *x == b'\n').unwrap();
+        let mut fields = str::from_utf8(&pbm[..end]).unwrap().split_whitespace();
         let header = Header {
-            magic: u16::from_be_bytes([pbm[0], pbm[1]]),
-            width: WIDTH,
-            height: HEIGHT,
+            magic: fields.next().unwrap(),
+            width: fields.next().unwrap().parse().unwrap(),
+            height: fields.next().unwrap().parse().unwrap(),
         };
-        assert_eq!(header.magic, 0x5034);
-        let mut data = [[0u8; BYTE_WIDTH]; HEIGHT];
-        let pixels = &pbm[12..];
-        for y in 0..HEIGHT {
-            for x in 0..BYTE_WIDTH {
-                data[y][x] = pixels[(y * BYTE_WIDTH) + x];
+        assert_eq!(header.magic, "P4");
+        let mut data = vec![vec![0u8; header.width / 8]; header.height];
+        let pixels = &pbm[end + 1..];
+        for y in 0..header.height {
+            for x in 0..header.width / 8 {
+                data[y][x] = pixels[(y * (header.width / 8)) + x];
             }
         }
         Image { header, data }
     }
 
-    pub fn get_data(&self) -> [[u8; BYTE_WIDTH]; HEIGHT] {
-        self.data
+    pub fn get_data(&self) -> &Vec<Vec<u8>> {
+        &self.data
     }
 
     pub fn get_width(&self) -> usize {
