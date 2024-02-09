@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::image::Image;
+use crate::image::{Pbm, Ppm};
 use crate::info;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
@@ -22,21 +22,37 @@ use core::fmt;
 use core::fmt::Write;
 
 pub fn initialize() -> fmt::Result {
-    let image = Image::new("initrd/usr/share/images/logo.pbm");
-    let image_width = image.get_width();
-
     let mut vga = VGA.lock();
     let width = vga.get_width();
     let height = vga.get_height();
     let font_width = vga.get_font_width();
 
+    let logo = Pbm::new("initrd/usr/share/images/logo.pbm");
     vga.set_cursor(
-        (width / 2) - (image_width / 2),
-        height / 4,
+        (width / 2) - (logo.get_width() / 2),
+        height / 8,
         Color::White as u32,
         Color::Black as u32,
     );
-    vga.draw_image(&image);
+    vga.draw_pbm(&logo);
+
+    let neuro = Ppm::new("initrd/usr/share/images/neuro.ppm");
+    vga.set_cursor(
+        (width / 3) - (neuro.get_width() / 2),
+        height / 2,
+        Color::White as u32,
+        Color::Black as u32,
+    );
+    vga.draw_ppm(&neuro);
+
+    let evil = Ppm::new("initrd/usr/share/images/evil.ppm");
+    vga.set_cursor(
+        width - (width / 3) - (evil.get_width() / 2),
+        height / 2,
+        Color::White as u32,
+        Color::Black as u32,
+    );
+    vga.draw_ppm(&evil);
 
     vga.set_cursor(
         font_width,

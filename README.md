@@ -128,3 +128,9 @@ This command removes compiled binaries and temporary files.
 This project uses the [GNU General Public License v3.0](COPYING) (or later).
 
 You can find the detailed terms of the license in the [COPYING](COPYING) file.
+
+# Credits
+
+This project uses artwork from the following artists; all rights are reserved to them:
+
+* [paccha](https://twitter.com/paccha_7) — Neurolings (Sprites)

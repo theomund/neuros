@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::font::Font;
-use crate::image::Image;
+use crate::image::{Pbm, Pgm, Ppm};
 use crate::shell::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -190,7 +190,7 @@ impl Vga {
         }
     }
 
-    pub fn draw_image(&self, image: &Image) {
+    pub fn draw_pbm(&self, image: &Pbm) {
         let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         let height = image.get_height();
         let byte_width = image.get_byte_width();
@@ -207,6 +207,42 @@ impl Vga {
                     let color = if column & mask == 0 { fg } else { bg };
                     self.draw_pixel(x + (ix * masks.len()) + mx, y + iy, color);
                 }
+            }
+        }
+    }
+
+    pub fn draw_pgm(&self, image: &Pgm) {
+        let height = image.get_height();
+        let width = image.get_width();
+        let data = image.get_data();
+
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+
+        for (iy, row) in data.iter().enumerate().take(height) {
+            for (ix, column) in row.iter().enumerate().take(width) {
+                let grayscale = u32::from(*column);
+                let color = grayscale << 16 | grayscale << 8 | grayscale;
+                self.draw_pixel(x + ix, y + iy, color);
+            }
+        }
+    }
+
+    pub fn draw_ppm(&self, image: &Ppm) {
+        let height = image.get_height();
+        let width = image.get_width();
+        let data = image.get_data();
+
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+
+        for (iy, row) in data.iter().enumerate().take(height) {
+            for (ix, column) in row.iter().enumerate().take(width) {
+                let red = u32::from(column.get_red());
+                let green = u32::from(column.get_green());
+                let blue = u32::from(column.get_blue());
+                let color = red << 16 | green << 8 | blue;
+                self.draw_pixel(x + ix, y + iy, color);
             }
         }
     }
