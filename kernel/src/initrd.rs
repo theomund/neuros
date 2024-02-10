@@ -153,39 +153,23 @@ impl Initrd {
     }
 
     fn parse_header(address: *mut u8) -> Header {
-        let name = Initrd::parse_string(address, 100);
-        let mode = Initrd::parse_integer(address.wrapping_add(100), 8);
-        let user_id = Initrd::parse_octal(address.wrapping_add(108), 8);
-        let group_id = Initrd::parse_octal(address.wrapping_add(116), 8);
-        let size = Initrd::parse_octal(address.wrapping_add(124), 12);
-        let mtime = Initrd::parse_octal(address.wrapping_add(136), 12);
-        let checksum = Initrd::parse_string(address.wrapping_add(148), 8);
-        let flag = Initrd::parse_integer(address.wrapping_add(156), 1);
-        let linked = Initrd::parse_string(address.wrapping_add(157), 100);
-        let indicator = Initrd::parse_string(address.wrapping_add(257), 6);
-        let version = Initrd::parse_string(address.wrapping_add(263), 2);
-        let username = Initrd::parse_string(address.wrapping_add(265), 32);
-        let group = Initrd::parse_string(address.wrapping_add(297), 32);
-        let major = Initrd::parse_integer(address.wrapping_add(329), 8);
-        let minor = Initrd::parse_integer(address.wrapping_add(337), 8);
-        let prefix = Initrd::parse_string(address.wrapping_add(345), 155);
         Header {
-            name,
-            mode,
-            user_id,
-            group_id,
-            size,
-            mtime,
-            checksum,
-            flag,
-            linked,
-            indicator,
-            version,
-            username,
-            group,
-            major,
-            minor,
-            prefix,
+            name: Initrd::parse_string(address, 100),
+            mode: Initrd::parse_integer(address.wrapping_add(100), 8),
+            user_id: Initrd::parse_octal(address.wrapping_add(108), 8),
+            group_id: Initrd::parse_octal(address.wrapping_add(116), 8),
+            size: Initrd::parse_octal(address.wrapping_add(124), 12),
+            mtime: Initrd::parse_octal(address.wrapping_add(136), 12),
+            checksum: Initrd::parse_string(address.wrapping_add(148), 8),
+            flag: Initrd::parse_integer(address.wrapping_add(156), 1),
+            linked: Initrd::parse_string(address.wrapping_add(157), 100),
+            indicator: Initrd::parse_string(address.wrapping_add(257), 6),
+            version: Initrd::parse_string(address.wrapping_add(263), 2),
+            username: Initrd::parse_string(address.wrapping_add(265), 32),
+            group: Initrd::parse_string(address.wrapping_add(297), 32),
+            major: Initrd::parse_integer(address.wrapping_add(329), 8),
+            minor: Initrd::parse_integer(address.wrapping_add(337), 8),
+            prefix: Initrd::parse_string(address.wrapping_add(345), 155),
         }
     }
 
