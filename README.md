@@ -40,13 +40,13 @@ resulting in improved reliability, security, and maintainability.
 
 ```mermaid
 graph BT
-    classDef node font-size:24px,padding:64px,color:#f5f6fa,stroke-width:0px
-    style Application fill:#0097e6
-    style Drivers fill:#8c7ae6
-    style Hardware fill:#e1b12c
-    style Kernel fill:#c23616
-    style Servers fill:#44bd32
-    style Userspace color:#f5f6fa,fill:#2f3640
+    classDef node color: #f5f6fa, stroke-width: 0px
+    style Application fill: #0097e6
+    style Drivers fill: #8c7ae6
+    style Hardware fill: #e1b12c
+    style Kernel fill: #c23616
+    style Servers fill: #44bd32
+    style Userspace color: #f5f6fa, fill: #2f3640
     Hardware <==> Kernel
     Kernel <==> Drivers
     Kernel <==> Servers
@@ -56,25 +56,29 @@ graph BT
     end
 ```
 
-# Building
+# Development
 
 > [!NOTE]
 > Building on Windows or macOS is currently not supported at this time.
 
-To build and compile the operating system from source, follow the outlined
-steps. Make sure you have the necessary tools and dependencies installed on
-your Linux system.
+If you're interested in developing the operating system, follow the outlined steps.
+Make sure you have the necessary tools and dependencies installed
+on your Linux system.
 
 ## Prerequisites
 
-Before building the operating system, ensure you have the following prerequisites installed:
+Before developing, ensure you have the following prerequisites installed:
 
 * `edk2-ovmf`
 * `gcc`
 * `git`
+* `hadolint`
 * `make`
+* `podman`
 * `qemu`
 * `rustup`
+* `tar`
+* `vale`
 * `xorriso`
 
 ## Cloning
@@ -105,11 +109,53 @@ command:
 make run
 ```
 
-This command will start QEMU and run the operating system with BIOS firmware.
-To switch the firmware to UEFI, run the following command:
+This command will start QEMU and run the operating system. To switch the
+firmware to UEFI, run the following command:
 
 ```bash
 make run-uefi
+```
+
+To test a release build of the operating system, change the `PROFILE`
+variable to the appropriate value:
+
+```bash
+make run PROFILE=release
+```
+
+## Debugging
+
+To debug the operating system, open a terminal and run the following command:
+
+```bash
+make run DEBUG=true
+```
+
+This will start QEMU with the flags needed for utilizing a debugger such
+as GDB. You can likewise debug UEFI setups by using this command:
+
+```bash
+make run-uefi DEBUG=true
+```
+
+In another terminal, run the following command:
+
+```bash
+make debug
+```
+
+This starts GDB with the correct symbol file and connection parameters.
+
+You are now able to set breakpoints at arbitrary locations:
+
+```bash
+(gdb) break _start
+Breakpoint 1 at 0xffffffff80018691: file kernel/src/main.rs, line 48.
+(gdb) continue
+Continuing.
+
+Breakpoint 1, kernel::_start () at kernel/src/main.rs:48
+48          memory::initialize();
 ```
 
 ## Cleaning
