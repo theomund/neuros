@@ -71,6 +71,7 @@ Before developing, ensure you have the following prerequisites installed:
 
 * `edk2-ovmf`
 * `gcc`
+* `gdb`
 * `git`
 * `hadolint`
 * `make`
