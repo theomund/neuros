@@ -21,14 +21,39 @@ pub enum State {
 }
 
 #[derive(Copy, Clone)]
+#[repr(C)]
+pub struct Context {
+    r12: u64,
+    r13: u64,
+    r14: u64,
+    r15: u64,
+    rbp: u64,
+    rbx: u64,
+    rsp: u64,
+}
+
+#[derive(Copy, Clone)]
 pub struct Process {
     id: u32,
+    context: Context,
     state: State,
 }
 
 impl Process {
     pub fn new(id: u32, state: State) -> Process {
-        Process { id, state }
+        Process {
+            id,
+            context: Context {
+                r12: 0,
+                r13: 0,
+                r14: 0,
+                r15: 0,
+                rbp: 0,
+                rbx: 0,
+                rsp: 0,
+            },
+            state,
+        }
     }
 
     pub fn get_id(self) -> u32 {
