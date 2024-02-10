@@ -49,9 +49,8 @@ graph BT
     style Userspace color: #f5f6fa, fill: #2f3640
     Hardware <==> Kernel
     Kernel <==> Drivers
-    Kernel <==> Servers
     subgraph Userspace
-        Drivers <==> Application
+        Drivers <==> Servers
         Servers <==> Application
     end
 ```
