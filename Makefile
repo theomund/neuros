@@ -35,10 +35,11 @@ BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin
 BOOTLOADER_CFG := bootloader/limine.cfg
 BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
 INITRD := target/initrd.tar
+INITRD_SOURCE := $(shell find initrd)
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/$(SUBDIR)/kernel
-KERNEL_SRC := $(wildcard kernel/src/*.rs) $(addprefix kernel/,Cargo.toml build.rs linker.ld)
+KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .vale/styles/RedHat
 TAG := builder
@@ -59,10 +60,10 @@ $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
 	$(MAKE) -C bootloader/src
 
-$(INITRD):
+$(INITRD): $(INITRD_SOURCE)
 	tar -H ustar -c -f $(INITRD) initrd
 
-$(KERNEL): $(KERNEL_SRC)
+$(KERNEL): $(KERNEL_SOURCE)
 	cargo build --target $(TARGET) --profile $(PROFILE)
 
 $(STYLE):
