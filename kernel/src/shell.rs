@@ -45,9 +45,14 @@ impl Shell {
         let hostname = str::from_utf8(INITRD.get_data("initrd/etc/hostname"))
             .unwrap()
             .trim_end();
+        let username = str::from_utf8(INITRD.get_data("initrd/etc/passwd"))
+            .unwrap()
+            .split_terminator(':')
+            .next()
+            .unwrap();
         Shell {
             buffer: Vec::new(),
-            prompt: format!("\r{DEFAULT}[{GREEN}root@{hostname} {BLUE}/{DEFAULT}]# "),
+            prompt: format!("\r{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}/{DEFAULT}]# "),
         }
     }
 
