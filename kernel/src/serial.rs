@@ -37,6 +37,9 @@ pub enum Ports {
 impl Write for Serial {
     fn write_str(&mut self, s: &str) -> Result {
         for character in s.chars() {
+            if character == '\n' {
+                self.write_char('\r')?;
+            }
             self.write_char(character)?;
         }
         Ok(())

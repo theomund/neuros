@@ -52,34 +52,15 @@ impl Shell {
             .unwrap();
         Shell {
             buffer: Vec::new(),
-            prompt: format!("\r{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}/{DEFAULT}]# "),
+            prompt: format!("{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}/{DEFAULT}]# "),
         }
     }
 
     pub fn display<T: Write>(&self, writer: &Lazy<Mutex<T>>) -> Result {
+        let motd = str::from_utf8(INITRD.get_data("initrd/etc/motd")).unwrap();
         let mut lock = writer.lock();
-        write!(lock, "{BOLD}")?;
-        writeln!(
-            lock,
-            "{}NeurOS v{} (x86_64)",
-            RED,
-            env!("CARGO_PKG_VERSION")
-        )?;
-        writeln!(
-            lock,
-            "\r{}Copyright (C) 2024 {}",
-            BLUE,
-            env!("CARGO_PKG_AUTHORS")
-        )?;
-        writeln!(
-            lock,
-            "\n\r{DEFAULT}This is an administrative console shell.",
-        )?;
-        writeln!(
-            lock,
-            "\rTo get started, type the 'help' command (without quotes)."
-        )?;
-        write!(lock, "\n{}", self.prompt)?;
+        writeln!(lock, "{motd}")?;
+        write!(lock, "{}", self.prompt)?;
         Ok(())
     }
 
@@ -102,35 +83,35 @@ impl Shell {
                                 Some(pair) => pair.1,
                                 None => "",
                             };
-                            writeln!(serial, "\r{argument}")?;
+                            writeln!(serial, "{argument}")?;
                         }
                         "help" => {
-                            writeln!(serial, "\rAvailable commands:")?;
-                            writeln!(serial, "\r\techo -- Display a line of text.")?;
-                            writeln!(serial, "\r\thelp -- Print a list of commands.")?;
-                            writeln!(serial, "\r\tlogs -- Retrieve the system logs.")?;
-                            writeln!(serial, "\r\ttime -- Display the elapsed time.")?;
+                            writeln!(serial, "Available commands:")?;
+                            writeln!(serial, "\techo -- Display a line of text.")?;
+                            writeln!(serial, "\thelp -- Print a list of commands.")?;
+                            writeln!(serial, "\tlogs -- Retrieve the system logs.")?;
+                            writeln!(serial, "\ttime -- Display the elapsed time.")?;
                             writeln!(
                                 serial,
-                                "\r\tpwd  -- Print the name of the current working directory."
+                                "\tpwd  -- Print the name of the current working directory."
                             )?;
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
-                                writeln!(serial, "\r{log}")?;
+                                writeln!(serial, "{log}")?;
                             }
                         }
                         "pwd" => {
-                            writeln!(serial, "\r/")?;
+                            writeln!(serial, "/")?;
                         }
                         "time" => {
-                            writeln!(serial, "\r{}", TIMER.lock().get_elapsed())?;
+                            writeln!(serial, "{}", TIMER.lock().get_elapsed())?;
                         }
                         _ => {
-                            writeln!(serial, "\r{RED}ERROR: Command not found.")?;
+                            writeln!(serial, "{RED}ERROR: Command not found.")?;
                         }
                     }
-                    write!(serial, "{}{}", BOLD, self.prompt)?;
+                    write!(serial, "{}", self.prompt)?;
                     self.buffer.clear();
                 }
                 '\x08' => {

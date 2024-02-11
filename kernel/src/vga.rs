@@ -77,11 +77,14 @@ impl Write for Vga {
         while let Some(character) = chars.next() {
             match character {
                 '\n' => {
+                    x = self.font.get_width();
                     y += self.font.get_height();
+                    position = 0;
                     self.set_cursor(x, y, fg, bg);
                 }
                 '\r' => {
                     x = self.font.get_width();
+                    position = 0;
                     self.set_cursor(x, y, fg, bg);
                 }
                 '\t' => {
@@ -115,7 +118,6 @@ impl Write for Vga {
                         }
                         _ => {}
                     }
-                    self.set_cursor(x, y, fg, bg);
                 }
                 _ => {
                     self.set_cursor(x + self.font.get_width() * position, y, fg, bg);
