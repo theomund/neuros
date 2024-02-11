@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::initrd::INITRD;
 use crate::logger::LOGGER;
 use crate::serial::SERIAL;
 use crate::timer::TIMER;
@@ -21,6 +22,7 @@ use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
+use core::str;
 use spin::{Lazy, Mutex};
 
 pub const BLUE: &str = "\x1b[38;2;0;151;230m";
@@ -40,9 +42,12 @@ pub struct Shell {
 
 impl Shell {
     pub fn new() -> Shell {
+        let hostname = str::from_utf8(INITRD.get_data("initrd/etc/hostname"))
+            .unwrap()
+            .trim_end();
         Shell {
             buffer: Vec::new(),
-            prompt: format!("\r{DEFAULT}[{GREEN}root@localhost {BLUE}/{DEFAULT}]# "),
+            prompt: format!("\r{DEFAULT}[{GREEN}root@{hostname} {BLUE}/{DEFAULT}]# "),
         }
     }
 
