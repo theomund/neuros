@@ -19,7 +19,7 @@ use crate::logger::LOGGER;
 use crate::serial::SERIAL;
 use crate::timer::TIMER;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 use core::str;
@@ -38,6 +38,7 @@ pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 pub struct Shell {
     buffer: Vec<char>,
     prompt: String,
+    working_directory: String,
 }
 
 impl Shell {
@@ -45,14 +46,17 @@ impl Shell {
         let hostname = str::from_utf8(INITRD.get_data("initrd/etc/hostname"))
             .unwrap()
             .trim_end();
-        let username = str::from_utf8(INITRD.get_data("initrd/etc/passwd"))
+        let mut passwd = str::from_utf8(INITRD.get_data("initrd/etc/passwd"))
             .unwrap()
-            .split_terminator(':')
-            .next()
-            .unwrap();
+            .split_terminator(':');
+        let username = passwd.nth(0).unwrap();
+        let home = passwd.nth(4).unwrap();
         Shell {
             buffer: Vec::new(),
-            prompt: format!("{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}/{DEFAULT}]# "),
+            prompt: format!(
+                "{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}{home}{DEFAULT}]# "
+            ),
+            working_directory: home.to_string(),
         }
     }
 
@@ -102,7 +106,7 @@ impl Shell {
                             }
                         }
                         "pwd" => {
-                            writeln!(serial, "/")?;
+                            writeln!(serial, "{}", self.working_directory)?;
                         }
                         "time" => {
                             writeln!(serial, "{}", TIMER.lock().get_elapsed())?;
