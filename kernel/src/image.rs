@@ -19,120 +19,9 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::str;
 
-struct PbmHeader {
-    magic: &'static str,
+struct Header {
     width: usize,
     height: usize,
-}
-
-pub struct Pbm {
-    header: PbmHeader,
-    data: Vec<Vec<u8>>,
-}
-
-impl Pbm {
-    pub fn new(path: &str) -> Pbm {
-        let pbm = INITRD.get_data(path);
-        let index = pbm
-            .iter()
-            .enumerate()
-            .filter(|(_, &x)| x == b'\n')
-            .map(|(i, _)| i)
-            .nth(1)
-            .unwrap();
-        let mut fields = str::from_utf8(&pbm[..index]).unwrap().split_whitespace();
-        let header = PbmHeader {
-            magic: fields.next().unwrap(),
-            width: fields.next().unwrap().parse().unwrap(),
-            height: fields.next().unwrap().parse().unwrap(),
-        };
-        assert_eq!(header.magic, "P4");
-        let mut data = vec![vec![0u8; header.width / 8]; header.height];
-        let pixels = &pbm[index + 1..];
-        for y in 0..header.height {
-            for x in 0..header.width / 8 {
-                data[y][x] = pixels[(y * (header.width / 8)) + x];
-            }
-        }
-        Pbm { header, data }
-    }
-
-    pub fn get_data(&self) -> &Vec<Vec<u8>> {
-        &self.data
-    }
-
-    pub fn get_width(&self) -> usize {
-        self.header.width
-    }
-
-    pub fn get_height(&self) -> usize {
-        self.header.height
-    }
-
-    pub fn get_byte_width(&self) -> usize {
-        self.get_width() / 8
-    }
-}
-
-struct PgmHeader {
-    magic: &'static str,
-    width: usize,
-    height: usize,
-    max_value: u16,
-}
-
-pub struct Pgm {
-    header: PgmHeader,
-    data: Vec<Vec<u8>>,
-}
-
-impl Pgm {
-    pub fn new(path: &str) -> Pgm {
-        let pgm = INITRD.get_data(path);
-        let index = pgm
-            .iter()
-            .enumerate()
-            .filter(|(_, &x)| x == b'\n')
-            .map(|(i, _)| i)
-            .nth(2)
-            .unwrap();
-        let mut fields = str::from_utf8(&pgm[..index]).unwrap().split_whitespace();
-        let header = PgmHeader {
-            magic: fields.next().unwrap(),
-            width: fields.next().unwrap().parse().unwrap(),
-            height: fields.next().unwrap().parse().unwrap(),
-            max_value: fields.next().unwrap().parse().unwrap(),
-        };
-        assert_eq!(header.magic, "P5");
-        assert_eq!(header.max_value, 255);
-        let mut data = vec![vec![0u8; header.width]; header.height];
-        let pixels = &pgm[index + 1..];
-        for y in 0..header.height {
-            for x in 0..header.width {
-                data[y][x] = pixels[(y * header.width) + x];
-            }
-        }
-        Pgm { header, data }
-    }
-
-    pub fn get_data(&self) -> &Vec<Vec<u8>> {
-        &self.data
-    }
-
-    pub fn get_width(&self) -> usize {
-        self.header.width
-    }
-
-    pub fn get_height(&self) -> usize {
-        self.header.height
-    }
-}
-
-struct PpmHeader {
-    magic: &'static str,
-    width: usize,
-    height: usize,
-    max_value: u16,
 }
 
 #[derive(Clone)]
@@ -156,30 +45,30 @@ impl Pixel {
     }
 }
 
-pub struct Ppm {
-    header: PpmHeader,
+pub struct Image {
+    header: Header,
     data: Vec<Vec<Pixel>>,
 }
 
-impl Ppm {
-    pub fn new(path: &str) -> Ppm {
-        let ppm = INITRD.get_data(path);
-        let index = ppm
+impl Image {
+    pub fn new(path: &str) -> Image {
+        let image = INITRD.get_data(path);
+        let mut newlines = image
             .iter()
             .enumerate()
             .filter(|(_, &x)| x == b'\n')
-            .map(|(i, _)| i)
-            .nth(2)
-            .unwrap();
-        let mut fields = str::from_utf8(&ppm[..index]).unwrap().split_whitespace();
-        let header = PpmHeader {
-            magic: fields.next().unwrap(),
-            width: fields.next().unwrap().parse().unwrap(),
-            height: fields.next().unwrap().parse().unwrap(),
-            max_value: fields.next().unwrap().parse().unwrap(),
+            .map(|(i, _)| i);
+        let extension = path.split_terminator('.').last().unwrap();
+        let index = match extension {
+            "pbm" => newlines.nth(1).unwrap(),
+            "pgm" | "ppm" => newlines.nth(2).unwrap(),
+            _ => panic!("Unsupported image file type detected."),
         };
-        assert_eq!(header.magic, "P6");
-        assert_eq!(header.max_value, 255);
+        let mut fields = str::from_utf8(&image[..index]).unwrap().split_whitespace();
+        let header = Header {
+            width: fields.nth(1).unwrap().parse().unwrap(),
+            height: fields.next().unwrap().parse().unwrap(),
+        };
         let mut data = vec![
             vec![
                 Pixel {
@@ -191,18 +80,39 @@ impl Ppm {
             ];
             header.height
         ];
-        let pixels = &ppm[index + 1..];
+        let pixels = &image[index + 1..];
+        let masks = [128, 64, 32, 16, 8, 4, 2, 1];
         for y in 0..header.height {
             for x in 0..header.width {
-                let pixel = Pixel {
-                    red: pixels[(y * header.width * 3) + (3 * x)],
-                    green: pixels[(y * header.width * 3) + (3 * x + 1)],
-                    blue: pixels[(y * header.width * 3) + (3 * x + 2)],
-                };
-                data[y][x] = pixel;
+                data[y][x] = match extension {
+                    "pbm" => {
+                        let pixel = pixels[(y * (header.width / 8)) + x / 8];
+                        let mask = masks[x % 8];
+                        let value = if pixel & mask == 0 { 0xFF } else { 0x00 };
+                        Pixel {
+                            red: value,
+                            green: value,
+                            blue: value,
+                        }
+                    }
+                    "pgm" => {
+                        let value = pixels[(y * header.width) + x];
+                        Pixel {
+                            red: value,
+                            green: value,
+                            blue: value,
+                        }
+                    }
+                    "ppm" => Pixel {
+                        red: pixels[(y * header.width * 3) + (3 * x)],
+                        green: pixels[(y * header.width * 3) + (3 * x + 1)],
+                        blue: pixels[(y * header.width * 3) + (3 * x + 2)],
+                    },
+                    _ => panic!("Unsupported image file type detected."),
+                }
             }
         }
-        Ppm { header, data }
+        Image { header, data }
     }
 
     pub fn get_data(&self) -> &Vec<Vec<Pixel>> {
