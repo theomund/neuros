@@ -34,6 +34,8 @@ BOOTLOADER := bootloader/src/limine
 BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOTLOADER_CFG := bootloader/limine.cfg
 BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
+INIT := initrd/bin/init
+INIT_SOURCE := $(shell find userland/init)
 INITRD := target/initrd.tar
 INITRD_SOURCE := $(shell find initrd)
 ISO := target/NeurOS.iso
@@ -60,11 +62,16 @@ $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
 	$(MAKE) -C bootloader/src
 
-$(INITRD): $(INITRD_SOURCE)
+$(INIT): $(INIT_SOURCE)
+	cargo build --target $(TARGET) --profile $(PROFILE) --package init
+	mkdir -p initrd/bin
+	cp target/$(SUBDIR)/init initrd/bin/
+
+$(INITRD): $(INITRD_SOURCE) $(INIT)
 	tar -H ustar -c -f $(INITRD) initrd
 
 $(KERNEL): $(KERNEL_SOURCE)
-	cargo build --target $(TARGET) --profile $(PROFILE)
+	cargo build --target $(TARGET) --profile $(PROFILE) --package kernel
 
 $(STYLE):
 	vale sync

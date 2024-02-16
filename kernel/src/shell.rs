@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::elf::Elf;
 use crate::initrd::INITRD;
 use crate::logger::LOGGER;
 use crate::serial::SERIAL;
@@ -89,9 +90,18 @@ impl Shell {
                             };
                             writeln!(serial, "{argument}")?;
                         }
+                        "exec" => {
+                            let argument = match input {
+                                Some(pair) => pair.1,
+                                None => "",
+                            };
+                            let path = format!("initrd/bin/{argument}");
+                            Elf::new(path.as_str());
+                        }
                         "help" => {
                             writeln!(serial, "Available commands:")?;
                             writeln!(serial, "\techo -- Display a line of text.")?;
+                            writeln!(serial, "\texec -- Execute a command.")?;
                             writeln!(serial, "\thelp -- Print a list of commands.")?;
                             writeln!(serial, "\tlogs -- Retrieve the system logs.")?;
                             writeln!(serial, "\ttime -- Display the elapsed time.")?;
