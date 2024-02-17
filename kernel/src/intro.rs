@@ -27,32 +27,17 @@ pub fn initialize() -> fmt::Result {
     let height = vga.get_height();
     let font_width = vga.get_font_width();
 
-    let logo = Image::new("initrd/usr/share/images/logo.pbm");
-    vga.set_cursor(
-        (width / 2) - (logo.get_width() / 2),
-        height / 8,
-        Color::White as u32,
-        Color::Black as u32,
-    );
-    vga.draw_image(&logo);
+    let mut logo = Image::new("initrd/usr/share/images/logo.pbm");
+    logo.set_position((width / 2) - (logo.get_width() / 2), height / 8);
+    logo.draw(&vga);
 
-    let neuro = Image::new("initrd/usr/share/images/neuro.ppm");
-    vga.set_cursor(
-        (width / 3) - (neuro.get_width() / 2),
-        height / 2,
-        Color::White as u32,
-        Color::Black as u32,
-    );
-    vga.draw_image(&neuro);
+    let mut neuro = Image::new("initrd/usr/share/images/neuro.ppm");
+    neuro.set_position((width / 3) - (neuro.get_width() / 2), height / 2);
+    neuro.draw(&vga);
 
-    let evil = Image::new("initrd/usr/share/images/evil.ppm");
-    vga.set_cursor(
-        width - (width / 3) - (evil.get_width() / 2),
-        height / 2,
-        Color::White as u32,
-        Color::Black as u32,
-    );
-    vga.draw_image(&evil);
+    let mut evil = Image::new("initrd/usr/share/images/evil.ppm");
+    evil.set_position(width - (width / 3) - (evil.get_width() / 2), height / 2);
+    evil.draw(&vga);
 
     vga.set_cursor(
         font_width,

@@ -15,13 +15,17 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::initrd::INITRD;
+use crate::vga::Vga;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::str;
+use spin::MutexGuard;
 
 struct Header {
     width: usize,
     height: usize,
+    x: usize,
+    y: usize,
 }
 
 #[derive(Clone)]
@@ -68,6 +72,8 @@ impl Image {
         let header = Header {
             width: fields.nth(1).unwrap().parse().unwrap(),
             height: fields.next().unwrap().parse().unwrap(),
+            x: 0,
+            y: 0,
         };
         let mut data = vec![
             vec![
@@ -115,15 +121,30 @@ impl Image {
         Image { header, data }
     }
 
-    pub fn get_data(&self) -> &Vec<Vec<Pixel>> {
-        &self.data
+    pub fn draw(self, vga: &MutexGuard<Vga>) {
+        let data = self.data;
+        let height = self.header.height;
+        let width = self.header.width;
+        let x = self.header.x;
+        let y = self.header.y;
+
+        for (iy, row) in data.iter().enumerate().take(height) {
+            for (ix, column) in row.iter().enumerate().take(width) {
+                let red = u32::from(column.get_red());
+                let green = u32::from(column.get_green());
+                let blue = u32::from(column.get_blue());
+                let color = red << 16 | green << 8 | blue;
+                vga.draw_pixel(x + ix, y + iy, color);
+            }
+        }
     }
 
     pub fn get_width(&self) -> usize {
         self.header.width
     }
 
-    pub fn get_height(&self) -> usize {
-        self.header.height
+    pub fn set_position(&mut self, x: usize, y: usize) {
+        self.header.x = x;
+        self.header.y = y;
     }
 }
