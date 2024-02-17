@@ -20,6 +20,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use core::fmt::{Arguments, Result, Write};
 use core::ptr;
+use core::sync::atomic::{AtomicPtr, Ordering};
 use limine::request::FramebufferRequest;
 use spin::{Lazy, Mutex};
 use x86_64::instructions::interrupts::without_interrupts;
@@ -52,16 +53,13 @@ struct Cursor {
 }
 
 pub struct Vga {
-    address: *mut u8,
+    address: AtomicPtr<u8>,
     cursor: Cursor,
     font: Font,
     height: u64,
     pitch: u64,
     width: u64,
 }
-
-unsafe impl Send for Vga {}
-unsafe impl Sync for Vga {}
 
 impl Write for Vga {
     fn write_str(&mut self, s: &str) -> Result {
@@ -162,7 +160,7 @@ impl Vga {
         if let Some(framebuffer_response) = FRAMEBUFFER_REQUEST.get_response() {
             let framebuffer = framebuffer_response.framebuffers().next().unwrap();
             Vga {
-                address: framebuffer.addr(),
+                address: AtomicPtr::new(framebuffer.addr()),
                 cursor: Cursor {
                     x: 0,
                     y: 0,
@@ -193,7 +191,11 @@ impl Vga {
 
     pub fn draw_pixel(&self, x: usize, y: usize, color: u32) {
         let offset = y * usize::try_from(self.pitch).unwrap() + x * 4;
-        let pixel = self.address.wrapping_add(offset).cast::<u32>();
+        let pixel = self
+            .address
+            .load(Ordering::Relaxed)
+            .wrapping_add(offset)
+            .cast::<u32>();
         unsafe {
             ptr::write(pixel, color);
         }
