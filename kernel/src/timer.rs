@@ -14,31 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use spin::{Lazy, Mutex};
+use core::sync::atomic::{AtomicU32, Ordering};
+use spin::Lazy;
 
-pub static TIMER: Lazy<Mutex<Timer>> = Lazy::new(|| {
-    let timer = Timer::new();
-    Mutex::new(timer)
-});
+pub static TIMER: Lazy<Timer> = Lazy::new(Timer::new);
 
 pub struct Timer {
-    elapsed: u32,
+    elapsed: AtomicU32,
 }
 
 impl Timer {
     pub fn new() -> Timer {
-        Timer { elapsed: 0 }
+        Timer {
+            elapsed: AtomicU32::new(0),
+        }
     }
 
     pub fn get_elapsed(&self) -> u32 {
-        self.elapsed
+        self.elapsed.load(Ordering::Relaxed)
     }
 
-    pub fn set_elapsed(&mut self, value: u32) {
-        self.elapsed = value;
-    }
-
-    pub fn increment(&mut self) {
-        self.elapsed += 1;
+    pub fn increment(&self) {
+        self.elapsed.fetch_add(1, Ordering::Relaxed);
     }
 }

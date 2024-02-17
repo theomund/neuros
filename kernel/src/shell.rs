@@ -119,7 +119,7 @@ impl Shell {
                             writeln!(serial, "{}", self.working_directory)?;
                         }
                         "time" => {
-                            writeln!(serial, "{}", TIMER.lock().get_elapsed())?;
+                            writeln!(serial, "{}", TIMER.get_elapsed())?;
                         }
                         _ => {
                             writeln!(serial, "{RED}ERROR: Command not found.")?;

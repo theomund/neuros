@@ -49,7 +49,7 @@ extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) 
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
-    TIMER.lock().increment();
+    TIMER.increment();
     SCHEDULER.lock().tick();
 
     unsafe {
