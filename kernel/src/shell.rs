@@ -17,6 +17,7 @@
 use crate::elf::Elf;
 use crate::initrd::INITRD;
 use crate::logger::LOGGER;
+use crate::serial::Serial;
 use crate::serial::SERIAL;
 use crate::timer::TIMER;
 use alloc::format;
@@ -24,7 +25,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 use core::str;
-use spin::{Lazy, Mutex};
+use spin::MutexGuard;
 
 pub const BLUE: &str = "\x1b[38;2;0;151;230m";
 pub const BOLD: &str = "\x1b[1m";
@@ -61,18 +62,16 @@ impl Shell {
         }
     }
 
-    pub fn display<T: Write>(&self, writer: &Lazy<Mutex<T>>) -> Result {
+    pub fn display<T: Write>(&self, writer: &mut MutexGuard<T>) -> Result {
         let motd = str::from_utf8(INITRD.get_data("initrd/etc/motd")).unwrap();
-        let mut lock = writer.lock();
-        writeln!(lock, "{motd}")?;
-        write!(lock, "{}", self.prompt)?;
+        writeln!(writer, "{motd}")?;
+        write!(writer, "{}", self.prompt)?;
         Ok(())
     }
 
-    pub fn interpret(&mut self) -> Result {
-        let mut serial = SERIAL.lock();
+    pub fn interpret(&mut self, writer: &mut MutexGuard<Serial>) -> Result {
         loop {
-            let character = serial.read() as char;
+            let character = writer.read() as char;
             match character {
                 '\r' => {
                     let line: String = self.buffer.iter().collect();
@@ -81,14 +80,14 @@ impl Shell {
                         Some(pair) => pair.0,
                         None => line.as_str(),
                     };
-                    writeln!(serial, "{NORMAL}")?;
+                    writeln!(writer, "{NORMAL}")?;
                     match command {
                         "echo" => {
                             let argument = match input {
                                 Some(pair) => pair.1,
                                 None => "",
                             };
-                            writeln!(serial, "{argument}")?;
+                            writeln!(writer, "{argument}")?;
                         }
                         "exec" => {
                             let argument = match input {
@@ -99,44 +98,44 @@ impl Shell {
                             Elf::new(path.as_str());
                         }
                         "help" => {
-                            writeln!(serial, "Available commands:")?;
-                            writeln!(serial, "\techo -- Display a line of text.")?;
-                            writeln!(serial, "\texec -- Execute a command.")?;
-                            writeln!(serial, "\thelp -- Print a list of commands.")?;
-                            writeln!(serial, "\tlogs -- Retrieve the system logs.")?;
-                            writeln!(serial, "\ttime -- Display the elapsed time.")?;
+                            writeln!(writer, "Available commands:")?;
+                            writeln!(writer, "\techo -- Display a line of text.")?;
+                            writeln!(writer, "\texec -- Execute a command.")?;
+                            writeln!(writer, "\thelp -- Print a list of commands.")?;
+                            writeln!(writer, "\tlogs -- Retrieve the system logs.")?;
+                            writeln!(writer, "\ttime -- Display the elapsed time.")?;
                             writeln!(
-                                serial,
+                                writer,
                                 "\tpwd  -- Print the name of the current working directory."
                             )?;
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
-                                writeln!(serial, "{log}")?;
+                                writeln!(writer, "{log}")?;
                             }
                         }
                         "pwd" => {
-                            writeln!(serial, "{}", self.working_directory)?;
+                            writeln!(writer, "{}", self.working_directory)?;
                         }
                         "time" => {
-                            writeln!(serial, "{}", TIMER.get_elapsed())?;
+                            writeln!(writer, "{}", TIMER.get_elapsed())?;
                         }
                         _ => {
-                            writeln!(serial, "{RED}ERROR: Command not found.")?;
+                            writeln!(writer, "{RED}ERROR: Command not found.")?;
                         }
                     }
-                    write!(serial, "{}", self.prompt)?;
+                    write!(writer, "{}", self.prompt)?;
                     self.buffer.clear();
                 }
                 '\x08' => {
                     if !self.buffer.is_empty() {
                         self.buffer.pop();
-                        write!(serial, "{character} {character}")?;
+                        write!(writer, "{character} {character}")?;
                     }
                 }
                 _ => {
                     self.buffer.push(character);
-                    write!(serial, "{character}")?;
+                    write!(writer, "{character}")?;
                 }
             }
         }
@@ -145,8 +144,11 @@ impl Shell {
 
 pub fn initialize() {
     let mut shell = Shell::new();
+    let mut serial = SERIAL.lock();
     shell
-        .display(&SERIAL)
+        .display(&mut serial)
         .expect("Failed to display serial console.");
-    shell.interpret().expect("Failed to interpret shell input.");
+    shell
+        .interpret(&mut serial)
+        .expect("Failed to interpret shell input.");
 }
