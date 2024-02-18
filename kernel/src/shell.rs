@@ -89,25 +89,15 @@ impl Shell {
                             };
                             writeln!(writer, "{argument}")?;
                         }
-                        "exec" => {
-                            let argument = match input {
-                                Some(pair) => pair.1,
-                                None => "",
-                            };
-                            let path = format!("initrd/bin/{argument}");
-                            Elf::new(path.as_str());
-                        }
                         "help" => {
                             writeln!(writer, "Available commands:")?;
-                            writeln!(writer, "\techo -- Display a line of text.")?;
-                            writeln!(writer, "\texec -- Execute a command.")?;
-                            writeln!(writer, "\thelp -- Print a list of commands.")?;
-                            writeln!(writer, "\tlogs -- Retrieve the system logs.")?;
-                            writeln!(writer, "\ttime -- Display the elapsed time.")?;
-                            writeln!(
-                                writer,
-                                "\tpwd  -- Print the name of the current working directory."
-                            )?;
+                            writeln!(writer, "\techo    -- Display a line of text.")?;
+                            writeln!(writer, "\texec    -- Execute a command.")?;
+                            writeln!(writer, "\thelp    -- Print a list of commands.")?;
+                            writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
+                            writeln!(writer, "\treadelf -- Read ELF executable file.")?;
+                            writeln!(writer, "\ttime    -- Display the elapsed time.")?;
+                            writeln!(writer, "\tpwd     -- Print current working directory.")?;
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
@@ -116,6 +106,14 @@ impl Shell {
                         }
                         "pwd" => {
                             writeln!(writer, "{}", self.working_directory)?;
+                        }
+                        "readelf" => {
+                            let argument = match input {
+                                Some(pair) => pair.1,
+                                None => "",
+                            };
+                            let executable = Elf::new(argument);
+                            writeln!(writer, "{executable}")?;
                         }
                         "time" => {
                             writeln!(writer, "{}", TIMER.get_elapsed())?;

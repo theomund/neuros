@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::initrd::INITRD;
+use core::fmt::{Display, Formatter};
 
 struct Header {
     magic: u32,
@@ -30,7 +31,7 @@ struct Header {
     ph_offset: u64,
     sh_offset: u64,
     flags: u32,
-    header_size: u16,
+    eh_size: u16,
     ph_size: u16,
     ph_number: u16,
     sh_size: u16,
@@ -40,6 +41,99 @@ struct Header {
 
 pub struct Elf {
     header: Header,
+}
+
+impl Display for Elf {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        writeln!(f, "ELF Header:")?;
+        writeln!(f, "  Magic: 0x{:x}", self.header.magic)?;
+        let class = match self.header.class {
+            1 => "ELF32",
+            2 => "ELF64",
+            _ => "Unknown",
+        };
+        writeln!(f, "  Class: {class}")?;
+        let data = match self.header.data {
+            1 => "2's complement, little endian",
+            2 => "2's complement, big endian",
+            _ => "Unknown",
+        };
+        writeln!(f, "  Data: {data}")?;
+        let version = match self.header.version {
+            1 => "1 (current)",
+            _ => "Unknown",
+        };
+        writeln!(f, "  Version: {version}")?;
+        let os_abi = match self.header.os_abi {
+            0 => "UNIX - System V",
+            1 => "UNIX - HP-UX",
+            2 => "UNIX - NetBSD",
+            3 => "UNIX - Linux",
+            4 => "UNIX - GNU Hurd",
+            6 => "UNIX - Solaris",
+            7 => "UNIX - AIX",
+            8 => "UNIX - IRIX",
+            9 => "UNIX - FreeBSD",
+            10 => "UNIX - TRU64",
+            11 => "Novell - Modesto",
+            12 => "UNIX - OpenBSD",
+            13 => "VMS - OpenVMS",
+            14 => "HP - Non-Stop Kernel",
+            15 => "AROS",
+            16 => "FenixOS",
+            17 => "Nuxi CloudABI",
+            18 => "Stratus Technologies OpenVOS",
+            _ => "Unknown",
+        };
+        writeln!(f, "  OS/ABI: {os_abi}")?;
+        writeln!(f, "  ABI Version: {}", self.header.abi_version)?;
+        let file_type = match self.header.file_type {
+            0 => "NONE (None)",
+            1 => "REL (Relocatable file)",
+            2 => "EXEC (Executable file)",
+            3 => "DYN (Position-Independent Executable file)",
+            4 => "CORE (Core file)",
+            _ => "Unknown",
+        };
+        writeln!(f, "  Type: {file_type}")?;
+        let machine = match self.header.machine {
+            0x3E => "Advanced Micro Devices X86-64",
+            _ => "Unknown",
+        };
+        writeln!(f, "  Machine: {machine}")?;
+        writeln!(f, "  Version: 0x{:x}", self.header.exec_version)?;
+        writeln!(f, "  Entry point address: 0x{:x}", self.header.entrypoint)?;
+        writeln!(
+            f,
+            "  Start of program headers: {} (bytes into file)",
+            self.header.ph_offset
+        )?;
+        writeln!(
+            f,
+            "  Start of section headers: {} (bytes into file)",
+            self.header.sh_offset
+        )?;
+        writeln!(f, "  Flags: 0x{:x}", self.header.flags)?;
+        writeln!(f, "  Size of this header: {} (bytes)", self.header.eh_size)?;
+        writeln!(
+            f,
+            "  Size of program headers: {} (bytes)",
+            self.header.ph_size
+        )?;
+        writeln!(f, "  Number of program headers: {}", self.header.ph_number)?;
+        writeln!(
+            f,
+            "  Size of section headers: {} (bytes)",
+            self.header.sh_size
+        )?;
+        writeln!(f, "  Number of section headers: {}", self.header.sh_number)?;
+        writeln!(
+            f,
+            "  Section header string table index: {}",
+            self.header.sh_index
+        )?;
+        Ok(())
+    }
 }
 
 impl Elf {
@@ -65,7 +159,7 @@ impl Elf {
                 data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47],
             ]),
             flags: u32::from_le_bytes([data[48], data[49], data[50], data[51]]),
-            header_size: u16::from_le_bytes([data[52], data[53]]),
+            eh_size: u16::from_le_bytes([data[52], data[53]]),
             ph_size: u16::from_le_bytes([data[54], data[55]]),
             ph_number: u16::from_le_bytes([data[56], data[57]]),
             sh_size: u16::from_le_bytes([data[58], data[59]]),
