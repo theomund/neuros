@@ -92,7 +92,6 @@ impl Shell {
                         "help" => {
                             writeln!(writer, "Available commands:")?;
                             writeln!(writer, "\techo    -- Display a line of text.")?;
-                            writeln!(writer, "\texec    -- Execute a command.")?;
                             writeln!(writer, "\thelp    -- Print a list of commands.")?;
                             writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
                             writeln!(writer, "\treadelf -- Read ELF executable file.")?;
