@@ -18,16 +18,15 @@ SHELL := /bin/sh
 
 DEBUG := false
 PROFILE := dev
-TARGET := x86_64-unknown-none
 
 ifeq ($(DEBUG),true)
     DEBUG_FLAGS := -s -S
 endif
 
 ifeq ($(PROFILE),dev)
-    SUBDIR := $(TARGET)/debug
+    SUBDIR := debug
 else
-    SUBDIR := $(TARGET)/$(PROFILE)
+    SUBDIR := $(PROFILE)
 endif
 
 BOOTLOADER := bootloader/src/limine
@@ -40,7 +39,7 @@ INITRD := target/initrd.tar
 INITRD_SOURCE := $(shell find initrd)
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
-KERNEL := target/$(SUBDIR)/kernel
+KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .vale/styles/RedHat
@@ -63,15 +62,15 @@ $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	$(MAKE) -C bootloader/src
 
 $(INIT): $(INIT_SOURCE)
-	cargo build --target $(TARGET) --profile $(PROFILE) --package init
+	cargo build --profile $(PROFILE) --package init
 	mkdir -p initrd/bin
-	cp target/$(SUBDIR)/init initrd/bin/
+	cp target/x86_64-unknown-none/$(SUBDIR)/init initrd/bin/
 
 $(INITRD): $(INITRD_SOURCE) $(INIT)
 	tar -H ustar -c -f $(INITRD) initrd
 
 $(KERNEL): $(KERNEL_SOURCE)
-	cargo build --target $(TARGET) --profile $(PROFILE) --package kernel
+	cargo build --profile $(PROFILE) --package kernel
 
 $(STYLE):
 	vale sync
@@ -106,7 +105,7 @@ image:
 
 .PHONY: lint
 lint: $(STYLE)
-	cargo clippy --target $(TARGET) --profile $(PROFILE)
+	cargo clippy --profile $(PROFILE)
 	hadolint Dockerfile
 	vale README.md
 
