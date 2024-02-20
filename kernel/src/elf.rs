@@ -51,9 +51,23 @@ struct Program {
     alignment: u64,
 }
 
+struct Section {
+    name: u32,
+    header_type: u32,
+    flags: u64,
+    address: u64,
+    offset: u64,
+    size: u64,
+    link: u32,
+    info: u32,
+    alignment: u64,
+    entry_size: u64,
+}
+
 pub struct Elf {
     header: Header,
     programs: Vec<Program>,
+    sections: Vec<Section>,
 }
 
 impl Display for Elf {
@@ -213,6 +227,46 @@ impl Elf {
             };
             programs.push(program);
         }
-        Elf { header, programs }
+        let mut sections: Vec<Section> = Vec::new();
+        for index in 0..header.sh_number {
+            let offset = header.sh_offset + u64::from(index * header.sh_size);
+            let slice = &data[usize::try_from(offset).unwrap()..];
+            let section = Section {
+                name: u32::from_le_bytes([slice[0], slice[1], slice[2], slice[3]]),
+                header_type: u32::from_le_bytes([slice[4], slice[5], slice[6], slice[7]]),
+                flags: u64::from_le_bytes([
+                    slice[8], slice[9], slice[10], slice[11], slice[12], slice[13], slice[14],
+                    slice[15],
+                ]),
+                address: u64::from_le_bytes([
+                    slice[16], slice[17], slice[18], slice[19], slice[20], slice[21], slice[22],
+                    slice[23],
+                ]),
+                offset: u64::from_le_bytes([
+                    slice[24], slice[25], slice[26], slice[27], slice[28], slice[29], slice[30],
+                    slice[31],
+                ]),
+                size: u64::from_le_bytes([
+                    slice[32], slice[33], slice[34], slice[35], slice[36], slice[37], slice[38],
+                    slice[39],
+                ]),
+                link: u32::from_le_bytes([slice[40], slice[41], slice[42], slice[43]]),
+                info: u32::from_le_bytes([slice[44], slice[45], slice[46], slice[47]]),
+                alignment: u64::from_le_bytes([
+                    slice[48], slice[49], slice[50], slice[51], slice[52], slice[53], slice[54],
+                    slice[55],
+                ]),
+                entry_size: u64::from_le_bytes([
+                    slice[56], slice[57], slice[58], slice[59], slice[60], slice[61], slice[62],
+                    slice[63],
+                ]),
+            };
+            sections.push(section);
+        }
+        Elf {
+            header,
+            programs,
+            sections,
+        }
     }
 }
