@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::ansi::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
 use crate::font::Font;
-use crate::shell::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
 use alloc::format;
 use alloc::string::{String, ToString};
 use core::fmt::{Arguments, Result, Write};

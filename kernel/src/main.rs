@@ -22,6 +22,7 @@
 
 extern crate alloc;
 
+mod ansi;
 mod elf;
 mod font;
 mod image;

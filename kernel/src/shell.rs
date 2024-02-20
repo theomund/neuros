@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::ansi::{BLUE, BOLD, DEFAULT, GREEN, NORMAL, RED};
 use crate::elf::Elf;
 use crate::initrd::INITRD;
 use crate::logger::LOGGER;
@@ -26,16 +27,6 @@ use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 use core::str;
 use spin::MutexGuard;
-
-pub const BLUE: &str = "\x1b[38;2;0;151;230m";
-pub const BOLD: &str = "\x1b[1m";
-pub const DEFAULT: &str = "\x1b[39m";
-pub const GREEN: &str = "\x1b[38;2;68;189;50m";
-pub const NORMAL: &str = "\x1b[0m";
-pub const ORANGE: &str = "\x1b[38;2;194;54;52m";
-pub const PURPLE: &str = "\x1b[38;2;140;122;230m";
-pub const RED: &str = "\x1b[38;2;232;65;24m";
-pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 
 pub struct Shell {
     buffer: Vec<char>,
