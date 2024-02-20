@@ -68,7 +68,7 @@ pub fn initialize() -> fmt::Result {
         Color::White as u32,
         Color::Black as u32,
     );
-    write!(vga, "{instruction}").expect("Failed to write instruction.");
+    write!(vga, "{instruction}")?;
 
     info!("The operating system has been successfully initialized.");
 
