@@ -40,6 +40,38 @@ struct Header {
     sh_index: u16,
 }
 
+impl Header {
+    pub fn new(data: &[u8]) -> Header {
+        Header {
+            magic: u32::from_le_bytes([data[0], data[1], data[2], data[3]]),
+            class: data[4],
+            data: data[5],
+            version: data[6],
+            os_abi: data[7],
+            abi_version: data[8],
+            file_type: u16::from_le_bytes([data[16], data[17]]),
+            machine: u16::from_le_bytes([data[18], data[19]]),
+            exec_version: u32::from_le_bytes([data[20], data[21], data[22], data[23]]),
+            entrypoint: u64::from_le_bytes([
+                data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31],
+            ]),
+            ph_offset: u64::from_le_bytes([
+                data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39],
+            ]),
+            sh_offset: u64::from_le_bytes([
+                data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47],
+            ]),
+            flags: u32::from_le_bytes([data[48], data[49], data[50], data[51]]),
+            eh_size: u16::from_le_bytes([data[52], data[53]]),
+            ph_size: u16::from_le_bytes([data[54], data[55]]),
+            ph_number: u16::from_le_bytes([data[56], data[57]]),
+            sh_size: u16::from_le_bytes([data[58], data[59]]),
+            sh_number: u16::from_le_bytes([data[60], data[61]]),
+            sh_index: u16::from_le_bytes([data[62], data[63]]),
+        }
+    }
+}
+
 struct Program {
     segment_type: u32,
     flags: u32,
@@ -49,6 +81,33 @@ struct Program {
     file_size: u64,
     memory_size: u64,
     alignment: u64,
+}
+
+impl Program {
+    pub fn new(data: &[u8]) -> Program {
+        Program {
+            segment_type: u32::from_le_bytes([data[0], data[1], data[2], data[3]]),
+            flags: u32::from_le_bytes([data[4], data[5], data[6], data[7]]),
+            offset: u64::from_le_bytes([
+                data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15],
+            ]),
+            virtual_address: u64::from_le_bytes([
+                data[16], data[17], data[18], data[19], data[20], data[21], data[22], data[23],
+            ]),
+            physical_address: u64::from_le_bytes([
+                data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31],
+            ]),
+            file_size: u64::from_le_bytes([
+                data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39],
+            ]),
+            memory_size: u64::from_le_bytes([
+                data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47],
+            ]),
+            alignment: u64::from_le_bytes([
+                data[48], data[49], data[50], data[51], data[52], data[53], data[54], data[55],
+            ]),
+        }
+    }
 }
 
 struct Section {
@@ -62,6 +121,35 @@ struct Section {
     info: u32,
     alignment: u64,
     entry_size: u64,
+}
+
+impl Section {
+    pub fn new(data: &[u8]) -> Section {
+        Section {
+            name: u32::from_le_bytes([data[0], data[1], data[2], data[3]]),
+            header_type: u32::from_le_bytes([data[4], data[5], data[6], data[7]]),
+            flags: u64::from_le_bytes([
+                data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15],
+            ]),
+            address: u64::from_le_bytes([
+                data[16], data[17], data[18], data[19], data[20], data[21], data[22], data[23],
+            ]),
+            offset: u64::from_le_bytes([
+                data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31],
+            ]),
+            size: u64::from_le_bytes([
+                data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39],
+            ]),
+            link: u32::from_le_bytes([data[40], data[41], data[42], data[43]]),
+            info: u32::from_le_bytes([data[44], data[45], data[46], data[47]]),
+            alignment: u64::from_le_bytes([
+                data[48], data[49], data[50], data[51], data[52], data[53], data[54], data[55],
+            ]),
+            entry_size: u64::from_le_bytes([
+                data[56], data[57], data[58], data[59], data[60], data[61], data[62], data[63],
+            ]),
+        }
+    }
 }
 
 pub struct Elf {
@@ -166,101 +254,19 @@ impl Display for Elf {
 impl Elf {
     pub fn new(path: &str) -> Elf {
         let data = INITRD.get_data(path);
-        let header = Header {
-            magic: u32::from_le_bytes([data[0], data[1], data[2], data[3]]),
-            class: data[4],
-            data: data[5],
-            version: data[6],
-            os_abi: data[7],
-            abi_version: data[8],
-            file_type: u16::from_le_bytes([data[16], data[17]]),
-            machine: u16::from_le_bytes([data[18], data[19]]),
-            exec_version: u32::from_le_bytes([data[20], data[21], data[22], data[23]]),
-            entrypoint: u64::from_le_bytes([
-                data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31],
-            ]),
-            ph_offset: u64::from_le_bytes([
-                data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39],
-            ]),
-            sh_offset: u64::from_le_bytes([
-                data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47],
-            ]),
-            flags: u32::from_le_bytes([data[48], data[49], data[50], data[51]]),
-            eh_size: u16::from_le_bytes([data[52], data[53]]),
-            ph_size: u16::from_le_bytes([data[54], data[55]]),
-            ph_number: u16::from_le_bytes([data[56], data[57]]),
-            sh_size: u16::from_le_bytes([data[58], data[59]]),
-            sh_number: u16::from_le_bytes([data[60], data[61]]),
-            sh_index: u16::from_le_bytes([data[62], data[63]]),
-        };
+        let header = Header::new(data);
         let mut programs: Vec<Program> = Vec::new();
         for index in 0..header.ph_number {
             let offset = header.ph_offset + u64::from(index * header.ph_size);
             let slice = &data[usize::try_from(offset).unwrap()..];
-            let program = Program {
-                segment_type: u32::from_le_bytes([slice[0], slice[1], slice[2], slice[3]]),
-                flags: u32::from_le_bytes([slice[4], slice[5], slice[6], slice[7]]),
-                offset: u64::from_le_bytes([
-                    slice[8], slice[9], slice[10], slice[11], slice[12], slice[13], slice[14],
-                    slice[15],
-                ]),
-                virtual_address: u64::from_le_bytes([
-                    slice[16], slice[17], slice[18], slice[19], slice[20], slice[21], slice[22],
-                    slice[23],
-                ]),
-                physical_address: u64::from_le_bytes([
-                    slice[24], slice[25], slice[26], slice[27], slice[28], slice[29], slice[30],
-                    slice[31],
-                ]),
-                file_size: u64::from_le_bytes([
-                    slice[32], slice[33], slice[34], slice[35], slice[36], slice[37], slice[38],
-                    slice[39],
-                ]),
-                memory_size: u64::from_le_bytes([
-                    slice[40], slice[41], slice[42], slice[43], slice[44], slice[45], slice[46],
-                    slice[47],
-                ]),
-                alignment: u64::from_le_bytes([
-                    slice[48], slice[49], slice[50], slice[51], slice[52], slice[53], slice[54],
-                    slice[55],
-                ]),
-            };
+            let program = Program::new(slice);
             programs.push(program);
         }
         let mut sections: Vec<Section> = Vec::new();
         for index in 0..header.sh_number {
             let offset = header.sh_offset + u64::from(index * header.sh_size);
             let slice = &data[usize::try_from(offset).unwrap()..];
-            let section = Section {
-                name: u32::from_le_bytes([slice[0], slice[1], slice[2], slice[3]]),
-                header_type: u32::from_le_bytes([slice[4], slice[5], slice[6], slice[7]]),
-                flags: u64::from_le_bytes([
-                    slice[8], slice[9], slice[10], slice[11], slice[12], slice[13], slice[14],
-                    slice[15],
-                ]),
-                address: u64::from_le_bytes([
-                    slice[16], slice[17], slice[18], slice[19], slice[20], slice[21], slice[22],
-                    slice[23],
-                ]),
-                offset: u64::from_le_bytes([
-                    slice[24], slice[25], slice[26], slice[27], slice[28], slice[29], slice[30],
-                    slice[31],
-                ]),
-                size: u64::from_le_bytes([
-                    slice[32], slice[33], slice[34], slice[35], slice[36], slice[37], slice[38],
-                    slice[39],
-                ]),
-                link: u32::from_le_bytes([slice[40], slice[41], slice[42], slice[43]]),
-                info: u32::from_le_bytes([slice[44], slice[45], slice[46], slice[47]]),
-                alignment: u64::from_le_bytes([
-                    slice[48], slice[49], slice[50], slice[51], slice[52], slice[53], slice[54],
-                    slice[55],
-                ]),
-                entry_size: u64::from_le_bytes([
-                    slice[56], slice[57], slice[58], slice[59], slice[60], slice[61], slice[62],
-                    slice[63],
-                ]),
-            };
+            let section = Section::new(slice);
             sections.push(section);
         }
         Elf {
