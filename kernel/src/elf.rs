@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::initrd::INITRD;
+use alloc::vec::Vec;
 use core::fmt::{Display, Formatter};
 
 struct Header {
@@ -39,8 +40,20 @@ struct Header {
     sh_index: u16,
 }
 
+struct Program {
+    segment_type: u32,
+    flags: u32,
+    offset: u64,
+    virtual_address: u64,
+    physical_address: u64,
+    file_size: u64,
+    memory_size: u64,
+    alignment: u64,
+}
+
 pub struct Elf {
     header: Header,
+    programs: Vec<Program>,
 }
 
 impl Display for Elf {
@@ -166,6 +179,40 @@ impl Elf {
             sh_number: u16::from_le_bytes([data[60], data[61]]),
             sh_index: u16::from_le_bytes([data[62], data[63]]),
         };
-        Elf { header }
+        let mut programs: Vec<Program> = Vec::new();
+        for index in 0..header.ph_number {
+            let offset = header.ph_offset + u64::from(index * header.ph_size);
+            let slice = &data[usize::try_from(offset).unwrap()..];
+            let program = Program {
+                segment_type: u32::from_le_bytes([slice[0], slice[1], slice[2], slice[3]]),
+                flags: u32::from_le_bytes([slice[4], slice[5], slice[6], slice[7]]),
+                offset: u64::from_le_bytes([
+                    slice[8], slice[9], slice[10], slice[11], slice[12], slice[13], slice[14],
+                    slice[15],
+                ]),
+                virtual_address: u64::from_le_bytes([
+                    slice[16], slice[17], slice[18], slice[19], slice[20], slice[21], slice[22],
+                    slice[23],
+                ]),
+                physical_address: u64::from_le_bytes([
+                    slice[24], slice[25], slice[26], slice[27], slice[28], slice[29], slice[30],
+                    slice[31],
+                ]),
+                file_size: u64::from_le_bytes([
+                    slice[32], slice[33], slice[34], slice[35], slice[36], slice[37], slice[38],
+                    slice[39],
+                ]),
+                memory_size: u64::from_le_bytes([
+                    slice[40], slice[41], slice[42], slice[43], slice[44], slice[45], slice[46],
+                    slice[47],
+                ]),
+                alignment: u64::from_le_bytes([
+                    slice[48], slice[49], slice[50], slice[51], slice[52], slice[53], slice[54],
+                    slice[55],
+                ]),
+            };
+            programs.push(program);
+        }
+        Elf { header, programs }
     }
 }
