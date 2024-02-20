@@ -58,12 +58,8 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    if let Some(payload) = info.payload().downcast_ref::<&str>() {
-        let log = format!("The kernel has panicked: {payload:?}");
-        fatal!(log.as_str());
-    } else {
-        fatal!("The kernel has panicked.");
-    }
+    let log = format!("The kernel has panicked.\n\n{info}");
+    fatal!(log.as_str());
     halt();
 }
 
