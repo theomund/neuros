@@ -39,7 +39,11 @@ pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
 
 pub struct Shell {
     buffer: Vec<char>,
+    group: String,
+    group_id: u32,
     prompt: String,
+    user_id: u32,
+    username: String,
     working_directory: String,
 }
 
@@ -52,12 +56,22 @@ impl Shell {
             .unwrap()
             .split_terminator(':');
         let username = passwd.nth(0).unwrap();
-        let home = passwd.nth(4).unwrap();
+        let user_id = passwd.nth(1).unwrap().parse().unwrap();
+        let group_id = passwd.nth(0).unwrap().parse().unwrap();
+        let home = passwd.nth(1).unwrap();
+        let mut groups = str::from_utf8(INITRD.get_data("initrd/etc/group"))
+            .unwrap()
+            .split_terminator(':');
+        let group = groups.nth(0).unwrap();
         Shell {
             buffer: Vec::new(),
+            group: group.to_string(),
+            group_id,
             prompt: format!(
                 "{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}{home}{DEFAULT}]# "
             ),
+            user_id,
+            username: username.to_string(),
             working_directory: home.to_string(),
         }
     }
@@ -93,10 +107,18 @@ impl Shell {
                             writeln!(writer, "Available commands:")?;
                             writeln!(writer, "\techo    -- Display a line of text.")?;
                             writeln!(writer, "\thelp    -- Print a list of commands.")?;
+                            writeln!(writer, "\tid      -- Print user and group ID.")?;
                             writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
                             writeln!(writer, "\treadelf -- Read ELF executable file.")?;
                             writeln!(writer, "\ttime    -- Display the elapsed time.")?;
                             writeln!(writer, "\tpwd     -- Print current working directory.")?;
+                        }
+                        "id" => {
+                            writeln!(
+                                writer,
+                                "uid={}({}) gid={}({})",
+                                self.user_id, self.username, self.group_id, self.group
+                            )?;
                         }
                         "logs" => {
                             for log in LOGGER.lock().get_logs() {
