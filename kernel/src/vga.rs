@@ -191,13 +191,9 @@ impl Vga {
 
     pub fn draw_pixel(&self, x: usize, y: usize, color: u32) {
         let offset = y * usize::try_from(self.pitch).unwrap() + x * 4;
-        let pixel = self
-            .address
-            .load(Ordering::Relaxed)
-            .wrapping_add(offset)
-            .cast::<u32>();
+        let pixel = self.address.load(Ordering::Relaxed).wrapping_add(offset);
         unsafe {
-            ptr::write(pixel, color);
+            ptr::write_unaligned(pixel.cast::<u32>(), color);
         }
     }
 
