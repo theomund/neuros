@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::ansi::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
+use crate::ansi::{BLUE, BOLD, DEFAULT, GREEN, NORMAL, ORANGE, PURPLE, RED, YELLOW};
 use crate::font::Font;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -92,6 +92,9 @@ impl Write for Vga {
                     let mut sequence: String = chars.take_while(|x| *x != 'm').collect();
                     sequence = format!("\x1b{sequence}m");
                     match sequence.as_str() {
+                        BOLD => {
+                            self.font = Font::new("initrd/usr/share/fonts/ter-i16b.psf");
+                        }
                         BLUE => {
                             fg = Color::Blue as u32;
                         }
@@ -100,6 +103,9 @@ impl Write for Vga {
                         }
                         GREEN => {
                             fg = Color::Green as u32;
+                        }
+                        NORMAL => {
+                            self.font = Font::new("initrd/usr/share/fonts/ter-i16n.psf");
                         }
                         ORANGE => {
                             fg = Color::Orange as u32;
