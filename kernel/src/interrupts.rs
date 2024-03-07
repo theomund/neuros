@@ -36,8 +36,8 @@ enum InterruptIndex {
 static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     let mut idt = InterruptDescriptorTable::new();
     idt.breakpoint.set_handler_fn(breakpoint_handler);
-    idt[InterruptIndex::Timer as usize].set_handler_fn(timer_handler);
-    idt[InterruptIndex::Keyboard as usize].set_handler_fn(keyboard_handler);
+    idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
+    idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
     idt
 });
 
