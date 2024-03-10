@@ -19,10 +19,11 @@ use crate::logger::LOGGER;
 use crate::scheduler::SCHEDULER;
 use crate::timer::TIMER;
 use crate::{debug, error, warn};
+use alloc::format;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
 use x86_64::instructions;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
 const PIC_1_OFFSET: u8 = 32;
 const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -38,6 +39,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.divide_error.set_handler_fn(divide_error_handler);
     idt.debug.set_handler_fn(debug_handler);
     idt.breakpoint.set_handler_fn(breakpoint_handler);
+    idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
     idt
@@ -46,19 +48,30 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
 static PICS: Mutex<ChainedPics> =
     Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
-extern "x86-interrupt" fn divide_error_handler(_stack_frame: InterruptStackFrame) {
-    error!("Division error was thrown.");
+extern "x86-interrupt" fn divide_error_handler(frame: InterruptStackFrame) {
+    let log = format!("Division error was thrown: {frame:?}");
+    error!(log.as_str());
 }
 
-extern "x86-interrupt" fn debug_handler(_stack_frame: InterruptStackFrame) {
-    debug!("Debug exception was thrown");
+extern "x86-interrupt" fn debug_handler(frame: InterruptStackFrame) {
+    let log = format!("Debug exception was thrown: {frame:?}");
+    debug!(log.as_str());
 }
 
-extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
-    warn!("Breakpoint exception was thrown.");
+extern "x86-interrupt" fn breakpoint_handler(frame: InterruptStackFrame) {
+    let log = format!("Breakpoint exception was thrown: {frame:?}");
+    warn!(log.as_str());
 }
 
-extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
+extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: PageFaultErrorCode) {
+    let log = format!(
+        "Page fault was thrown (code 0x{:x}): {frame:?}",
+        code.bits()
+    );
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn timer_handler(_frame: InterruptStackFrame) {
     TIMER.increment();
     SCHEDULER.lock().tick();
 
@@ -68,7 +81,7 @@ extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
     }
 }
 
-extern "x86-interrupt" fn keyboard_handler(_stack_frame: InterruptStackFrame) {
+extern "x86-interrupt" fn keyboard_handler(_frame: InterruptStackFrame) {
     KEYBOARD.lock().interpret();
 
     unsafe {

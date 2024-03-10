@@ -38,7 +38,7 @@ resulting in improved reliability, security, and maintainability.
 
 # Roadmap
 
-This delineates the general areas of focus for development (note that this is
+This delineates the general areas of focus for development (this is
 not an exhaustive list):
 
 * [x] **Bootstrapping**
@@ -53,7 +53,7 @@ not an exhaustive list):
 * [ ] **Interrupt Handling**
     * [ ] CPU Exceptions
         * [x] Breakpoint Exception
-        * [ ] Page Fault
+        * [x] Page Fault
         * [x] Division Error
         * [x] Debug Exception
         * [ ] General Protection Fault
