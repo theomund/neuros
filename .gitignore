@@ -17,6 +17,6 @@
 *.elf
 *.iso
 .idea/
-.vale/
+.vale/styles/RedHat/
 initrd/bin/
 target/

@@ -178,6 +178,6 @@ You can find the detailed terms of the license in the [COPYING](COPYING) file.
 
 # Credits
 
-This project uses artwork from the following artists; all rights are reserved to them:
+This project features artwork from the following artists, who reserve all rights to their work:
 
 * [paccha](https://twitter.com/paccha_7) — Neurolings (Sprites)
