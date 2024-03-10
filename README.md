@@ -63,7 +63,7 @@ not an exhaustive list):
         * [x] Double Fault
         * [x] Invalid TSS
         * [x] Segment Not Present
-        * [ ] Stack Segment Fault
+        * [x] Stack Segment Fault
         * [ ] General Protection Fault
         * [x] Page Fault
         * [ ] x87 Floating Point

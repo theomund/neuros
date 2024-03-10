@@ -49,6 +49,8 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.invalid_tss.set_handler_fn(invalid_tss_handler);
     idt.segment_not_present
         .set_handler_fn(segment_not_present_handler);
+    idt.stack_segment_fault
+        .set_handler_fn(stack_segment_fault_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
@@ -111,6 +113,11 @@ extern "x86-interrupt" fn invalid_tss_handler(frame: InterruptStackFrame, code: 
 
 extern "x86-interrupt" fn segment_not_present_handler(frame: InterruptStackFrame, code: u64) {
     let log = format!("Segment not present exception was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn stack_segment_fault_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("Stack segement fault was thrown (code 0x{code:x}): {frame:?}");
     error!(log.as_str());
 }
 
