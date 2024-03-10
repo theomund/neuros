@@ -54,7 +54,7 @@ not an exhaustive list):
     * [ ] CPU Exceptions
         * [x] Breakpoint
         * [ ] Page Fault
-        * [ ] Divide by Zero
+        * [x] Division Error
         * [ ] General Protection Fault
     * [ ] Hardware Interrupts
         * [x] Timer
