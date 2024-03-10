@@ -39,6 +39,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.divide_error.set_handler_fn(divide_error_handler);
     idt.debug.set_handler_fn(debug_handler);
     idt.breakpoint.set_handler_fn(breakpoint_handler);
+    idt.overflow.set_handler_fn(overflow_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
@@ -61,6 +62,11 @@ extern "x86-interrupt" fn debug_handler(frame: InterruptStackFrame) {
 extern "x86-interrupt" fn breakpoint_handler(frame: InterruptStackFrame) {
     let log = format!("Breakpoint exception was thrown: {frame:?}");
     warn!(log.as_str());
+}
+
+extern "x86-interrupt" fn overflow_handler(frame: InterruptStackFrame) {
+    let log = format!("Overflow exception was thrown: {frame:?}");
+    error!(log.as_str());
 }
 
 extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: PageFaultErrorCode) {

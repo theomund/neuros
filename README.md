@@ -52,10 +52,11 @@ not an exhaustive list):
     * [ ] Virtual Memory Manager
 * [ ] **Interrupt Handling**
     * [ ] CPU Exceptions
-        * [x] Breakpoint Exception
-        * [x] Page Fault
         * [x] Division Error
         * [x] Debug Exception
+        * [x] Breakpoint Exception
+        * [x] Overflow Exception
+        * [x] Page Fault
         * [ ] General Protection Fault
     * [ ] Hardware Interrupts
         * [x] Timer
