@@ -58,6 +58,7 @@ not an exhaustive list):
         * [x] Breakpoint Exception
         * [x] Overflow Exception
         * [x] Page Fault
+        * [x] Bound Range Exceeded Exception
         * [ ] General Protection Fault
     * [ ] Hardware Interrupts
         * [x] Timer
