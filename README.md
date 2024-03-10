@@ -59,7 +59,7 @@ not an exhaustive list):
         * [x] Overflow
         * [x] Bound Range Exceeded
         * [x] Invalid Opcode
-        * [ ] Device Not Available
+        * [x] Device Not Available
         * [ ] Double Fault
         * [ ] Invalid TSS
         * [ ] Segment Not Present
