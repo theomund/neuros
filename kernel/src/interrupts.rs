@@ -51,6 +51,8 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
         .set_handler_fn(segment_not_present_handler);
     idt.stack_segment_fault
         .set_handler_fn(stack_segment_fault_handler);
+    idt.general_protection_fault
+        .set_handler_fn(general_protection_fault_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
@@ -117,7 +119,12 @@ extern "x86-interrupt" fn segment_not_present_handler(frame: InterruptStackFrame
 }
 
 extern "x86-interrupt" fn stack_segment_fault_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Stack segement fault was thrown (code 0x{code:x}): {frame:?}");
+    let log = format!("Stack segment fault was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn general_protection_fault_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("General protection fault was thrown (code 0x{code:x}): {frame:?}");
     error!(log.as_str());
 }
 
