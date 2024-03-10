@@ -38,6 +38,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     let mut idt = InterruptDescriptorTable::new();
     idt.divide_error.set_handler_fn(divide_error_handler);
     idt.debug.set_handler_fn(debug_handler);
+    idt.non_maskable_interrupt.set_handler_fn(nmi_handler);
     idt.breakpoint.set_handler_fn(breakpoint_handler);
     idt.overflow.set_handler_fn(overflow_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
@@ -57,6 +58,11 @@ extern "x86-interrupt" fn divide_error_handler(frame: InterruptStackFrame) {
 extern "x86-interrupt" fn debug_handler(frame: InterruptStackFrame) {
     let log = format!("Debug exception was thrown: {frame:?}");
     debug!(log.as_str());
+}
+
+extern "x86-interrupt" fn nmi_handler(frame: InterruptStackFrame) {
+    let log = format!("Non-Maskable Interrupt (NMI) was thrown: {frame:?}");
+    error!(log.as_str());
 }
 
 extern "x86-interrupt" fn breakpoint_handler(frame: InterruptStackFrame) {

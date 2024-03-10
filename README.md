@@ -54,6 +54,7 @@ not an exhaustive list):
     * [ ] CPU Exceptions
         * [x] Division Error
         * [x] Debug Exception
+        * [x] Non-Maskable Interrupt (NMI)
         * [x] Breakpoint Exception
         * [x] Overflow Exception
         * [x] Page Fault
