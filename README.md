@@ -62,7 +62,7 @@ not an exhaustive list):
         * [x] Device Not Available
         * [x] Double Fault
         * [x] Invalid TSS
-        * [ ] Segment Not Present
+        * [x] Segment Not Present
         * [ ] Stack Segment Fault
         * [ ] General Protection Fault
         * [x] Page Fault
