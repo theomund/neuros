@@ -36,6 +36,68 @@ system based on the microkernel architecture. The microkernel design minimizes
 the kernel's complexity by delegating most tasks to userspace services,
 resulting in improved reliability, security, and maintainability.
 
+# Roadmap
+
+This delineates the general areas of focus for development (note that this is
+not an exhaustive list):
+
+* [x] **Bootstrapping**
+    * [x] Bootloader Configuration
+    * [x] Initial RAM Disk
+* [ ] **System Initialization**
+    * [ ] Global Descriptor Table (GDT)
+    * [x] Interrupt Descriptor Table (IDT)
+* [ ] **Memory Management**
+    * [x] Physical Memory Manager
+    * [ ] Virtual Memory Manager
+* [ ] **Interrupt Handling**
+    * [ ] CPU Exceptions
+        * [x] Breakpoint
+        * [ ] Page Fault
+        * [ ] Divide by Zero
+        * [ ] General Protection Fault
+    * [ ] Hardware Interrupts
+        * [x] Timer
+        * [x] Keyboard
+        * [ ] Serial Port
+* [ ] **Device Drivers**
+    * [ ] Disk
+        * [ ] IDE
+        * [ ] Serial AT Attachment (SATA)
+        * [ ] SCSI
+        * [ ] NVMe
+    * [ ] Interrupt Controller
+        * [x] PIC
+        * [ ] Advanced Programmable Interrupt Controller (APIC)
+    * [x] Display
+    * [x] Serial Port
+    * [ ] Timer
+        * [ ] Programmable Interval Timer (PIT)
+    * [ ] Network Interface Card (NIC)
+* [ ] **User Mode**
+    * [ ] System Calls
+    * [x] Executable and Linkable Format (ELF)
+* [ ] **Concurrency**
+    * [x] Processes
+    * [x] Scheduler
+    * [ ] Context Switching
+* [ ] **Filesystems**
+    * [x] USTAR
+    * [ ] FAT32
+    * [ ] Ext2
+* [ ] **Networking**
+    * [ ] TCP
+    * [ ] UDP
+    * [ ] Internet Control Message Protocol (ICMP)
+* [ ] **User Interfaces**
+    * [x] Command Line Interface (CLI)
+    * [ ] Text User Interface (TUI)
+    * [ ] Graphical User Interface (GUI)
+* [ ] **Testing Support**
+    * [x] Debugging (GDB/LLDB)
+    * [ ] Unit Tests
+    * [ ] Integration Tests
+
 # Architecture
 
 ```mermaid
