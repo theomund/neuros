@@ -60,7 +60,7 @@ not an exhaustive list):
         * [x] Bound Range Exceeded
         * [x] Invalid Opcode
         * [x] Device Not Available
-        * [ ] Double Fault
+        * [x] Double Fault
         * [ ] Invalid TSS
         * [ ] Segment Not Present
         * [ ] Stack Segment Fault
