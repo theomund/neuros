@@ -172,12 +172,15 @@ This command removes compiled binaries and temporary files.
 
 ![GPL Logo](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)
 
-This project uses the [GNU General Public License v3.0](COPYING) (or later).
+This project uses the
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
+(or later).
 
 You can find the detailed terms of the license in the [COPYING](COPYING) file.
 
 # Credits
 
-This project features artwork from the following artists, who reserve all rights to their work:
+This project features artwork from the following artists, who reserve all
+rights to their work:
 
 * [paccha](https://twitter.com/paccha_7) — Neurolings (Sprites)
