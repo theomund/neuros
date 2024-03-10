@@ -18,7 +18,7 @@ use crate::keyboard::KEYBOARD;
 use crate::logger::LOGGER;
 use crate::scheduler::SCHEDULER;
 use crate::timer::TIMER;
-use crate::{error, warn};
+use crate::{debug, error, warn};
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
 use x86_64::instructions;
@@ -35,8 +35,9 @@ enum InterruptIndex {
 
 static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     let mut idt = InterruptDescriptorTable::new();
-    idt.breakpoint.set_handler_fn(breakpoint_handler);
     idt.divide_error.set_handler_fn(divide_error_handler);
+    idt.debug.set_handler_fn(debug_handler);
+    idt.breakpoint.set_handler_fn(breakpoint_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
     idt
@@ -45,12 +46,16 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
 static PICS: Mutex<ChainedPics> =
     Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
-extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
-    warn!("Breakpoint exception was thrown.");
-}
-
 extern "x86-interrupt" fn divide_error_handler(_stack_frame: InterruptStackFrame) {
     error!("Division error was thrown.");
+}
+
+extern "x86-interrupt" fn debug_handler(_stack_frame: InterruptStackFrame) {
+    debug!("Debug exception was thrown");
+}
+
+extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
+    warn!("Breakpoint exception was thrown.");
 }
 
 extern "x86-interrupt" fn timer_handler(_stack_frame: InterruptStackFrame) {
