@@ -54,6 +54,8 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.general_protection_fault
         .set_handler_fn(general_protection_fault_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
+    idt.x87_floating_point
+        .set_handler_fn(x87_floating_point_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
     idt
@@ -133,6 +135,11 @@ extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: P
         "Page fault was thrown (code 0x{:x}): {frame:?}",
         code.bits()
     );
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn x87_floating_point_handler(frame: InterruptStackFrame) {
+    let log = format!("x87 floating point exception was thrown: {frame:?}");
     error!(log.as_str());
 }
 

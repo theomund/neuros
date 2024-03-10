@@ -66,7 +66,7 @@ not an exhaustive list):
         * [x] Stack Segment Fault
         * [x] General Protection Fault
         * [x] Page Fault
-        * [ ] x87 Floating Point
+        * [x] x87 Floating Point
         * [ ] Alignment Check
         * [ ] Machine Check
         * [ ] SIMD Floating Point
