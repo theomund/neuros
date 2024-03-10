@@ -23,7 +23,6 @@ use alloc::format;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
 use x86_64::instructions;
-use x86_64::instructions::hlt;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
 const PIC_1_OFFSET: u8 = 32;
@@ -47,6 +46,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.device_not_available
         .set_handler_fn(device_not_available_handler);
     idt.double_fault.set_handler_fn(double_fault_handler);
+    idt.invalid_tss.set_handler_fn(invalid_tss_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
@@ -97,9 +97,14 @@ extern "x86-interrupt" fn device_not_available_handler(frame: InterruptStackFram
 }
 
 extern "x86-interrupt" fn double_fault_handler(frame: InterruptStackFrame, code: u64) -> ! {
-    let log = format!("Double fault was thrown (code 0x{code:x}: {frame:?}");
+    let log = format!("Double fault was thrown (code 0x{code:x}): {frame:?}");
     error!(log.as_str());
     halt();
+}
+
+extern "x86-interrupt" fn invalid_tss_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("Invalid TSS exception was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
 }
 
 extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: PageFaultErrorCode) {

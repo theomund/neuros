@@ -61,7 +61,7 @@ not an exhaustive list):
         * [x] Invalid Opcode
         * [x] Device Not Available
         * [x] Double Fault
-        * [ ] Invalid TSS
+        * [x] Invalid TSS
         * [ ] Segment Not Present
         * [ ] Stack Segment Fault
         * [ ] General Protection Fault
