@@ -42,6 +42,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.breakpoint.set_handler_fn(breakpoint_handler);
     idt.overflow.set_handler_fn(overflow_handler);
     idt.bound_range_exceeded.set_handler_fn(bound_range_handler);
+    idt.invalid_opcode.set_handler_fn(invalid_opcode_handler);
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
@@ -78,6 +79,11 @@ extern "x86-interrupt" fn overflow_handler(frame: InterruptStackFrame) {
 
 extern "x86-interrupt" fn bound_range_handler(frame: InterruptStackFrame) {
     let log = format!("Bound range exceeded exception was thrown: {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn invalid_opcode_handler(frame: InterruptStackFrame) {
+    let log = format!("Invalid opcode exception was thrown: {frame:?}");
     error!(log.as_str());
 }
 

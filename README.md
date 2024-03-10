@@ -53,13 +53,28 @@ not an exhaustive list):
 * [ ] **Interrupt Handling**
     * [ ] CPU Exceptions
         * [x] Division Error
-        * [x] Debug Exception
+        * [x] Debug
         * [x] Non-Maskable Interrupt (NMI)
-        * [x] Breakpoint Exception
-        * [x] Overflow Exception
-        * [x] Page Fault
-        * [x] Bound Range Exceeded Exception
+        * [x] Breakpoint
+        * [x] Overflow
+        * [x] Bound Range Exceeded
+        * [x] Invalid Opcode
+        * [ ] Device Not Available
+        * [ ] Double Fault
+        * [ ] Invalid TSS
+        * [ ] Segment Not Present
+        * [ ] Stack Segment Fault
         * [ ] General Protection Fault
+        * [x] Page Fault
+        * [ ] x87 Floating Point
+        * [ ] Alignment Check
+        * [ ] Machine Check
+        * [ ] SIMD Floating Point
+        * [ ] Virtualization
+        * [ ] Control Protection
+        * [ ] Hypervisor Injection
+        * [ ] VMM Communication
+        * [ ] Security
     * [ ] Hardware Interrupts
         * [x] Timer
         * [x] Keyboard
