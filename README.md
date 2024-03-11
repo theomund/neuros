@@ -38,9 +38,10 @@ The primary aim of this operating system is to provide mechanisms facilitating
 system interaction by an artificial intelligence.
 
 This project also aims to create a lightweight, modular, and extensible
-operating system based on the microkernel architecture. The microkernel design
-minimizes the kernel's complexity by delegating most tasks to userspace
-services, resulting in improved reliability, security, and maintainability.
+Unix-like operating system based on the microkernel architecture. The
+microkernel design minimizes the kernel's complexity by delegating most tasks
+to userspace services, resulting in improved reliability, security, and
+maintainability.
 
 # Screenshots
 
