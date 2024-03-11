@@ -42,6 +42,12 @@ operating system based on the microkernel architecture. The microkernel design
 minimizes the kernel's complexity by delegating most tasks to userspace
 services, resulting in improved reliability, security, and maintainability.
 
+# Screenshots
+
+![Intro](https://github.com/Theomund/NeurOS/assets/34360334/a496341d-b0f1-4526-b195-f62a738f1f21)
+![VGA](https://github.com/Theomund/NeurOS/assets/34360334/60f28d68-28ba-4fc0-9897-9a8a969f8ba3)
+![Serial](https://github.com/Theomund/NeurOS/assets/34360334/febc95a8-f512-47cf-b683-a1795e8315a6)
+
 # Roadmap
 
 This delineates the general areas of focus for development (this is
