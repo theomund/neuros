@@ -31,11 +31,12 @@
 
 # Overview
 
-NeurOS, as its name suggests, centers around
+NeurOS, as its name suggests, has a theme that revolves around
 [Neuro-sama](https://en.wikipedia.org/wiki/Neuro-sama), an artificial
 intelligence streamer created by [vedal987](https://twitter.com/vedal987).
-The primary aim of this operating system is to provide mechanisms facilitating
-system interaction by an artificial intelligence.
+
+The primary goal of this operating system is to allow a large language model
+(LLM) to interact with the system through various mechanisms.
 
 This project also aims to create a lightweight, modular, and extensible
 Unix-like operating system based on the microkernel architecture. The
