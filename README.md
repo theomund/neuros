@@ -44,9 +44,9 @@ services, resulting in improved reliability, security, and maintainability.
 
 # Screenshots
 
-![Intro](https://github.com/Theomund/NeurOS/assets/34360334/a496341d-b0f1-4526-b195-f62a738f1f21)
-![VGA](https://github.com/Theomund/NeurOS/assets/34360334/60f28d68-28ba-4fc0-9897-9a8a969f8ba3)
-![Serial](https://github.com/Theomund/NeurOS/assets/34360334/febc95a8-f512-47cf-b683-a1795e8315a6)
+![Intro](https://github.com/Theomund/NeurOS/assets/34360334/1a23a76e-309d-48d6-bc73-e566d9e7f353)
+![VGA](https://github.com/Theomund/NeurOS/assets/34360334/9cf8459a-5108-40a5-b489-5d320d0c79b5)
+![Serial](https://github.com/Theomund/NeurOS/assets/34360334/c111aa28-ecd9-496a-89e2-42f401d91854)
 
 # Roadmap
 
