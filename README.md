@@ -70,7 +70,7 @@ not an exhaustive list):
     * [x] Physical Memory Manager
     * [ ] Virtual Memory Manager
 * [ ] **Interrupt Handling**
-    * [ ] CPU Exceptions
+    * [x] CPU Exceptions
         * [x] Division Error
         * [x] Debug
         * [x] Non-Maskable Interrupt (NMI)
@@ -86,14 +86,14 @@ not an exhaustive list):
         * [x] General Protection Fault
         * [x] Page Fault
         * [x] x87 Floating Point
-        * [ ] Alignment Check
-        * [ ] Machine Check
-        * [ ] SIMD Floating Point
-        * [ ] Virtualization
-        * [ ] Control Protection
-        * [ ] Hypervisor Injection
-        * [ ] VMM Communication
-        * [ ] Security
+        * [x] Alignment Check
+        * [x] Machine Check
+        * [x] SIMD Floating Point
+        * [x] Virtualization
+        * [x] Control Protection
+        * [x] Hypervisor Injection
+        * [x] VMM Communication
+        * [x] Security
     * [ ] Hardware Interrupts
         * [x] Timer
         * [x] Keyboard

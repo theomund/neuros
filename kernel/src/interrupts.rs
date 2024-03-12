@@ -56,6 +56,18 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.page_fault.set_handler_fn(page_fault_handler);
     idt.x87_floating_point
         .set_handler_fn(x87_floating_point_handler);
+    idt.alignment_check.set_handler_fn(alignment_check_handler);
+    idt.machine_check.set_handler_fn(machine_check_handler);
+    idt.simd_floating_point
+        .set_handler_fn(simd_floating_point_handler);
+    idt.virtualization.set_handler_fn(virtualization_handler);
+    idt.cp_protection_exception
+        .set_handler_fn(control_protection_handler);
+    idt.hv_injection_exception
+        .set_handler_fn(hypervisor_injection_handler);
+    idt.vmm_communication_exception
+        .set_handler_fn(vmm_communication_handler);
+    idt.security_exception.set_handler_fn(security_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
     idt
@@ -140,6 +152,47 @@ extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: P
 
 extern "x86-interrupt" fn x87_floating_point_handler(frame: InterruptStackFrame) {
     let log = format!("x87 floating point exception was thrown: {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn alignment_check_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("Alignment check exception was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn machine_check_handler(frame: InterruptStackFrame) -> ! {
+    let log = format!("Machine check exception was thrown: {frame:?}");
+    error!(log.as_str());
+    halt();
+}
+
+extern "x86-interrupt" fn simd_floating_point_handler(frame: InterruptStackFrame) {
+    let log = format!("SIMD floating point exception was thrown: {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn virtualization_handler(frame: InterruptStackFrame) {
+    let log = format!("Virtualization exception was thrown: {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn control_protection_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("Control protection exception was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn hypervisor_injection_handler(frame: InterruptStackFrame) {
+    let log = format!("Hypervisor injection exception was thrown: {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn vmm_communication_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("VMM communication exception was thrown (code 0x{code:x}): {frame:?}");
+    error!(log.as_str());
+}
+
+extern "x86-interrupt" fn security_handler(frame: InterruptStackFrame, code: u64) {
+    let log = format!("Security exception was thrown (code 0x{code:x}): {frame:?}");
     error!(log.as_str());
 }
 
