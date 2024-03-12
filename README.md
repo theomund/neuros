@@ -31,18 +31,23 @@
 
 # Overview
 
-NeurOS, as its name suggests, has a theme that revolves around
+This project aims to create a lightweight, modular, and extensible operating
+system based on the microkernel architecture. The microkernel design minimizes
+the kernel's complexity by delegating most tasks to userspace services,
+resulting in improved reliability, security, and maintainability.
+
+In addition, this operating system aims to allow a large language model
+(LLM) to interact with the system. What this means is that an AI will have the
+eventual ability to interact with the user interface.
+
+As its name suggests, this operating system thematically revolves around
 [Neuro-sama](https://en.wikipedia.org/wiki/Neuro-sama), an artificial
 intelligence streamer created by [vedal987](https://twitter.com/vedal987).
+References from the stream and the community will make an appearance.
 
-The primary goal of this operating system is to allow a large language model
-(LLM) to interact with the system through various mechanisms.
-
-This project also aims to create a lightweight, modular, and extensible
-Unix-like operating system based on the microkernel architecture. The
-microkernel design minimizes the kernel's complexity by delegating most tasks
-to userspace services, resulting in improved reliability, security, and
-maintainability.
+Lastly, to ensure compatibility with UNIX and its derivatives, this operating
+system will try to adhere to the [POSIX](https://en.wikipedia.org/wiki/POSIX)
+specification. This will ease the porting of software from those systems.
 
 # Screenshots
 
@@ -155,9 +160,9 @@ graph BT
 > [!NOTE]
 > Building on Windows or macOS is currently not supported at this time.
 
-If you're interested in developing the operating system, follow the outlined steps.
-Make sure you have the necessary tools and dependencies installed
-on your Linux system.
+If you're interested in developing the operating system, follow the outlined
+steps. Make sure you have the necessary tools and dependencies installed on your
+Linux system.
 
 ## Prerequisites
 
