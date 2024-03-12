@@ -27,7 +27,7 @@ pub fn initialize() -> fmt::Result {
     let height = vga.get_height();
     let font_width = vga.get_font_width();
 
-    let mut logo = Image::new("initrd/usr/share/images/logo.pbm");
+    let mut logo = Image::new("initrd/usr/share/images/logo.ppm");
     logo.set_position((width / 2) - (logo.get_width() / 2), height / 8);
     logo.draw(&vga);
 
