@@ -51,7 +51,7 @@ specification. This will ease the porting of software from those systems.
 
 # Screenshots
 
-![Intro](https://github.com/Theomund/NeurOS/assets/34360334/1a23a76e-309d-48d6-bc73-e566d9e7f353)
+![Intro](https://github.com/Theomund/NeurOS/assets/34360334/8e7fdf47-1c0b-4033-b446-222b979f4574)
 ![VGA](https://github.com/Theomund/NeurOS/assets/34360334/9cf8459a-5108-40a5-b489-5d320d0c79b5)
 ![Serial](https://github.com/Theomund/NeurOS/assets/34360334/c111aa28-ecd9-496a-89e2-42f401d91854)
 
