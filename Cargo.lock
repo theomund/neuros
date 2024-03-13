@@ -32,7 +32,7 @@ dependencies = [
  "linked_list_allocator",
  "pic8259",
  "spin",
- "x86_64 0.15.0",
+ "x86_64",
 ]
 
 [[package]]
@@ -65,11 +65,11 @@ dependencies = [
 
 [[package]]
 name = "pic8259"
-version = "0.10.4"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb844b5b01db1e0b17938685738f113bfc903846f18932b378bc0eabfa40e194"
+checksum = "62d9a86c292b165f757e47e7fd66855def189b2564609bc4203727b27c33db22"
 dependencies = [
- "x86_64 0.14.12",
+ "x86_64",
 ]
 
 [[package]]
@@ -107,18 +107,6 @@ name = "volatile"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "442887c63f2c839b346c192d047a7c87e73d0689c9157b00b53dcc27dd5ea793"
-
-[[package]]
-name = "x86_64"
-version = "0.14.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96cb6fd45bfeab6a5055c5bffdb08768bd0c069f1d946debe585bbb380a7c062"
-dependencies = [
- "bit_field",
- "bitflags",
- "rustversion",
- "volatile",
-]
 
 [[package]]
 name = "x86_64"
