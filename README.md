@@ -68,8 +68,9 @@ not an exhaustive list):
     * [x] Interrupt Descriptor Table (IDT)
     * [x] Task State Segment (TSS)
 * [ ] **Memory Management**
-    * [x] Physical Memory Manager
+    * [ ] Physical Memory Manager
     * [ ] Virtual Memory Manager
+    * [x] Heap Allocator
 * [ ] **Interrupt Handling**
     * [x] CPU Exceptions
         * [x] Division Error
