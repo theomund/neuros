@@ -25,6 +25,7 @@ extern crate alloc;
 mod ansi;
 mod elf;
 mod font;
+mod gdt;
 mod image;
 mod initrd;
 mod interrupts;
@@ -47,6 +48,7 @@ use x86_64::instructions;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
+    gdt::initialize();
     memory::initialize();
     interrupts::initialize();
     smp::initialize();

@@ -63,9 +63,10 @@ not an exhaustive list):
 * [x] **Bootstrapping**
     * [x] Bootloader Configuration
     * [x] Initial RAM Disk
-* [ ] **System Initialization**
-    * [ ] Global Descriptor Table (GDT)
+* [x] **System Initialization**
+    * [x] Global Descriptor Table (GDT)
     * [x] Interrupt Descriptor Table (IDT)
+    * [x] Task State Segment (TSS)
 * [ ] **Memory Management**
     * [x] Physical Memory Manager
     * [ ] Virtual Memory Manager
