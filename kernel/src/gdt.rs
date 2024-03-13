@@ -16,7 +16,7 @@
 
 use spin::Lazy;
 use x86_64::instructions::tables::load_tss;
-use x86_64::registers::segmentation::{Segment, CS, SS};
+use x86_64::registers::segmentation::{Segment, CS, DS, ES, FS, GS, SS};
 use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
 use x86_64::structures::tss::TaskStateSegment;
 
@@ -53,6 +53,10 @@ pub fn initialize() {
     GDT.0.load();
     unsafe {
         CS::set_reg(GDT.1.kernel_code);
+        DS::set_reg(GDT.1.kernel_data);
+        ES::set_reg(GDT.1.kernel_data);
+        FS::set_reg(GDT.1.kernel_data);
+        GS::set_reg(GDT.1.kernel_data);
         SS::set_reg(GDT.1.kernel_data);
         load_tss(GDT.1.tss);
     }
