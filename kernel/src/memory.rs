@@ -18,6 +18,7 @@ use limine::memory_map::{Entry, EntryType};
 use limine::request::{HhdmRequest, MemoryMapRequest, StackSizeRequest};
 use linked_list_allocator::LockedHeap;
 use x86_64::registers::control::Cr3;
+use x86_64::structures::paging::page::PageRangeInclusive;
 use x86_64::structures::paging::{
     FrameAllocator, Mapper, OffsetPageTable, Page, PageTableFlags, PhysFrame, Size4KiB,
 };
@@ -73,6 +74,19 @@ impl VirtualManager {
             unsafe { OffsetPageTable::new(&mut *page_table_pointer, physical_memory_offset) };
         VirtualManager { table }
     }
+
+    fn allocate_pages(&mut self, range: PageRangeInclusive, manager: &mut PhysicalManager) {
+        for page in range {
+            let frame = manager.allocate_frame().unwrap();
+            let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
+            unsafe {
+                self.table
+                    .map_to(page, frame, flags, manager)
+                    .unwrap()
+                    .flush();
+            };
+        }
+    }
 }
 
 #[global_allocator]
@@ -95,17 +109,7 @@ pub fn initialize() {
     let mut physical_manager = PhysicalManager::new();
     let mut virtual_manager = VirtualManager::new();
 
-    for page in page_range {
-        let frame = physical_manager.allocate_frame().unwrap();
-        let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
-        unsafe {
-            virtual_manager
-                .table
-                .map_to(page, frame, flags, &mut physical_manager)
-                .unwrap()
-                .flush();
-        };
-    }
+    virtual_manager.allocate_pages(page_range, &mut physical_manager);
 
     unsafe {
         ALLOCATOR.lock().init(HEAP_START as *mut u8, HEAP_SIZE);
