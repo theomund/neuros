@@ -67,9 +67,9 @@ not an exhaustive list):
     * [x] Global Descriptor Table (GDT)
     * [x] Interrupt Descriptor Table (IDT)
     * [x] Task State Segment (TSS)
-* [ ] **Memory Management**
-    * [ ] Physical Memory Manager
-    * [ ] Virtual Memory Manager
+* [x] **Memory Management**
+    * [x] Physical Memory Manager
+    * [x] Virtual Memory Manager
     * [x] Heap Allocator
 * [ ] **Interrupt Handling**
     * [x] CPU Exceptions

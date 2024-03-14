@@ -14,32 +14,100 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::debug;
-use crate::logger::LOGGER;
-use alloc::format;
-use limine::memory_map::EntryType;
-use limine::request::{MemoryMapRequest, StackSizeRequest};
+use limine::memory_map::{Entry, EntryType};
+use limine::request::{HhdmRequest, MemoryMapRequest, StackSizeRequest};
 use linked_list_allocator::LockedHeap;
+use x86_64::registers::control::Cr3;
+use x86_64::structures::paging::{
+    FrameAllocator, Mapper, OffsetPageTable, Page, PageTableFlags, PhysFrame, Size4KiB,
+};
+use x86_64::{PhysAddr, VirtAddr};
 
 static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(0x32000);
 static MEMORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
+static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+
+struct PhysicalManager {
+    memory_map: &'static [&'static Entry],
+    next: usize,
+}
+
+impl PhysicalManager {
+    fn new() -> PhysicalManager {
+        let entries = MEMORY_MAP_REQUEST.get_response().unwrap().entries();
+        PhysicalManager {
+            memory_map: entries,
+            next: 0,
+        }
+    }
+
+    fn usable_frames(&self) -> impl Iterator<Item = PhysFrame> {
+        self.memory_map
+            .iter()
+            .filter(|x| x.entry_type == EntryType::USABLE)
+            .flat_map(|x| (x.base..x.base + x.length).step_by(4096))
+            .map(|x| PhysFrame::containing_address(PhysAddr::new(x)))
+    }
+}
+
+unsafe impl FrameAllocator<Size4KiB> for PhysicalManager {
+    fn allocate_frame(&mut self) -> Option<PhysFrame<Size4KiB>> {
+        let frame = self.usable_frames().nth(self.next);
+        self.next += 1;
+        frame
+    }
+}
+
+struct VirtualManager {
+    table: OffsetPageTable<'static>,
+}
+
+impl VirtualManager {
+    fn new() -> VirtualManager {
+        let (level_4_table_frame, _) = Cr3::read();
+        let physical_memory_offset = VirtAddr::new(HHDM_REQUEST.get_response().unwrap().offset());
+        let physical_address = level_4_table_frame.start_address();
+        let virtual_address = physical_memory_offset + physical_address.as_u64();
+        let page_table_pointer = virtual_address.as_mut_ptr();
+        let table =
+            unsafe { OffsetPageTable::new(&mut *page_table_pointer, physical_memory_offset) };
+        VirtualManager { table }
+    }
+}
 
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
+const HEAP_START: usize = 0x_4444_4444_0000;
+const HEAP_SIZE: usize = 4 * 1024 * 1024;
+
 pub fn initialize() {
     STACK_SIZE_REQUEST.get_response();
-    let entries = MEMORY_MAP_REQUEST.get_response().unwrap().entries();
-    let entry = entries
-        .iter()
-        .filter(|x| x.entry_type == EntryType::USABLE)
-        .max_by_key(|x| x.length)
-        .unwrap();
-    let start = entry.base;
-    let size = usize::try_from(entry.length).unwrap();
-    unsafe {
-        ALLOCATOR.lock().init(start as *mut u8, size);
+
+    let page_range = {
+        let heap_start = VirtAddr::new(HEAP_START as u64);
+        let heap_end = heap_start + HEAP_SIZE as u64 - 1;
+        let heap_start_page: Page<Size4KiB> = Page::containing_address(heap_start);
+        let heap_end_page: Page<Size4KiB> = Page::containing_address(heap_end);
+        Page::range_inclusive(heap_start_page, heap_end_page)
+    };
+
+    let mut physical_manager = PhysicalManager::new();
+    let mut virtual_manager = VirtualManager::new();
+
+    for page in page_range {
+        let frame = physical_manager.allocate_frame().unwrap();
+        let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
+        unsafe {
+            virtual_manager
+                .table
+                .map_to(page, frame, flags, &mut physical_manager)
+                .unwrap()
+                .flush();
+        };
     }
-    let log = format!("Reserved memory region at 0x{start:x} ({size} bytes) for heap allocation.");
-    debug!(log.as_str());
+
+    unsafe {
+        ALLOCATOR.lock().init(HEAP_START as *mut u8, HEAP_SIZE);
+    }
 }
