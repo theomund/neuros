@@ -99,7 +99,8 @@ not an exhaustive list):
     * [ ] Hardware Interrupts
         * [x] Timer
         * [x] Keyboard
-        * [ ] Serial Port
+        * [x] Serial Port
+        * [ ] Mouse
 * [ ] **Device Drivers**
     * [ ] Disk
         * [ ] IDE

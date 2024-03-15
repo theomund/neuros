@@ -67,7 +67,7 @@ impl Serial {
     }
 
     pub fn initialize(&self) {
-        self.outb(1, 0x00);
+        self.outb(1, 0x01);
         self.outb(3, 0x80);
         self.outb(0, 0x03);
         self.outb(1, 0x00);

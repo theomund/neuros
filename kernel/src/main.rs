@@ -56,7 +56,7 @@ extern "C" fn _start() -> ! {
     scheduler::initialize();
     intro::initialize().expect("Failed to initialize intro.");
     shell::initialize();
-    halt();
+    tick();
 }
 
 #[panic_handler]
@@ -64,6 +64,13 @@ fn panic(info: &PanicInfo) -> ! {
     let log = format!("The kernel has panicked.\n\n{info}");
     fatal!(log.as_str());
     halt();
+}
+
+fn tick() -> ! {
+    instructions::interrupts::enable();
+    loop {
+        instructions::hlt();
+    }
 }
 
 fn halt() -> ! {

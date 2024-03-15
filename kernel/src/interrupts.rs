@@ -17,12 +17,13 @@
 use crate::keyboard::KEYBOARD;
 use crate::logger::LOGGER;
 use crate::scheduler::SCHEDULER;
+use crate::serial::SERIAL;
+use crate::shell::SERIAL_CONSOLE;
 use crate::timer::TIMER;
 use crate::{debug, error, halt, warn};
 use alloc::format;
 use pic8259::ChainedPics;
 use spin::{Lazy, Mutex};
-use x86_64::instructions;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
 const PIC_1_OFFSET: u8 = 32;
@@ -32,6 +33,9 @@ const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 enum InterruptIndex {
     Timer = PIC_1_OFFSET,
     Keyboard,
+    Cascade,
+    COM2,
+    COM1,
 }
 
 static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
@@ -70,6 +74,7 @@ static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
     idt.security_exception.set_handler_fn(security_handler);
     idt[InterruptIndex::Timer as u8].set_handler_fn(timer_handler);
     idt[InterruptIndex::Keyboard as u8].set_handler_fn(keyboard_handler);
+    idt[InterruptIndex::COM1 as u8].set_handler_fn(serial_handler);
     idt
 });
 
@@ -215,14 +220,24 @@ extern "x86-interrupt" fn keyboard_handler(_frame: InterruptStackFrame) {
     }
 }
 
+extern "x86-interrupt" fn serial_handler(_frame: InterruptStackFrame) {
+    SERIAL_CONSOLE
+        .lock()
+        .interpret(&mut SERIAL.lock())
+        .expect("Failed to interpret serial console input.");
+
+    unsafe {
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::COM1 as u8);
+    }
+}
+
 pub fn initialize() {
     IDT.load();
     let mut pics = PICS.lock();
 
     unsafe {
         pics.initialize();
-        pics.write_masks(0b1111_1100, 0b1111_1111);
+        pics.write_masks(0b1110_1100, 0b1111_1111);
     }
-
-    instructions::interrupts::enable();
 }

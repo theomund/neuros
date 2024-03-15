@@ -26,7 +26,12 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::fmt::{Result, Write};
 use core::str;
-use spin::MutexGuard;
+use spin::{Lazy, Mutex, MutexGuard};
+
+pub static SERIAL_CONSOLE: Lazy<Mutex<Shell>> = Lazy::new(|| {
+    let shell = Shell::new();
+    Mutex::new(shell)
+});
 
 pub struct Shell {
     buffer: Vec<char>,
@@ -75,90 +80,85 @@ impl Shell {
     }
 
     pub fn interpret(&mut self, writer: &mut MutexGuard<Serial>) -> Result {
-        loop {
-            let character = writer.read() as char;
-            match character {
-                '\r' => {
-                    let line: String = self.buffer.iter().collect();
-                    let input = line.split_once(char::is_whitespace);
-                    let command = match input {
-                        Some(pair) => pair.0,
-                        None => line.as_str(),
-                    };
-                    writeln!(writer, "{NORMAL}")?;
-                    match command {
-                        "echo" => {
-                            let argument = match input {
-                                Some(pair) => pair.1,
-                                None => "",
-                            };
-                            writeln!(writer, "{argument}")?;
-                        }
-                        "help" => {
-                            writeln!(writer, "Available commands:")?;
-                            writeln!(writer, "\techo    -- Display a line of text.")?;
-                            writeln!(writer, "\thelp    -- Print a list of commands.")?;
-                            writeln!(writer, "\tid      -- Print user and group ID.")?;
-                            writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
-                            writeln!(writer, "\treadelf -- Read ELF executable file.")?;
-                            writeln!(writer, "\ttime    -- Display the elapsed time.")?;
-                            writeln!(writer, "\tpwd     -- Print current working directory.")?;
-                        }
-                        "id" => {
-                            writeln!(
-                                writer,
-                                "uid={}({}) gid={}({})",
-                                self.user_id, self.username, self.group_id, self.group
-                            )?;
-                        }
-                        "logs" => {
-                            for log in LOGGER.lock().get_logs() {
-                                writeln!(writer, "{log}")?;
-                            }
-                        }
-                        "pwd" => {
-                            writeln!(writer, "{}", self.working_directory)?;
-                        }
-                        "readelf" => {
-                            let argument = match input {
-                                Some(pair) => pair.1,
-                                None => "",
-                            };
-                            let executable = Elf::new(argument);
-                            writeln!(writer, "{executable}")?;
-                        }
-                        "time" => {
-                            writeln!(writer, "{}", TIMER.get_elapsed())?;
-                        }
-                        _ => {
-                            writeln!(writer, "{RED}ERROR: Command not found.")?;
+        let character = writer.read() as char;
+        match character {
+            '\r' => {
+                let line: String = self.buffer.iter().collect();
+                let input = line.split_once(char::is_whitespace);
+                let command = match input {
+                    Some(pair) => pair.0,
+                    None => line.as_str(),
+                };
+                writeln!(writer, "{NORMAL}")?;
+                match command {
+                    "echo" => {
+                        let argument = match input {
+                            Some(pair) => pair.1,
+                            None => "",
+                        };
+                        writeln!(writer, "{argument}")?;
+                    }
+                    "help" => {
+                        writeln!(writer, "Available commands:")?;
+                        writeln!(writer, "\techo    -- Display a line of text.")?;
+                        writeln!(writer, "\thelp    -- Print a list of commands.")?;
+                        writeln!(writer, "\tid      -- Print user and group ID.")?;
+                        writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
+                        writeln!(writer, "\treadelf -- Read ELF executable file.")?;
+                        writeln!(writer, "\ttime    -- Display the elapsed time.")?;
+                        writeln!(writer, "\tpwd     -- Print current working directory.")?;
+                    }
+                    "id" => {
+                        writeln!(
+                            writer,
+                            "uid={}({}) gid={}({})",
+                            self.user_id, self.username, self.group_id, self.group
+                        )?;
+                    }
+                    "logs" => {
+                        for log in LOGGER.lock().get_logs() {
+                            writeln!(writer, "{log}")?;
                         }
                     }
-                    write!(writer, "{}", self.prompt)?;
-                    self.buffer.clear();
-                }
-                '\x08' => {
-                    if !self.buffer.is_empty() {
-                        self.buffer.pop();
-                        write!(writer, "{character} {character}")?;
+                    "pwd" => {
+                        writeln!(writer, "{}", self.working_directory)?;
+                    }
+                    "readelf" => {
+                        let argument = match input {
+                            Some(pair) => pair.1,
+                            None => "",
+                        };
+                        let executable = Elf::new(argument);
+                        writeln!(writer, "{executable}")?;
+                    }
+                    "time" => {
+                        writeln!(writer, "{}", TIMER.get_elapsed())?;
+                    }
+                    _ => {
+                        writeln!(writer, "{RED}ERROR: Command not found.")?;
                     }
                 }
-                _ => {
-                    self.buffer.push(character);
-                    write!(writer, "{character}")?;
+                write!(writer, "{}", self.prompt)?;
+                self.buffer.clear();
+            }
+            '\x08' => {
+                if !self.buffer.is_empty() {
+                    self.buffer.pop();
+                    write!(writer, "{character} {character}")?;
                 }
             }
+            _ => {
+                self.buffer.push(character);
+                write!(writer, "{character}")?;
+            }
         }
+        Ok(())
     }
 }
 
 pub fn initialize() {
-    let mut shell = Shell::new();
-    let mut serial = SERIAL.lock();
-    shell
-        .display(&mut serial)
+    SERIAL_CONSOLE
+        .lock()
+        .display(&mut SERIAL.lock())
         .expect("Failed to display serial console.");
-    shell
-        .interpret(&mut serial)
-        .expect("Failed to interpret shell input.");
 }
