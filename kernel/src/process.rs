@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#[derive(Copy, Clone)]
+use alloc::string::{String, ToString};
+
 pub enum State {
     Running,
     Stopped,
 }
 
-#[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Context {
     r12: u64,
@@ -32,11 +32,10 @@ pub struct Context {
     rsp: u64,
 }
 
-#[derive(Copy, Clone)]
 pub struct Process {
     id: u32,
     context: Context,
-    name: &'static str,
+    name: String,
     state: State,
 }
 
@@ -53,13 +52,17 @@ impl Process {
                 rbx: 0,
                 rsp: 0,
             },
-            name,
+            name: name.to_string(),
             state,
         }
     }
 
-    pub fn get_id(self) -> u32 {
+    pub fn get_id(&self) -> u32 {
         self.id
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name.as_str()
     }
 
     pub fn set_state(&mut self, state: State) {

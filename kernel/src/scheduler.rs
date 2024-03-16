@@ -17,7 +17,7 @@
 use crate::logger::LOGGER;
 use crate::process::Process;
 use crate::process::State;
-use crate::{debug, trace};
+use crate::{debug, trace, warn};
 use alloc::collections::VecDeque;
 use alloc::format;
 use spin::{Lazy, Mutex};
@@ -50,17 +50,25 @@ impl Scheduler {
 
     pub fn tick(&mut self) {
         if self.remaining == 0 {
-            let mut current = self.queue.pop_front().unwrap();
-            current.set_state(State::Stopped);
-            self.queue.push_back(current);
-            let mut next = *self.queue.front().unwrap();
-            next.set_state(State::Running);
-            let log = format!(
-                "Time slice for process #{} elapsed; switching to process #{}.",
-                current.get_id(),
-                next.get_id()
-            );
-            trace!(log.as_str());
+            if self.queue.len() >= 2 {
+                self.queue.swap(0, self.queue.len() - 1);
+                if let Some(front) = self.queue.front_mut() {
+                    front.set_state(State::Running);
+                    let log = format!(
+                        "Started process #{} ({}).",
+                        front.get_id(),
+                        front.get_name()
+                    );
+                    trace!(log.as_str());
+                }
+                if let Some(back) = self.queue.back_mut() {
+                    back.set_state(State::Stopped);
+                    let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
+                    trace!(log.as_str());
+                }
+            } else {
+                warn!("Queue doesn't have enough processes to swap.");
+            }
             self.remaining = self.quantum;
         } else {
             self.remaining -= 1;
