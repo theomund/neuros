@@ -69,7 +69,7 @@ impl Scheduler {
 }
 
 pub fn initialize() {
-    let mut scheduler = SCHEDULER.lock();
-    scheduler.add(Process::new(1, State::Running));
-    scheduler.add(Process::new(2, State::Stopped));
+    SCHEDULER
+        .lock()
+        .add(Process::new(1, "kernel", State::Running));
 }

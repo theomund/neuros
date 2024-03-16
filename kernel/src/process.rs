@@ -36,11 +36,12 @@ pub struct Context {
 pub struct Process {
     id: u32,
     context: Context,
+    name: &'static str,
     state: State,
 }
 
 impl Process {
-    pub fn new(id: u32, state: State) -> Process {
+    pub fn new(id: u32, name: &str, state: State) -> Process {
         Process {
             id,
             context: Context {
@@ -52,6 +53,7 @@ impl Process {
                 rbx: 0,
                 rsp: 0,
             },
+            name,
             state,
         }
     }
