@@ -38,6 +38,7 @@ mod scheduler;
 mod serial;
 mod shell;
 mod smp;
+mod syscall;
 mod timer;
 mod vga;
 
