@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::scheduler::SCHEDULER;
+
 pub fn close() {
     todo!("Implement system call.");
 }
@@ -26,8 +28,8 @@ pub fn exit() {
     todo!("Implement system call.");
 }
 
-pub fn fork() {
-    todo!("Implement system call.");
+pub fn fork() -> u64 {
+    SCHEDULER.lock().fork()
 }
 
 pub fn kill() {

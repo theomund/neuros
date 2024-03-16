@@ -20,6 +20,7 @@ use crate::initrd::INITRD;
 use crate::logger::LOGGER;
 use crate::serial::Serial;
 use crate::serial::SERIAL;
+use crate::syscall;
 use crate::timer::TIMER;
 use crate::vga::{Color, VGA};
 use alloc::format;
@@ -109,9 +110,14 @@ impl Shell {
                         };
                         writeln!(writer, "{argument}")?;
                     }
+                    "fork" => {
+                        let pid = syscall::fork();
+                        writeln!(writer, "Created child process with ID #{pid}.")?;
+                    }
                     "help" => {
                         writeln!(writer, "Available commands:")?;
                         writeln!(writer, "\techo    -- Display a line of text.")?;
+                        writeln!(writer, "\tfork    -- Create child process.")?;
                         writeln!(writer, "\thelp    -- Print a list of commands.")?;
                         writeln!(writer, "\tid      -- Print user and group ID.")?;
                         writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;

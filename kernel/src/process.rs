@@ -16,11 +16,13 @@
 
 use alloc::string::{String, ToString};
 
+#[derive(Clone)]
 pub enum State {
     Running,
     Stopped,
 }
 
+#[derive(Clone)]
 #[repr(C)]
 pub struct Context {
     r12: u64,
@@ -32,15 +34,16 @@ pub struct Context {
     rsp: u64,
 }
 
+#[derive(Clone)]
 pub struct Process {
-    id: u32,
+    id: u64,
     context: Context,
     name: String,
     state: State,
 }
 
 impl Process {
-    pub fn new(id: u32, name: &str, state: State) -> Process {
+    pub fn new(id: u64, name: &str, state: State) -> Process {
         Process {
             id,
             context: Context {
@@ -57,12 +60,16 @@ impl Process {
         }
     }
 
-    pub fn get_id(&self) -> u32 {
+    pub fn get_id(&self) -> u64 {
         self.id
     }
 
     pub fn get_name(&self) -> &str {
         self.name.as_str()
+    }
+
+    pub fn set_id(&mut self, id: u64) {
+        self.id = id;
     }
 
     pub fn set_state(&mut self, state: State) {

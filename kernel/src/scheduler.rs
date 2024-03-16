@@ -62,7 +62,13 @@ impl Scheduler {
     }
 
     fn schedule(&mut self) {
-        self.queue.swap(0, self.queue.len() - 1);
+        let current = self.queue.pop_front().unwrap();
+        self.queue.push_back(current);
+        if let Some(back) = self.queue.back_mut() {
+            back.set_state(State::Stopped);
+            let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
+            trace!(log.as_str());
+        }
         if let Some(front) = self.queue.front_mut() {
             front.set_state(State::Running);
             let log = format!(
@@ -72,11 +78,15 @@ impl Scheduler {
             );
             trace!(log.as_str());
         }
-        if let Some(back) = self.queue.back_mut() {
-            back.set_state(State::Stopped);
-            let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
-            trace!(log.as_str());
-        }
+    }
+
+    pub fn fork(&mut self) -> u64 {
+        let parent = self.queue.front().unwrap();
+        let mut child = parent.clone();
+        child.set_id((self.queue.len() + 1) as u64);
+        let pid = child.get_id();
+        self.add(child);
+        pid
     }
 }
 
