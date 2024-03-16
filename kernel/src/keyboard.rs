@@ -16,9 +16,9 @@
 
 use crate::keyboard::ScanCode::Enter;
 use crate::logger::LOGGER;
-use crate::shell::Shell;
+use crate::shell::VGA_CONSOLE;
 use crate::trace;
-use crate::vga::{Color, VGA};
+use crate::vga::VGA;
 use alloc::format;
 use spin::{Lazy, Mutex};
 use x86_64::instructions::port::Port;
@@ -53,14 +53,9 @@ impl Keyboard {
         trace!(log.as_str());
 
         if scan_code == Enter as u8 {
-            let mut vga = VGA.lock();
-            let x = vga.get_font_width();
-            let y = vga.get_font_height() + x;
-            vga.clear();
-            vga.set_cursor(x, y, Color::White as u32, Color::Black as u32);
-            let shell = Shell::new();
-            shell
-                .display(&mut vga)
+            VGA_CONSOLE
+                .lock()
+                .display(&mut VGA.lock())
                 .expect("Failed to display VGA console.");
         }
     }

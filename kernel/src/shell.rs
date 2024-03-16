@@ -21,6 +21,7 @@ use crate::logger::LOGGER;
 use crate::serial::Serial;
 use crate::serial::SERIAL;
 use crate::timer::TIMER;
+use crate::vga::{Color, VGA};
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -29,6 +30,16 @@ use core::str;
 use spin::{Lazy, Mutex, MutexGuard};
 
 pub static SERIAL_CONSOLE: Lazy<Mutex<Shell>> = Lazy::new(|| {
+    let shell = Shell::new();
+    Mutex::new(shell)
+});
+
+pub static VGA_CONSOLE: Lazy<Mutex<Shell>> = Lazy::new(|| {
+    let mut vga = VGA.lock();
+    let x = vga.get_font_width();
+    let y = vga.get_font_height() + x;
+    vga.clear();
+    vga.set_cursor(x, y, Color::White as u32, Color::Black as u32);
     let shell = Shell::new();
     Mutex::new(shell)
 });
