@@ -122,6 +122,11 @@ not an exhaustive list):
     * [x] Processes
     * [x] Scheduler
     * [ ] Context Switching
+* [ ] **Inter-Process Communication (IPC)**
+    * [ ] Messages
+    * [ ] Transmission
+      * [ ] Asynchronous
+      * [ ] Synchronous
 * [ ] **Filesystems**
     * [x] USTAR
     * [ ] FAT32
