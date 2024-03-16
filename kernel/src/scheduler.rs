@@ -51,27 +51,31 @@ impl Scheduler {
     pub fn tick(&mut self) {
         if self.remaining == 0 {
             if self.queue.len() >= 2 {
-                self.queue.swap(0, self.queue.len() - 1);
-                if let Some(front) = self.queue.front_mut() {
-                    front.set_state(State::Running);
-                    let log = format!(
-                        "Started process #{} ({}).",
-                        front.get_id(),
-                        front.get_name()
-                    );
-                    trace!(log.as_str());
-                }
-                if let Some(back) = self.queue.back_mut() {
-                    back.set_state(State::Stopped);
-                    let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
-                    trace!(log.as_str());
-                }
+                self.schedule();
             } else {
                 warn!("Queue doesn't have enough processes to swap.");
             }
             self.remaining = self.quantum;
         } else {
             self.remaining -= 1;
+        }
+    }
+
+    fn schedule(&mut self) {
+        self.queue.swap(0, self.queue.len() - 1);
+        if let Some(front) = self.queue.front_mut() {
+            front.set_state(State::Running);
+            let log = format!(
+                "Started process #{} ({}).",
+                front.get_id(),
+                front.get_name()
+            );
+            trace!(log.as_str());
+        }
+        if let Some(back) = self.queue.back_mut() {
+            back.set_state(State::Stopped);
+            let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
+            trace!(log.as_str());
         }
     }
 }
