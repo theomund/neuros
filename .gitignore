@@ -16,7 +16,7 @@
 
 *.elf
 *.iso
+.github/styles/RedHat/
 .idea/
-.vale/styles/RedHat/
 initrd/bin/
 target/

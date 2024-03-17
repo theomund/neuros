@@ -42,7 +42,7 @@ ISO_ROOT := target/iso_root
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
-STYLE := .vale/styles/RedHat
+STYLE := .github/styles/RedHat
 TAG := builder
 
 $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
