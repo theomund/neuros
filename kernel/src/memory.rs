@@ -17,6 +17,7 @@
 use limine::memory_map::{Entry, EntryType};
 use limine::request::{HhdmRequest, MemoryMapRequest, StackSizeRequest};
 use linked_list_allocator::LockedHeap;
+use spin::{Lazy, Mutex};
 use x86_64::registers::control::Cr3;
 use x86_64::structures::paging::page::PageRangeInclusive;
 use x86_64::structures::paging::{
@@ -27,6 +28,16 @@ use x86_64::{PhysAddr, VirtAddr};
 static STACK_SIZE_REQUEST: StackSizeRequest = StackSizeRequest::new().with_size(0x32000);
 static MEMORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
+
+static PHYSICAL_MANAGER: Lazy<Mutex<PhysicalManager>> = Lazy::new(|| {
+    let manager = PhysicalManager::new();
+    Mutex::new(manager)
+});
+
+static VIRTUAL_MANAGER: Lazy<Mutex<VirtualManager>> = Lazy::new(|| {
+    let manager = VirtualManager::new();
+    Mutex::new(manager)
+});
 
 struct PhysicalManager {
     memory_map: &'static [&'static Entry],
@@ -106,10 +117,9 @@ pub fn initialize() {
         Page::range_inclusive(heap_start_page, heap_end_page)
     };
 
-    let mut physical_manager = PhysicalManager::new();
-    let mut virtual_manager = VirtualManager::new();
-
-    virtual_manager.allocate_pages(page_range, &mut physical_manager);
+    VIRTUAL_MANAGER
+        .lock()
+        .allocate_pages(page_range, &mut PHYSICAL_MANAGER.lock());
 
     unsafe {
         ALLOCATOR.lock().init(HEAP_START as *mut u8, HEAP_SIZE);
