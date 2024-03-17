@@ -112,6 +112,9 @@ not an exhaustive list):
         * [ ] Advanced Programmable Interrupt Controller (APIC)
     * [x] Display
     * [x] Serial Port
+    * [ ] Keyboard
+    * [ ] Mouse
+    * [ ] Audio
     * [ ] Timer
         * [ ] Programmable Interval Timer (PIT)
     * [ ] Network Interface Card (NIC)
