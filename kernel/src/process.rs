@@ -22,16 +22,25 @@ pub enum State {
     Stopped,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 #[repr(C)]
 pub struct Context {
+    rax: u64,
+    rbx: u64,
+    rcx: u64,
+    rdx: u64,
+    rsi: u64,
+    rdi: u64,
+    rsp: u64,
+    rbp: u64,
+    r8: u64,
+    r9: u64,
+    r10: u64,
+    r11: u64,
     r12: u64,
     r13: u64,
     r14: u64,
     r15: u64,
-    rbp: u64,
-    rbx: u64,
-    rsp: u64,
 }
 
 #[derive(Clone)]
@@ -46,15 +55,7 @@ impl Process {
     pub fn new(id: u64, name: &str, state: State) -> Process {
         Process {
             id,
-            context: Context {
-                r12: 0,
-                r13: 0,
-                r14: 0,
-                r15: 0,
-                rbp: 0,
-                rbx: 0,
-                rsp: 0,
-            },
+            context: Context::default(),
             name: name.to_string(),
             state,
         }
