@@ -67,6 +67,7 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 fn tick() -> ! {
+    info!("The operating system has been successfully initialized.");
     instructions::interrupts::enable();
     loop {
         instructions::hlt();
