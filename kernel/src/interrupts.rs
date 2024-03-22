@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::keyboard::KEYBOARD;
-use crate::logger::LOGGER;
+use crate::logger::{Level, LOGGER};
 use crate::scheduler::SCHEDULER;
 use crate::serial::SERIAL;
 use crate::shell::SERIAL_CONSOLE;

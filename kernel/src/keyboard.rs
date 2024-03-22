@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::keyboard::ScanCode::Enter;
-use crate::logger::LOGGER;
+use crate::logger::{Level, LOGGER};
 use crate::shell::VGA_CONSOLE;
 use crate::trace;
 use crate::vga::VGA;

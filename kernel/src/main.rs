@@ -42,7 +42,7 @@ mod syscall;
 mod timer;
 mod vga;
 
-use crate::logger::Logger;
+use crate::logger::{Level, LOGGER};
 use alloc::format;
 use core::panic::PanicInfo;
 use x86_64::instructions;

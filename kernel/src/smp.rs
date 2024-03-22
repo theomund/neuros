@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::debug;
-use crate::logger::LOGGER;
+use crate::logger::{Level, LOGGER};
 use alloc::format;
 use limine::request::SmpRequest;
 
