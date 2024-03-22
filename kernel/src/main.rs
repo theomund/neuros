@@ -62,8 +62,7 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    let log = format!("The kernel has panicked.\n\n{info}");
-    fatal!(log.as_str());
+    fatal!("The kernel has panicked.\n\n{info}");
     halt();
 }
 

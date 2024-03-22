@@ -35,8 +35,7 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new(quantum: u32) -> Scheduler {
-        let log = format!("Created process scheduler with a quantum of {quantum} ticks.");
-        debug!(log.as_str());
+        debug!("Created process scheduler with a quantum of {quantum} ticks.");
         Scheduler {
             queue: VecDeque::new(),
             quantum,
@@ -66,17 +65,15 @@ impl Scheduler {
         self.queue.push_back(current);
         if let Some(back) = self.queue.back_mut() {
             back.set_state(State::Stopped);
-            let log = format!("Stopped process #{} ({}).", back.get_id(), back.get_name());
-            trace!(log.as_str());
+            trace!("Stopped process #{} ({}).", back.get_id(), back.get_name());
         }
         if let Some(front) = self.queue.front_mut() {
             front.set_state(State::Running);
-            let log = format!(
+            trace!(
                 "Started process #{} ({}).",
                 front.get_id(),
                 front.get_name()
             );
-            trace!(log.as_str());
         }
     }
 

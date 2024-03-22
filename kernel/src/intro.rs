@@ -18,6 +18,7 @@ use crate::image::Image;
 use crate::info;
 use crate::logger::LOGGER;
 use crate::vga::{Color, VGA};
+use alloc::format;
 use core::fmt;
 use core::fmt::Write;
 

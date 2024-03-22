@@ -82,123 +82,100 @@ static PICS: Mutex<ChainedPics> =
     Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
 extern "x86-interrupt" fn divide_error_handler(frame: InterruptStackFrame) {
-    let log = format!("Division error was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Division error was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn debug_handler(frame: InterruptStackFrame) {
-    let log = format!("Debug exception was thrown: {frame:?}");
-    debug!(log.as_str());
+    debug!("Debug exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn nmi_handler(frame: InterruptStackFrame) {
-    let log = format!("Non-Maskable Interrupt (NMI) was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Non-Maskable Interrupt (NMI) was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(frame: InterruptStackFrame) {
-    let log = format!("Breakpoint exception was thrown: {frame:?}");
-    warn!(log.as_str());
+    warn!("Breakpoint exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn overflow_handler(frame: InterruptStackFrame) {
-    let log = format!("Overflow exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Overflow exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn bound_range_handler(frame: InterruptStackFrame) {
-    let log = format!("Bound range exceeded exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Bound range exceeded exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn invalid_opcode_handler(frame: InterruptStackFrame) {
-    let log = format!("Invalid opcode exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Invalid opcode exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn device_not_available_handler(frame: InterruptStackFrame) {
-    let log = format!("Device not available exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Device not available exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn double_fault_handler(frame: InterruptStackFrame, code: u64) -> ! {
-    let log = format!("Double fault was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Double fault was thrown (code 0x{code:x}): {frame:?}");
     halt();
 }
 
 extern "x86-interrupt" fn invalid_tss_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Invalid TSS exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Invalid TSS exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn segment_not_present_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Segment not present exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Segment not present exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn stack_segment_fault_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Stack segment fault was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Stack segment fault was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn general_protection_fault_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("General protection fault was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("General protection fault was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, code: PageFaultErrorCode) {
-    let log = format!(
+    error!(
         "Page fault was thrown (code 0x{:x}): {frame:?}",
         code.bits()
     );
-    error!(log.as_str());
 }
 
 extern "x86-interrupt" fn x87_floating_point_handler(frame: InterruptStackFrame) {
-    let log = format!("x87 floating point exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("x87 floating point exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn alignment_check_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Alignment check exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Alignment check exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn machine_check_handler(frame: InterruptStackFrame) -> ! {
-    let log = format!("Machine check exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Machine check exception was thrown: {frame:?}");
     halt();
 }
 
 extern "x86-interrupt" fn simd_floating_point_handler(frame: InterruptStackFrame) {
-    let log = format!("SIMD floating point exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("SIMD floating point exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn virtualization_handler(frame: InterruptStackFrame) {
-    let log = format!("Virtualization exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Virtualization exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn control_protection_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Control protection exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Control protection exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn hypervisor_injection_handler(frame: InterruptStackFrame) {
-    let log = format!("Hypervisor injection exception was thrown: {frame:?}");
-    error!(log.as_str());
+    error!("Hypervisor injection exception was thrown: {frame:?}");
 }
 
 extern "x86-interrupt" fn vmm_communication_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("VMM communication exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("VMM communication exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn security_handler(frame: InterruptStackFrame, code: u64) {
-    let log = format!("Security exception was thrown (code 0x{code:x}): {frame:?}");
-    error!(log.as_str());
+    error!("Security exception was thrown (code 0x{code:x}): {frame:?}");
 }
 
 extern "x86-interrupt" fn timer_handler(_frame: InterruptStackFrame) {

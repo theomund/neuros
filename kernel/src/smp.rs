@@ -23,6 +23,5 @@ static SMP_REQUEST: SmpRequest = SmpRequest::new();
 
 pub fn initialize() {
     let count = SMP_REQUEST.get_response().unwrap().cpus().len();
-    let message = format!("Detected that the processor has {count} core(s).");
-    debug!(message.as_str());
+    debug!("Detected that the processor has {count} core(s).");
 }

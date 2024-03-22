@@ -17,7 +17,7 @@
 use crate::ansi::{BLUE, DEFAULT, GREEN, ORANGE, PURPLE, RED, YELLOW};
 use crate::serial::SERIAL;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::Write;
 use core::fmt::{Display, Formatter, Result};
@@ -30,43 +30,49 @@ pub static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| {
 
 #[macro_export]
 macro_rules! debug {
-    ($message:expr) => {
-        LOGGER.lock().debug($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        LOGGER.lock().debug(message);
     };
 }
 
 #[macro_export]
 macro_rules! error {
-    ($message:expr) => {
-        LOGGER.lock().error($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        LOGGER.lock().error(message);
     };
 }
 
 #[macro_export]
 macro_rules! fatal {
-    ($message:expr) => {
-        Logger::fatal($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        Logger::fatal(message);
     };
 }
 
 #[macro_export]
 macro_rules! info {
-    ($message:expr) => {
-        LOGGER.lock().info($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        LOGGER.lock().info(message);
     };
 }
 
 #[macro_export]
 macro_rules! trace {
-    ($message:expr) => {
-        LOGGER.lock().trace($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        LOGGER.lock().trace(message);
     };
 }
 
 #[macro_export]
 macro_rules! warn {
-    ($message:expr) => {
-        LOGGER.lock().warn($message);
+    ($($arg:tt)*) => {
+        let message = format!($($arg)*);
+        LOGGER.lock().warn(message);
     };
 }
 
@@ -108,50 +114,50 @@ impl Logger {
         Logger { logs: Vec::new() }
     }
 
-    pub fn debug(&mut self, message: &str) {
+    pub fn debug(&mut self, message: String) {
         let log = Log {
             level: Level::Debug,
-            message: message.to_string(),
+            message,
         };
         self.logs.push(log);
     }
 
-    pub fn error(&mut self, message: &str) {
+    pub fn error(&mut self, message: String) {
         let log = Log {
             level: Level::Error,
-            message: message.to_string(),
+            message,
         };
         self.logs.push(log);
     }
 
-    pub fn fatal(message: &str) {
+    pub fn fatal(message: String) {
         let log = Log {
             level: Level::Fatal,
-            message: message.to_string(),
+            message,
         };
         write!(SERIAL.lock(), "{log}").unwrap();
     }
 
-    pub fn info(&mut self, message: &str) {
+    pub fn info(&mut self, message: String) {
         let log = Log {
             level: Level::Info,
-            message: message.to_string(),
+            message,
         };
         self.logs.push(log);
     }
 
-    pub fn trace(&mut self, message: &str) {
+    pub fn trace(&mut self, message: String) {
         let log = Log {
             level: Level::Trace,
-            message: message.to_string(),
+            message,
         };
         self.logs.push(log);
     }
 
-    pub fn warn(&mut self, message: &str) {
+    pub fn warn(&mut self, message: String) {
         let log = Log {
             level: Level::Warn,
-            message: message.to_string(),
+            message,
         };
         self.logs.push(log);
     }

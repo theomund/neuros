@@ -49,8 +49,7 @@ impl Keyboard {
 
     pub fn interpret(&mut self) {
         let scan_code = self.read();
-        let log = format!("Received scan code (0x{scan_code:x}) from keyboard.");
-        trace!(log.as_str());
+        trace!("Received scan code (0x{scan_code:x}) from keyboard.");
 
         if scan_code == Enter as u8 {
             VGA_CONSOLE

@@ -120,8 +120,7 @@ impl Initrd {
                 address = address.wrapping_add(BLOCK_SIZE);
             }
             let file = File { header, data };
-            let log = format!("{file}");
-            trace!(log.as_str());
+            trace!("{file}");
             files.push(file);
         }
         Initrd { files }
@@ -193,9 +192,8 @@ impl Initrd {
 }
 
 pub fn initialize() {
-    let log = format!(
+    debug!(
         "Loaded {} files from the initial ramdisk.",
         INITRD.get_files().len()
     );
-    debug!(log.as_str());
 }

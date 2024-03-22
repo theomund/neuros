@@ -42,7 +42,7 @@ pub struct Context {
     r14: u64,
     r15: u64,
     rip: u64,
-    rflags: u64
+    rflags: u64,
 }
 
 #[derive(Clone)]
