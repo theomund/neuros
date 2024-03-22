@@ -17,4 +17,4 @@
 [submodule "bootloader/src"]
 	path = bootloader/src
 	url = https://github.com/limine-bootloader/limine.git
-	branch = binary
+	branch = v7.x-binary
