@@ -26,8 +26,8 @@ static GDT: Lazy<(GlobalDescriptorTable, Selectors)> = Lazy::new(|| {
     let mut gdt = GlobalDescriptorTable::new();
     let kernel_code = gdt.append(Descriptor::kernel_code_segment());
     let kernel_data = gdt.append(Descriptor::kernel_data_segment());
-    let user_code = gdt.append(Descriptor::user_code_segment());
     let user_data = gdt.append(Descriptor::user_data_segment());
+    let user_code = gdt.append(Descriptor::user_code_segment());
     let tss = gdt.append(Descriptor::tss_segment(&TSS));
     (
         gdt,
@@ -47,6 +47,22 @@ struct Selectors {
     user_code: SegmentSelector,
     user_data: SegmentSelector,
     tss: SegmentSelector,
+}
+
+pub fn get_kernel_code() -> SegmentSelector {
+    GDT.1.kernel_code
+}
+
+pub fn get_kernel_data() -> SegmentSelector {
+    GDT.1.kernel_data
+}
+
+pub fn get_user_code() -> SegmentSelector {
+    GDT.1.user_code
+}
+
+pub fn get_user_data() -> SegmentSelector {
+    GDT.1.user_data
 }
 
 pub fn initialize() {

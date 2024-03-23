@@ -40,6 +40,7 @@ mod shell;
 mod smp;
 mod syscall;
 mod timer;
+mod userspace;
 mod vga;
 
 use crate::ansi::{BOLD, NORMAL, RED};
@@ -60,6 +61,7 @@ extern "C" fn _start() -> ! {
     scheduler::initialize();
     intro::initialize().expect("Failed to initialize intro.");
     shell::initialize();
+    userspace::initialize();
     tick();
 }
 
