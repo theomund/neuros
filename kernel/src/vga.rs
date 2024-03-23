@@ -183,7 +183,7 @@ impl Vga {
         }
     }
 
-    pub fn clear(&self) {
+    pub fn clear(&mut self) {
         for y in 0..self.height {
             for x in 0..self.width {
                 self.draw_pixel(
@@ -193,6 +193,7 @@ impl Vga {
                 );
             }
         }
+        self.set_cursor(8, 24, Color::White as u32, Color::Black as u32);
     }
 
     pub fn draw_pixel(&self, x: usize, y: usize, color: u32) {

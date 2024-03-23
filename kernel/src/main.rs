@@ -42,8 +42,11 @@ mod syscall;
 mod timer;
 mod vga;
 
+use crate::ansi::{BOLD, NORMAL, RED};
 use crate::logger::{Level, LOGGER};
+use crate::vga::VGA;
 use alloc::format;
+use core::fmt::Write;
 use core::panic::PanicInfo;
 use x86_64::instructions;
 
@@ -62,7 +65,13 @@ extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    fatal!("The kernel has panicked.\n\n{info}");
+    let mut vga = VGA.lock();
+    vga.clear();
+    writeln!(vga, "{BOLD}{RED}[KERNEL PANIC]{NORMAL}\n").unwrap();
+    fatal!("The kernel has panicked.\n{info}");
+    for log in LOGGER.lock().get_logs() {
+        writeln!(vga, "{log}").unwrap();
+    }
     halt();
 }
 
