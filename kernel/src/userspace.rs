@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::gdt;
+use x86_64::registers::control::{Efer, EferFlags};
 use x86_64::registers::model_specific::Star;
 
 pub fn initialize() {
@@ -25,4 +26,13 @@ pub fn initialize() {
         gdt::get_kernel_data(),
     )
     .expect("Failed to write to STAR register");
+
+    unsafe {
+        Efer::write(
+            EferFlags::SYSTEM_CALL_EXTENSIONS
+                | EferFlags::LONG_MODE_ENABLE
+                | EferFlags::LONG_MODE_ACTIVE
+                | EferFlags::NO_EXECUTE_ENABLE,
+        );
+    }
 }
