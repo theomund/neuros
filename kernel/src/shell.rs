@@ -76,7 +76,7 @@ impl Shell {
             group: group.to_string(),
             group_id,
             prompt: format!(
-                "{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}{home}{DEFAULT}]# "
+                "{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}~{DEFAULT}]# "
             ),
             user_id,
             username: username.to_string(),
