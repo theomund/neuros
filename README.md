@@ -242,7 +242,7 @@ To debug the operating system, open a terminal and run the following command:
 make run DEBUG=true
 ```
 
-This will start QEMU with the flags needed for utilizing a debugger such
+This will start QEMU with the flags needed to use a debugger such
 as GDB. You can likewise debug UEFI setups by using this command:
 
 ```bash
