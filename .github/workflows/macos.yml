@@ -1,9 +1,9 @@
-name: windows
-run-name: Windows Workflow
+name: macos
+run-name: MacOS Workflow
 on: [push]
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
