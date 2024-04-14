@@ -1,0 +1,11 @@
+name: Windows
+run-name: Windows Workflow
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Build ISO Image
+        run: make all
