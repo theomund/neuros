@@ -1,5 +1,5 @@
-name: build
-run-name: Build Workflow
+name: linux
+run-name: Linux Workflow
 on: [push]
 jobs:
   build:
