@@ -92,7 +92,7 @@ debug: $(KERNEL)
 
 .PHONY: distclean
 distclean: clean
-	rm -rf .vale
+	rm -rf $(STYLE)
 	$(MAKE) -C bootloader/src clean
 
 .PHONY: format
