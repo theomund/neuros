@@ -123,6 +123,6 @@ run-uefi: $(ISO) $(OVMF)
 .PHONY: setup
 setup:
 	if [ $(OS) = "Darwin" ]; then \
-		brew install docker colima \
-		colima start \
+		brew install docker colima; \
+		colima start; \
 	fi
