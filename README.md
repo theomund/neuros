@@ -171,9 +171,6 @@ graph BT
 
 # Development
 
-> [!NOTE]
-> Building on Windows or macOS is currently not supported at this time.
-
 If you're interested in developing the operating system, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on your
 Linux system.
