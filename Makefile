@@ -41,9 +41,7 @@ ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
-OS := $(shell uname)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
-RUNTIME := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
 STYLE := .github/styles/RedHat
 TAG := builder
 TARGET := all
@@ -87,7 +85,7 @@ clean:
 
 .PHONY: container
 container: image
-	$(RUNTIME) run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG) make $(TARGET)
+	podman run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG) make $(TARGET)
 
 .PHONY: debug
 debug: $(KERNEL)
@@ -103,8 +101,8 @@ format:
 	cargo fmt
 
 .PHONY: image
-image: setup
-	$(RUNTIME) build -t $(TAG) .
+image:
+	podman build --format docker -t $(TAG) .
 
 .PHONY: lint
 lint: $(STYLE)
@@ -119,10 +117,3 @@ run: $(ISO)
 .PHONY: run-uefi
 run-uefi: $(ISO) $(OVMF)
 	qemu-system-x86_64 $(DEBUG_FLAGS) -M q35 -m 2G -bios $(OVMF) -cdrom $(ISO) -boot d
-
-.PHONY: setup
-setup:
-	if [ $(OS) = "Darwin" ]; then \
-		brew install docker colima; \
-		colima start; \
-	fi

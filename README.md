@@ -18,13 +18,10 @@
 
 # ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/7b2e911a-429b-4d44-a4bb-131a8037cb97)
 
-![GitHub License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge)
+![License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge)
+![Build](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
 ![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version)
 ![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain)
-
-![Windows](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/windows.yml?style=for-the-badge&logo=windows&logoColor=white)
-![MacOS](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/macos.yml?style=for-the-badge&logo=apple&logoColor=white)
-![Linux](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
@@ -131,8 +128,8 @@ not an exhaustive list):
 * [ ] **Inter-Process Communication (IPC)**
     * [ ] Messages
     * [ ] Transmission
-      * [ ] Asynchronous
-      * [ ] Synchronous
+        * [ ] Asynchronous
+        * [ ] Synchronous
 * [ ] **Filesystems**
     * [x] USTAR
     * [ ] FAT32
@@ -170,6 +167,9 @@ graph BT
 ```
 
 # Development
+
+> [!NOTE]
+> Building on Windows or macOS is currently not supported at this time.
 
 If you're interested in developing the operating system, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on your
