@@ -13,8 +13,8 @@ jobs:
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          system: UCRT64
+          msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc xorriso
+          install: git mingw-w64-ucrt-x86_64-gcc xorriso make
       - name: Build ISO Image
         run: make all
