@@ -41,6 +41,7 @@ ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
+OS := $(shell uname)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
 TAG := builder
@@ -116,3 +117,9 @@ run: $(ISO)
 .PHONY: run-uefi
 run-uefi: $(ISO) $(OVMF)
 	qemu-system-x86_64 $(DEBUG_FLAGS) -M q35 -m 2G -bios $(OVMF) -cdrom $(ISO) -boot d
+
+.PHONY: setup
+setup:
+	if [ $(OS) = "Darwin" ]; then \
+		brew install xorriso; \
+	fi

@@ -26,7 +26,6 @@
 ![MacOS](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/macos.yml?style=for-the-badge&logo=apple&logoColor=white)
 ![Linux](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
 
-
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
 > might find bugs, incomplete features, and breaking changes. Be aware that
