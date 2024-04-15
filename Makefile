@@ -67,7 +67,7 @@ $(INIT): $(INIT_SOURCE)
 	cp target/x86_64-unknown-none/$(SUBDIR)/init initrd/bin/
 
 $(INITRD): $(INITRD_SOURCE) $(INIT)
-	tar -H ustar -c -f $(INITRD) initrd
+	tar --format ustar -c -f $(INITRD) initrd
 
 $(KERNEL): $(KERNEL_SOURCE)
 	cargo build --profile $(PROFILE) --package kernel
