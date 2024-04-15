@@ -124,4 +124,6 @@ run-uefi: $(ISO) $(OVMF)
 setup:
 	if [ $(OS) = "Darwin" ]; then \
 		brew install xorriso; \
+	elif [ $(OS) = "Linux" ]; then \
+	  	apt-get install -y xorriso; \
 	fi
