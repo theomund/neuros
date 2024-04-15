@@ -29,11 +29,12 @@ else
     SUBDIR := $(PROFILE)
 endif
 
+export CC := gcc
+
 BOOTLOADER := bootloader/src/limine
 BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOTLOADER_CFG := bootloader/limine.cfg
 BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
-CC := gcc
 INIT := initrd/bin/init
 INIT_SOURCE := $(shell find userland/init)
 INITRD := target/initrd.tar
