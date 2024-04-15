@@ -16,9 +16,10 @@
 
 FROM registry.fedoraproject.org/fedora:39
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV PATH="$PATH:/root/.cargo/bin"
 RUN dnf install -y \
-    dnf-plugins-core-4.5.0 \
-    edk2-ovmf-20231122 \
+    dnf-plugins-core-4.6.0 \
+    edk2-ovmf-20240214 \
     gcc-13.2.1 \
     git-2.44.0 \
     hadolint-2.12.0 \

@@ -7,7 +7,5 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Environment
-        run: make setup
       - name: Build ISO Image
-        run: make all
+        run: make container TARGET="all"

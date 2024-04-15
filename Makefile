@@ -29,8 +29,6 @@ else
     SUBDIR := $(PROFILE)
 endif
 
-export CC := gcc
-
 BOOTLOADER := bootloader/src/limine
 BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOTLOADER_CFG := bootloader/limine.cfg
@@ -45,8 +43,10 @@ KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OS := $(shell uname)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
+RUNTIME := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
 STYLE := .github/styles/RedHat
 TAG := builder
+TARGET := all
 
 $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
@@ -87,7 +87,7 @@ clean:
 
 .PHONY: container
 container: image
-	podman run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG)
+	$(RUNTIME) run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG) make $(TARGET)
 
 .PHONY: debug
 debug: $(KERNEL)
@@ -103,8 +103,8 @@ format:
 	cargo fmt
 
 .PHONY: image
-image:
-	podman build --format docker -t $(TAG) .
+image: setup
+	$(RUNTIME) build -t $(TAG) .
 
 .PHONY: lint
 lint: $(STYLE)
@@ -123,7 +123,6 @@ run-uefi: $(ISO) $(OVMF)
 .PHONY: setup
 setup:
 	if [ $(OS) = "Darwin" ]; then \
-		brew install xorriso; \
-	elif [ $(OS) = "Linux" ]; then \
-	  	apt-get install -y xorriso; \
+		brew install docker colima
+		colima start
 	fi
