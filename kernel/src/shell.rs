@@ -75,9 +75,7 @@ impl Shell {
             buffer: Vec::new(),
             group: group.to_string(),
             group_id,
-            prompt: format!(
-                "{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}~{DEFAULT}]# "
-            ),
+            prompt: format!("{BOLD}{DEFAULT}[{GREEN}{username}@{hostname} {BLUE}~{DEFAULT}]# "),
             user_id,
             username: username.to_string(),
             working_directory: home.to_string(),
