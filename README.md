@@ -18,10 +18,10 @@
 
 # ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/7b2e911a-429b-4d44-a4bb-131a8037cb97)
 
-![License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge)
+![License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge&logo=gnu&logoColor=white)
 ![Build](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
-![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version)
-![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain)
+![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version&logo=git&logoColor=white)
+![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain&logoColor=white)
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
