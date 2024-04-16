@@ -29,5 +29,4 @@ RUN dnf install -y \
 RUN dnf copr enable -y mczernek/vale \
     && dnf install -y vale-3.0.7 \
     && dnf clean all
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-WORKDIR /usr/src/app
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
