@@ -85,7 +85,7 @@ clean:
 
 .PHONY: container
 container: image
-	podman run -it -v $(shell pwd):/usr/src/app:z --rm $(TAG) make $(TARGET)
+	podman run --rm -v $(shell pwd):/usr/src/app:z $(TAG) make $(TARGET)
 
 .PHONY: debug
 debug: $(KERNEL)
