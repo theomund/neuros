@@ -170,7 +170,7 @@ graph BT
 
 > [!NOTE]
 > Building on Windows or macOS requires the usage of a container. See the
-> [Container](Container) section for more information.
+> [Container](#container) section for more information.
 
 If you're interested in developing the operating system, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on your
