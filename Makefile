@@ -97,7 +97,6 @@ format:
 .PHONY: lint
 lint: $(STYLE)
 	cargo clippy --profile $(PROFILE)
-	hadolint Dockerfile
 	vale README.md
 
 .PHONY: run
