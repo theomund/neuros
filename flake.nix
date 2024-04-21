@@ -19,12 +19,16 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, rust-overlay }:
     let
+      overlays = [ (import rust-overlay) ];
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system overlays;
+      };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -35,7 +39,7 @@
           git
           gnumake
           qemu
-          rustup
+          (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
           vale
           xorriso
         ];
