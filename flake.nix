@@ -29,12 +29,12 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
+          OVMF
           gcc
           gdb
           git
           gnumake
           qemu
-          OVMF
           rustup
           vale
           xorriso
