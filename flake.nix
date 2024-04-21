@@ -46,6 +46,7 @@
             gdb
             git
             gnumake
+            limine
             qemu
             (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
             vale

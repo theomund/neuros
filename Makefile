@@ -29,7 +29,6 @@ else
     SUBDIR := $(PROFILE)
 endif
 
-BOOTLOADER := bootloader/src/limine
 BOOTLOADER_BIN := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOTLOADER_CFG := bootloader/limine.cfg
 BOOTLOADER_EFI := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
@@ -44,7 +43,7 @@ KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
 
-$(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
+$(ISO): $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
 	cp -v $(BOOTLOADER_BIN) $(BOOTLOADER_CFG) $(INITRD) $(KERNEL) $(ISO_ROOT)
 	cp -v $(BOOTLOADER_EFI) $(ISO_ROOT)/EFI/BOOT/
@@ -53,12 +52,11 @@ $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_ROOT) -o $(ISO)
-	$(BOOTLOADER) bios-install $(ISO)
+	limine bios-install $(ISO)
 	rm -rf $(ISO_ROOT)
 
-$(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
+$(BOOTLOADER_BIN) $(BOOTLOADER_EFI):
 	git submodule update --init
-	$(MAKE) -C bootloader/src
 
 $(INIT): $(INIT_SOURCE)
 	cargo build --profile $(PROFILE) --package init
