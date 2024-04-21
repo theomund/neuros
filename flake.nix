@@ -33,10 +33,8 @@
           gdb
           git
           gnumake
-          hadolint
           qemu
           OVMF
-          podman
           rustup
           vale
           xorriso

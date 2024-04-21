@@ -43,8 +43,6 @@ KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
-TAG := builder
-TARGET := all
 
 $(ISO): $(BOOTLOADER) $(BOOTLOADER_BIN) $(BOOTLOADER_EFI) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
@@ -83,10 +81,6 @@ all: $(ISO)
 clean:
 	cargo clean
 
-.PHONY: container
-container: image
-	podman run --rm -v $(shell pwd):/usr/src/app:z $(TAG) make $(TARGET)
-
 .PHONY: debug
 debug: $(KERNEL)
 	rust-gdb -ex "file $(KERNEL)" -ex "target remote localhost:1234"
@@ -99,10 +93,6 @@ distclean: clean
 .PHONY: format
 format:
 	cargo fmt
-
-.PHONY: image
-image:
-	podman build --format docker -t $(TAG) .
 
 .PHONY: lint
 lint: $(STYLE)
