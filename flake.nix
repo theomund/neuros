@@ -18,46 +18,46 @@
   description = "Hobbyist operating system written in Rust.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
-      };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        overlays = [ (import rust-overlay) ];
-        pkgs = import nixpkgs {
-          inherit system overlays;
-        };
-      in
-      with pkgs;
+  outputs = inputs@{ flake-parts, fenix, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; }
       {
-        devShells.default = mkShell {
-          packages = [
-            OVMF
-            gcc
-            gdb
-            git
-            gnumake
-            limine
-            qemu
-            (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
-            vale
-            xorriso
-          ];
+        systems = [ "aarch64-linux" "x86_64-linux" ];
+        perSystem = { config, lib, options, pkgs, specialArgs, system }:
+          let
+            toolchain = fenix.packages.${system}.fromToolchainFile {
+              file = ./rust-toolchain.toml;
+              sha256 = "sha256-JdeBt4ApDwz+7rkdvzVdu43QQN3na9WFIsQul46nVxw=";
+            };
+          in
+          with pkgs;
+          {
+            devShells.default = mkShell {
+              packages = [
+                OVMF
+                gcc
+                gdb
+                git
+                gnumake
+                limine
+                qemu
+                toolchain
+                vale
+                xorriso
+              ];
 
-          shellHook = ''
-            echo "Welcome to the NeurOS development shell."
-          '';
-        };
-        formatter = nixpkgs-fmt;
-      }
-    );
+              shellHook = ''
+                echo "Welcome to the NeurOS development shell."
+              '';
+            };
+
+            formatter = nixpkgs-fmt;
+          };
+      };
 }
