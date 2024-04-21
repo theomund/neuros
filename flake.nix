@@ -18,36 +18,45 @@
   description = "Hobbyist operating system written in Rust.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
-    rust-overlay.url = "github:oxalica/rust-overlay";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, rust-overlay }:
-    let
-      overlays = [ (import rust-overlay) ];
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system overlays;
-      };
-    in
-    {
-      devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          OVMF
-          gcc
-          gdb
-          git
-          gnumake
-          qemu
-          (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
-          vale
-          xorriso
-        ];
+  outputs = { self, nixpkgs, rust-overlay, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        overlays = [ (import rust-overlay) ];
+        pkgs = import nixpkgs {
+          inherit system overlays;
+        };
+      in
+      with pkgs;
+      {
+        devShells.default = mkShell {
+          packages = [
+            OVMF
+            gcc
+            gdb
+            git
+            gnumake
+            qemu
+            (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
+            vale
+            xorriso
+          ];
 
-        shellHook = ''
-          echo "Welcome to the NeurOS development shell."
-        '';
-      };
-      formatter.${system} = pkgs.nixpkgs-fmt;
-    };
+          shellHook = ''
+            echo "Welcome to the NeurOS development shell."
+          '';
+        };
+        formatter = nixpkgs-fmt;
+      }
+    );
 }
