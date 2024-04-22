@@ -29,7 +29,7 @@
     flake-parts.lib.mkFlake { inherit inputs; }
       {
         systems = [ "aarch64-linux" "x86_64-linux" ];
-        perSystem = { config, lib, options, pkgs, specialArgs, system }:
+        perSystem = { lib, pkgs, system, ... }:
           let
             toolchain = fenix.packages.${system}.fromToolchainFile {
               file = ./rust-toolchain.toml;
