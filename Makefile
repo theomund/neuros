@@ -46,11 +46,11 @@ STYLE := .github/styles/RedHat
 TAG := builder
 TARGET := all
 
-$(LIMINE):
+$(BIOS_FILES) $(EFI_FILES) $(LIMINE):
 	git submodule update --init
-	make -C bootloader/src
+	$(MAKE) -C bootloader/src
 
-$(ISO): $(KERNEL) $(INITRD) $(LIMINE)
+$(ISO): $(BIOS_FILES) $(EFI_FILES) $(LIMINE) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
 	cp -v $(BIOS_FILES) $(BOOT_CONFIG) $(INITRD) $(KERNEL) $(ISO_ROOT)
 	cp -v $(EFI_FILES) $(ISO_ROOT)/EFI/BOOT/
