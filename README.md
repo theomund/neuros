@@ -169,7 +169,8 @@ graph BT
 # Development
 
 > [!NOTE]
-> Building on Windows requires the usage of Windows Subsystem for Linux (WSL).
+> Building on Windows or macOS requires the usage of a container. See the
+> [Container](#container) section for more information.
 
 If you're interested in developing the operating system, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on your
@@ -179,11 +180,18 @@ system.
 
 Before developing, ensure you have the following prerequisites installed:
 
+* `edk2-ovmf`
+* `gcc`
+* `gdb`
 * `git`
-* `nix`
-
-With Nix, you will need to ensure that the `flakes` and `nix-command`
-experimental features are enabled.
+* `hadolint`
+* `make`
+* `podman`
+* `qemu`
+* `rustup`
+* `tar`
+* `vale`
+* `xorriso`
 
 ## Cloning
 
@@ -193,12 +201,29 @@ Clone the repository to your local machine by using the following command:
 git clone https://github.com/Theomund/NeurOS.git
 ```
 
-## Developing
+## Container
 
-To instantiate a development shell, run the following command:
+This project leverages a Containerfile to streamline the onboarding process for
+development. The resulting container image encapsulates all the necessary
+dependencies required to build the software. To get started, run the following
+command to build the image with [Podman](https://podman.io):
 
 ```bash
-nix develop
+make image
+```
+
+After successfully building the image, use the following command to create a
+container:
+
+```bash
+make container
+```
+
+This launches the container into a shell prompt by default. To override this
+behavior, adjust the `CMD` variable:
+
+```bash
+make container CMD="make all"
 ```
 
 ## Compiling
@@ -295,4 +320,4 @@ You can find the detailed terms of the license in the [COPYING](COPYING) file.
 This project features artwork from the following artists, who reserve all
 rights to their work:
 
-* [paccha](https://twitter.com/paccha_7) — Neurolings (Sprites)
+* [paccha](https://twitter.com/paccha_7)

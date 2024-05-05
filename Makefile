@@ -29,31 +29,36 @@ else
     SUBDIR := $(PROFILE)
 endif
 
-BOOTLOADER := $(shell limine --print-datadir)/
-BOOTLOADER_BIN := $(addprefix $(BOOTLOADER),limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
-BOOTLOADER_CFG := bootloader/limine.cfg
-BOOTLOADER_EFI := $(addprefix $(BOOTLOADER),BOOTX64.EFI BOOTIA32.EFI)
+BIOS_FILES := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
+BOOT_CONFIG := bootloader/limine.cfg
+CMD := /bin/bash
+EFI_FILES := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
 INIT := initrd/bin/init
 INIT_SOURCE := $(shell find userland/init)
 INITRD := target/initrd.tar
 INITRD_SOURCE := $(shell find initrd)
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
+LIMINE := bootloader/src/limine
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
+TAG := builder
 
-$(ISO): $(KERNEL) $(INITRD)
+$(LIMINE):
+	make -C bootloader/src
+
+$(ISO): $(KERNEL) $(INITRD) $(LIMINE)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
-	cp -v $(BOOTLOADER_BIN) $(BOOTLOADER_CFG) $(INITRD) $(KERNEL) $(ISO_ROOT)
-	cp -v $(BOOTLOADER_EFI) $(ISO_ROOT)/EFI/BOOT/
+	cp -v $(BIOS_FILES) $(BOOT_CONFIG) $(INITRD) $(KERNEL) $(ISO_ROOT)
+	cp -v $(EFI_FILES) $(ISO_ROOT)/EFI/BOOT/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_ROOT) -o $(ISO)
-	limine bios-install $(ISO)
+	$(LIMINE) bios-install $(ISO)
 	rm -rf $(ISO_ROOT)
 
 $(INIT): $(INIT_SOURCE)
@@ -77,21 +82,30 @@ all: $(ISO)
 clean:
 	cargo clean
 
+.PHONY: container
+container: image
+	podman run -it --rm -v $(shell pwd):/usr/src/app:z $(TAG) $(CMD)
+
 .PHONY: debug
 debug: $(KERNEL)
 	rust-gdb -ex "file $(KERNEL)" -ex "target remote localhost:1234"
 
 .PHONY: distclean
 distclean: clean
-	rm -rf $(STYLE)
+	rm -rf $(LIMINE) $(STYLE)
 
 .PHONY: format
 format:
 	cargo fmt
 
+.PHONY: image
+image:
+	podman build -t $(TAG) --format docker .
+
 .PHONY: lint
 lint: $(STYLE)
 	cargo clippy --profile $(PROFILE)
+	hadolint Containerfile
 	vale README.md
 
 .PHONY: run
