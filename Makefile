@@ -47,6 +47,7 @@ TAG := builder
 TARGET := all
 
 $(LIMINE):
+	git submodule update --init
 	make -C bootloader/src
 
 $(ISO): $(KERNEL) $(INITRD) $(LIMINE)
