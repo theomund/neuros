@@ -7,7 +7,5 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Install Nix
-        uses: cachix/install-nix-action@v26
       - name: Build ISO Image
-        run: nix develop --command make all
+        run: make container CMD="make all"
