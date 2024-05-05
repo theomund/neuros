@@ -31,20 +31,20 @@ endif
 
 BIOS_FILES := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOT_CONFIG := bootloader/limine.cfg
-CMD := /bin/bash
 EFI_FILES := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
 INIT := initrd/bin/init
-INIT_SOURCE := $(shell find userland/init)
 INITRD := target/initrd.tar
 INITRD_SOURCE := $(shell find initrd)
+INIT_SOURCE := $(shell find userland/init)
 ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
-LIMINE := bootloader/src/limine
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
+LIMINE := bootloader/src/limine
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
 TAG := builder
+TARGET := all
 
 $(LIMINE):
 	make -C bootloader/src
@@ -84,7 +84,7 @@ clean:
 
 .PHONY: container
 container: image
-	podman run -it --rm -v $(shell pwd):/usr/src/app:z $(TAG) $(CMD)
+	podman run --rm -v $(shell pwd):/usr/src/app:z $(TAG) make $(TARGET)
 
 .PHONY: debug
 debug: $(KERNEL)

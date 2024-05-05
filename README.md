@@ -213,17 +213,10 @@ make image
 ```
 
 After successfully building the image, use the following command to create a
-container:
+container and run a specific Makefile target:
 
 ```bash
-make container
-```
-
-This launches the container into a shell prompt by default. To override this
-behavior, adjust the `CMD` variable:
-
-```bash
-make container CMD="make all"
+make container TARGET="all"
 ```
 
 ## Compiling
