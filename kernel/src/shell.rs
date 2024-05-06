@@ -114,14 +114,16 @@ impl Shell {
                     }
                     "help" => {
                         writeln!(writer, "Available commands:")?;
-                        writeln!(writer, "\techo    -- Display a line of text.")?;
-                        writeln!(writer, "\tfork    -- Create child process.")?;
-                        writeln!(writer, "\thelp    -- Print a list of commands.")?;
-                        writeln!(writer, "\tid      -- Print user and group ID.")?;
-                        writeln!(writer, "\tlogs    -- Retrieve the system logs.")?;
-                        writeln!(writer, "\treadelf -- Read ELF executable file.")?;
-                        writeln!(writer, "\ttime    -- Display the elapsed time.")?;
-                        writeln!(writer, "\tpwd     -- Print current working directory.")?;
+                        writeln!(writer, "\techo     -- Display a line of text.")?;
+                        writeln!(writer, "\tfork     -- Create child process.")?;
+                        writeln!(writer, "\thelp     -- Print a list of commands.")?;
+                        writeln!(writer, "\tid       -- Print user and group ID.")?;
+                        writeln!(writer, "\tlogs     -- Retrieve the system logs.")?;
+                        writeln!(writer, "\tpwd      -- Print current working directory.")?;
+                        writeln!(writer, "\treadelf  -- Read ELF executable file.")?;
+                        writeln!(writer, "\treboot   -- Reboot the operating system.")?;
+                        writeln!(writer, "\tshutdown -- Shutdown the operating system.")?;
+                        writeln!(writer, "\ttime     -- Display the elapsed time.")?;
                     }
                     "id" => {
                         writeln!(
@@ -145,6 +147,12 @@ impl Shell {
                         };
                         let executable = Elf::new(argument);
                         writeln!(writer, "{executable}")?;
+                    }
+                    "reboot" => {
+                        writeln!(writer, "Rebooting the operating system.")?;
+                    }
+                    "shutdown" => {
+                        writeln!(writer, "Shutting down the operating system.")?;
                     }
                     "time" => {
                         writeln!(writer, "{}", TIMER.get_elapsed())?;
