@@ -30,6 +30,6 @@ RUN dnf install -y \
 RUN dnf copr enable -y mczernek/vale \
     && dnf install -y vale-3.4.1 \
     && dnf clean all
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly-2024-05-05 -t x86_64-unknown-none
 ENV PATH="$PATH:/root/.cargo/bin"
 WORKDIR /usr/src/app
