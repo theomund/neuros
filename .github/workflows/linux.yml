@@ -7,5 +7,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Build ISO Image
-        run: make container TARGET="all"
+        run: nix develop --command make all
