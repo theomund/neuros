@@ -168,10 +168,6 @@ graph BT
 
 # Development
 
-> [!NOTE]
-> Building on Windows or macOS requires the usage of a container. See the
-> [Container](#container) section for more information.
-
 If you're interested in developing the operating system, follow the outlined
 steps. Make sure you have the necessary tools and dependencies installed on your
 system.
@@ -180,18 +176,8 @@ system.
 
 Before developing, ensure you have the following prerequisites installed:
 
-* `edk2-ovmf`
-* `gcc`
-* `gdb`
 * `git`
-* `hadolint`
-* `make`
-* `podman`
-* `qemu`
-* `rustup`
-* `tar`
-* `vale`
-* `xorriso`
+* `nix`
 
 ## Cloning
 
@@ -199,24 +185,6 @@ Clone the repository to your local machine by using the following command:
 
 ```bash
 git clone https://github.com/Theomund/NeurOS.git
-```
-
-## Container
-
-This project leverages a Containerfile to streamline the onboarding process for
-development. The resulting container image encapsulates all the necessary
-dependencies required to build the software. To get started, run the following
-command to build the image with [Podman](https://podman.io):
-
-```bash
-make image
-```
-
-After successfully building the image, use the following command to create a
-container and run a specific Makefile target:
-
-```bash
-make container TARGET="all"
 ```
 
 ## Compiling

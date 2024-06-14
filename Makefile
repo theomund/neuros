@@ -43,8 +43,6 @@ KERNEL_SOURCE := $(shell find kernel)
 LIMINE := bootloader/src/limine
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
-TAG := builder
-TARGET := all
 
 $(BIOS_FILES) $(EFI_FILES) $(LIMINE):
 	git submodule update --init
@@ -83,10 +81,6 @@ all: $(ISO)
 clean:
 	cargo clean
 
-.PHONY: container
-container: image
-	podman run --rm -v $(shell pwd):/usr/src/app:z $(TAG) make $(TARGET)
-
 .PHONY: debug
 debug: $(KERNEL)
 	rust-gdb -ex "file $(KERNEL)" -ex "target remote localhost:1234"
@@ -99,14 +93,9 @@ distclean: clean
 format:
 	cargo fmt
 
-.PHONY: image
-image:
-	podman build -t $(TAG) --format docker .
-
 .PHONY: lint
 lint: $(STYLE)
 	cargo clippy --profile $(PROFILE)
-	hadolint Containerfile
 	vale README.md
 
 .PHONY: run
