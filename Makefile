@@ -29,9 +29,11 @@ else
     SUBDIR := $(PROFILE)
 endif
 
-BIOS_FILES := $(addprefix bootloader/src/,limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
+DATA_DIRECTORY := $(shell limine --print-datadir)/
+
+BIOS_FILES := $(addprefix $(DATA_DIRECTORY),limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOT_CONFIG := bootloader/limine.cfg
-EFI_FILES := $(addprefix bootloader/src/,BOOTX64.EFI BOOTIA32.EFI)
+EFI_FILES := $(addprefix $(DATA_DIRECTORY),BOOTX64.EFI BOOTIA32.EFI)
 INIT := initrd/bin/init
 INITRD := target/initrd.tar
 INITRD_SOURCE := $(shell find initrd)
@@ -40,13 +42,8 @@ ISO := target/NeurOS.iso
 ISO_ROOT := target/iso_root
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
-LIMINE := bootloader/src/limine
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
 STYLE := .github/styles/RedHat
-
-$(BIOS_FILES) $(EFI_FILES) $(LIMINE):
-	git submodule update --init
-	$(MAKE) -C bootloader/src
 
 $(ISO): $(BIOS_FILES) $(EFI_FILES) $(LIMINE) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
@@ -57,7 +54,7 @@ $(ISO): $(BIOS_FILES) $(EFI_FILES) $(LIMINE) $(KERNEL) $(INITRD)
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_ROOT) -o $(ISO)
-	$(LIMINE) bios-install $(ISO)
+	limine bios-install $(ISO)
 	rm -rf $(ISO_ROOT)
 
 $(INIT): $(INIT_SOURCE)
@@ -87,7 +84,7 @@ debug: $(KERNEL)
 
 .PHONY: distclean
 distclean: clean
-	rm -rf $(LIMINE) $(STYLE)
+	rm -rf $(STYLE)
 
 .PHONY: format
 format:
