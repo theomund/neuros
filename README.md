@@ -187,6 +187,14 @@ Clone the repository to your local machine by using the following command:
 git clone https://github.com/Theomund/NeurOS.git
 ```
 
+## Developing
+
+To instantiate a development shell, run the following command:
+
+```bash
+nix develop
+```
+
 ## Compiling
 
 Run the following command to generate an ISO image:
