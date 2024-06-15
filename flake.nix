@@ -54,6 +54,7 @@
               ];
 
               shellHook = ''
+                export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
                 echo "Welcome to the NeurOS development shell."
               '';
             };
