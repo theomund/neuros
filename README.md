@@ -174,12 +174,19 @@ system.
 
 ## Prerequisites
 
-Before developing, ensure you have the following prerequisites installed:
+Before developing, ensure you have Nix installed on your host operating system:
 
-* `git`
-* `nix`
+```bash
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
 
 ## Cloning
+
+Spawn an interactive shell that contains the `git` package:
+
+```bash
+nix-shell -p git
+```
 
 Clone the repository to your local machine by using the following command:
 
