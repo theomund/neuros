@@ -33,7 +33,6 @@ DATA_DIRECTORY := $(shell limine --print-datadir)/
 
 BIOS_FILES := $(addprefix $(DATA_DIRECTORY),limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOT_CONFIG := bootloader/limine.cfg
-BUILD_DATE := $(shell date -u -d @$(SOURCE_DATE_EPOCH) +'%Y%m%d%H%M.%S')
 EFI_FILES := $(addprefix $(DATA_DIRECTORY),BOOTX64.EFI BOOTIA32.EFI)
 INIT := initrd/bin/init
 INITRD := target/initrd.tar
@@ -44,7 +43,10 @@ ISO_ROOT := target/iso_root
 KERNEL := target/x86_64-unknown-none/$(SUBDIR)/kernel
 KERNEL_SOURCE := $(shell find kernel)
 OVMF := /usr/share/edk2/ovmf/OVMF_CODE.fd
+SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct)
 STYLE := .github/styles/RedHat
+
+BUILD_DATE := $(shell date -u -d @$(SOURCE_DATE_EPOCH) +'%Y%m%d%H%M.%S')
 
 $(ISO): $(BIOS_FILES) $(EFI_FILES) $(LIMINE) $(KERNEL) $(INITRD)
 	mkdir -p $(ISO_ROOT)/EFI/BOOT
