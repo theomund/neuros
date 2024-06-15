@@ -33,6 +33,7 @@ DATA_DIRECTORY := $(shell limine --print-datadir)/
 
 BIOS_FILES := $(addprefix $(DATA_DIRECTORY),limine-bios.sys limine-bios-cd.bin limine-uefi-cd.bin)
 BOOT_CONFIG := bootloader/limine.cfg
+BUILD_DATE := $(shell date -u -d @$(SOURCE_DATE_EPOCH) +'%Y%m%d%H%M.%S')
 EFI_FILES := $(addprefix $(DATA_DIRECTORY),BOOTX64.EFI BOOTIA32.EFI)
 INIT := initrd/bin/init
 INITRD := target/initrd.tar
@@ -53,6 +54,7 @@ $(ISO): $(BIOS_FILES) $(EFI_FILES) $(LIMINE) $(KERNEL) $(INITRD)
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		--set_all_file_dates $(BUILD_DATE) \
 		$(ISO_ROOT) -o $(ISO)
 	limine bios-install $(ISO)
 	rm -rf $(ISO_ROOT)
