@@ -184,7 +184,7 @@ Before developing, ensure you have the following prerequisites installed:
 Clone the repository to your local machine by using the following command:
 
 ```bash
-git clone https://github.com/Theomund/NeurOS.git
+git clone https://github.com/theomund/neuros.git
 ```
 
 ## Developing
