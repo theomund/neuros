@@ -93,6 +93,7 @@ distclean: clean
 .PHONY: format
 format:
 	cargo fmt
+	nix fmt
 
 .PHONY: lint
 lint: $(STYLE)
