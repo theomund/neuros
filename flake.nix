@@ -55,6 +55,7 @@
 
               shellHook = ''
                 export OVMF=${OVMF.fd}/FV/OVMF.fd
+                export RUST_SRC_PATH=${toolchain}/lib/rustlib/src/rust/
                 echo "Welcome to the NeurOS development shell."
               '';
             };
