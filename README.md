@@ -191,7 +191,7 @@ nix-shell -p git
 Clone the repository to your local machine by using the following command:
 
 ```bash
-git clone https://github.com/theomund/neuros.git
+git clone https://github.com/Theomund/NeurOS.git
 ```
 
 ## Developing
