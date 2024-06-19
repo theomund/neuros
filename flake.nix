@@ -41,7 +41,7 @@
           {
             devShells.default = mkShell {
               packages = [
-                OVMF
+                OVMF.fd
                 gcc
                 gdb
                 git
@@ -54,6 +54,7 @@
               ];
 
               shellHook = ''
+                export OVMF=${OVMF.fd}/FV/OVMF.fd
                 echo "Welcome to the NeurOS development shell."
               '';
             };
