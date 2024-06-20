@@ -16,6 +16,7 @@
 
 [[bin]]
 name = "kernel"
+bench = false
 test = false
 
 [package]

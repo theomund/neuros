@@ -16,6 +16,7 @@
 
 [[bin]]
 name = "init"
+bench = false
 test = false
 
 [package]
