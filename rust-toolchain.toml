@@ -16,5 +16,5 @@
 
 [toolchain]
 channel = "nightly-2024-06-13"
-components = ["cargo", "clippy", "rust-src", "rustc", "rustfmt"]
+components = ["cargo", "clippy", "rust-analyzer", "rust-src", "rustc", "rustfmt"]
 targets = ["x86_64-unknown-none"]
