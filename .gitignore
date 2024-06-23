@@ -18,5 +18,5 @@
 *.iso
 .github/styles/RedHat/
 .idea/
-initrd/bin/
-target/
+zig-cache/
+zig-out/
