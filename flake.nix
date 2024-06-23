@@ -1,4 +1,4 @@
-# NeurOS - Hobbyist operating system written in Rust.
+# NeurOS - Hobbyist operating system written in Zig.
 # Copyright (C) 2024 Theomund
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,47 +15,34 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 {
-  description = "Hobbyist operating system written in Rust.";
+  description = "Hobbyist operating system written in Zig.";
 
   inputs = {
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
   };
 
-  outputs = inputs@{ flake-parts, fenix, ... }:
+  outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; }
       {
         systems = [ "aarch64-linux" "x86_64-linux" ];
         perSystem = { lib, pkgs, system, ... }:
-          let
-            toolchain = fenix.packages.${system}.fromToolchainFile {
-              file = ./rust-toolchain.toml;
-              sha256 = "sha256-FCzqCKyL/FGLz+OhfJL2sxO5VPVRTd8FgS8sNaEjzrg=";
-            };
-          in
           with pkgs;
           {
             devShells.default = mkShell {
               packages = [
                 OVMF.fd
-                gcc
                 gdb
                 git
-                gnumake
                 limine
                 qemu
-                toolchain
                 vale
                 xorriso
+                zig
               ];
 
               shellHook = ''
                 export OVMF=${OVMF.fd}/FV/OVMF.fd
-                export RUST_SRC_PATH=${toolchain}/lib/rustlib/src/rust/
                 echo "Welcome to the NeurOS development shell."
               '';
             };

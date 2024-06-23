@@ -1,5 +1,5 @@
 /*
-  NeurOS - Hobbyist operating system written in Rust.
+  NeurOS - Hobbyist operating system written in Zig.
   Copyright (C) 2024 Theomund
 
   This program is free software: you can redistribute it and/or modify
