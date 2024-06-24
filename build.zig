@@ -47,13 +47,29 @@ pub fn build(b: *std.Build) void {
     kernel.setLinkerScriptPath(b.path("src/kernel/linker.ld"));
     kernel.want_lto = false;
 
-    b.installArtifact(kernel);
+    const kernel_artifact = b.addInstallArtifact(kernel, .{});
 
     const kernel_step = b.step("kernel", "Build the kernel");
-    kernel_step.dependOn(&kernel.step);
+    kernel_step.dependOn(&kernel_artifact.step);
+
+    const initrd_cmd = b.addSystemCommand(&.{"tar"});
+    initrd_cmd.addArg("--format");
+    initrd_cmd.addArg("ustar");
+    initrd_cmd.addArg("-c");
+    initrd_cmd.addArg("-f");
+    const initrd_path = initrd_cmd.addOutputFileArg("initrd.tar");
+    initrd_cmd.addArg("-C");
+    initrd_cmd.addDirectoryArg(b.path("src/initrd"));
+    initrd_cmd.addArg(".");
+
+    const initrd_artifact = b.addInstallFile(initrd_path, "initrd.tar");
+
+    const initrd_step = b.step("initrd", "Build the initial ramdisk");
+    initrd_step.dependOn(&initrd_artifact.step);
 
     const iso_step = b.step("iso", "Build the ISO");
     iso_step.dependOn(kernel_step);
+    iso_step.dependOn(initrd_step);
 
     const run_step = b.step("run", "Run the operating system");
     run_step.dependOn(iso_step);
