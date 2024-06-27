@@ -73,13 +73,15 @@ pub fn build(b: *std.Build) void {
     const limine_config = b.path("src/bootloader/limine.cfg");
     const limine_uefi_cd = b.fmt("{s}/limine-uefi-cd.bin", .{limine_data});
 
-    const copy_bin_cmd = b.addSystemCommand(&.{"cp"});
-    copy_bin_cmd.step.dependOn(kernel_step);
-    copy_bin_cmd.addArg(limine_bios_cd);
-    copy_bin_cmd.addArg(limine_bios_sys);
-    copy_bin_cmd.addFileArg(limine_config);
-    copy_bin_cmd.addArg(limine_uefi_cd);
-    copy_bin_cmd.addArg(b.exe_dir);
+    const install_bin_cmd = b.addSystemCommand(&.{"install"});
+    install_bin_cmd.step.dependOn(kernel_step);
+    install_bin_cmd.addArg("-m");
+    install_bin_cmd.addArg("700");
+    install_bin_cmd.addArg(limine_bios_cd);
+    install_bin_cmd.addArg(limine_bios_sys);
+    install_bin_cmd.addFileArg(limine_config);
+    install_bin_cmd.addArg(limine_uefi_cd);
+    install_bin_cmd.addArg(b.exe_dir);
 
     const efi_boot = b.fmt("{s}/EFI/BOOT", .{b.exe_dir});
 
@@ -90,16 +92,18 @@ pub fn build(b: *std.Build) void {
     const boot_ia32 = b.fmt("{s}/BOOTIA32.EFI", .{limine_data});
     const boot_x64 = b.fmt("{s}/BOOTX64.EFI", .{limine_data});
 
-    const copy_efi_cmd = b.addSystemCommand(&.{"cp"});
-    copy_efi_cmd.step.dependOn(&efi_dir_cmd.step);
-    copy_efi_cmd.addArg(boot_ia32);
-    copy_efi_cmd.addArg(boot_x64);
-    copy_efi_cmd.addArg(efi_boot);
+    const install_efi_cmd = b.addSystemCommand(&.{"install"});
+    install_efi_cmd.step.dependOn(&efi_dir_cmd.step);
+    install_efi_cmd.addArg("-m");
+    install_efi_cmd.addArg("700");
+    install_efi_cmd.addArg(boot_ia32);
+    install_efi_cmd.addArg(boot_x64);
+    install_efi_cmd.addArg(efi_boot);
 
     const iso_cmd = b.addSystemCommand(&.{"xorriso"});
     iso_cmd.step.dependOn(initrd_step);
-    iso_cmd.step.dependOn(&copy_bin_cmd.step);
-    iso_cmd.step.dependOn(&copy_efi_cmd.step);
+    iso_cmd.step.dependOn(&install_bin_cmd.step);
+    iso_cmd.step.dependOn(&install_efi_cmd.step);
     iso_cmd.addArg("-as");
     iso_cmd.addArg("mkisofs");
     iso_cmd.addArg("-b");
