@@ -15,24 +15,21 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 const limine = @import("limine");
-const serial = @import("serial.zig");
-const vga = @import("vga.zig");
 
-pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
+pub export var framebuffer_request: limine.FramebufferRequest = .{};
 
-inline fn done() noreturn {
-    while (true) {
-        asm volatile ("hlt");
+pub fn init() void {
+    if (framebuffer_request.response) |framebuffer_response| {
+        if (framebuffer_response.framebuffer_count < 1) {
+            @panic("Failed to retrieve framebuffer.");
+        }
+
+        const framebuffer = framebuffer_response.framebuffers()[0];
+
+        for (0..100) |i| {
+            const pixel_offset = i * framebuffer.pitch + i * 4;
+
+            @as(*u32, @ptrCast(@alignCast(framebuffer.address + pixel_offset))).* = 0xFFFFFFFF;
+        }
     }
-}
-
-export fn _start() callconv(.C) noreturn {
-    if (!base_revision.is_supported()) {
-        @panic("Failed to use base revision.");
-    }
-
-    serial.init();
-    vga.init();
-
-    done();
 }
