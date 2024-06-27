@@ -67,12 +67,79 @@ pub fn build(b: *std.Build) void {
     const initrd_step = b.step("initrd", "Build the initial ramdisk");
     initrd_step.dependOn(&initrd_artifact.step);
 
+    const limine_data = std.posix.getenv("LIMINE_DATA").?;
+    const limine_bios_cd = b.fmt("{s}/limine-bios-cd.bin", .{limine_data});
+    const limine_bios_sys = b.fmt("{s}/limine-bios.sys", .{limine_data});
+    const limine_config = b.path("src/bootloader/limine.cfg");
+    const limine_uefi_cd = b.fmt("{s}/limine-uefi-cd.bin", .{limine_data});
+
+    const copy_bin_cmd = b.addSystemCommand(&.{"cp"});
+    copy_bin_cmd.step.dependOn(kernel_step);
+    copy_bin_cmd.addArg(limine_bios_cd);
+    copy_bin_cmd.addArg(limine_bios_sys);
+    copy_bin_cmd.addFileArg(limine_config);
+    copy_bin_cmd.addArg(limine_uefi_cd);
+    copy_bin_cmd.addArg(b.exe_dir);
+
+    const efi_boot = b.fmt("{s}/EFI/BOOT", .{b.exe_dir});
+
+    const efi_dir_cmd = b.addSystemCommand(&.{"mkdir"});
+    efi_dir_cmd.addArg("-p");
+    efi_dir_cmd.addArg(efi_boot);
+
+    const boot_ia32 = b.fmt("{s}/BOOTIA32.EFI", .{limine_data});
+    const boot_x64 = b.fmt("{s}/BOOTX64.EFI", .{limine_data});
+
+    const copy_efi_cmd = b.addSystemCommand(&.{"cp"});
+    copy_efi_cmd.step.dependOn(&efi_dir_cmd.step);
+    copy_efi_cmd.addArg(boot_ia32);
+    copy_efi_cmd.addArg(boot_x64);
+    copy_efi_cmd.addArg(efi_boot);
+
+    const iso_cmd = b.addSystemCommand(&.{"xorriso"});
+    iso_cmd.step.dependOn(initrd_step);
+    iso_cmd.step.dependOn(&copy_bin_cmd.step);
+    iso_cmd.step.dependOn(&copy_efi_cmd.step);
+    iso_cmd.addArg("-as");
+    iso_cmd.addArg("mkisofs");
+    iso_cmd.addArg("-b");
+    iso_cmd.addArg("limine-bios-cd.bin");
+    iso_cmd.addArg("-no-emul-boot");
+    iso_cmd.addArg("-boot-load-size");
+    iso_cmd.addArg("4");
+    iso_cmd.addArg("-boot-info-table");
+    iso_cmd.addArg("--efi-boot");
+    iso_cmd.addArg("limine-uefi-cd.bin");
+    iso_cmd.addArg("-efi-boot-part");
+    iso_cmd.addArg("--efi-boot-image");
+    iso_cmd.addArg("--protective-msdos-label");
+    iso_cmd.addArg(b.exe_dir);
+    iso_cmd.addArg("-o");
+    const iso_path = iso_cmd.addOutputFileArg("NeurOS.iso");
+
+    const limine_cmd = b.addSystemCommand(&.{"limine"});
+    limine_cmd.addArg("bios-install");
+    limine_cmd.addFileArg(iso_path);
+
+    const iso_artifact = b.addInstallFile(iso_path, "NeurOS.iso");
+    iso_artifact.step.dependOn(&limine_cmd.step);
+
     const iso_step = b.step("iso", "Build the ISO");
-    iso_step.dependOn(kernel_step);
-    iso_step.dependOn(initrd_step);
+    iso_step.dependOn(&iso_artifact.step);
+
+    const run_cmd = b.addSystemCommand(&.{"qemu-system-x86_64"});
+    run_cmd.step.dependOn(iso_step);
+    run_cmd.addArg("-M");
+    run_cmd.addArg("q35");
+    run_cmd.addArg("-m");
+    run_cmd.addArg("2G");
+    run_cmd.addArg("-cdrom");
+    run_cmd.addArg("zig-out/NeurOS.iso");
+    run_cmd.addArg("-boot");
+    run_cmd.addArg("d");
 
     const run_step = b.step("run", "Run the operating system");
-    run_step.dependOn(iso_step);
+    run_step.dependOn(&run_cmd.step);
 
     const clean_cmd = b.addSystemCommand(&.{"rm"});
     clean_cmd.addArg("-rf");
