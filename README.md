@@ -19,7 +19,9 @@
 # ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/7b2e911a-429b-4d44-a4bb-131a8037cb97)
 
 ![License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge&logo=gnu&logoColor=white)
-![Linux](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
+![Build](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
+![Version](https://img.shields.io/badge/0.1.0-blue?style=for-the-badge&logo=git&logoColor=white&label=version&labelColor=gray)
+![Toolchain](https://img.shields.io/badge/0.13-orange?style=for-the-badge&logo=zig&logoColor=white&label=toolchain&labelColor=gray)
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
