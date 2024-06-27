@@ -62,7 +62,7 @@ pub fn build(b: *std.Build) void {
     initrd_cmd.addDirectoryArg(b.path("src/initrd"));
     initrd_cmd.addArg(".");
 
-    const initrd_artifact = b.addInstallFile(initrd_path, "initrd.tar");
+    const initrd_artifact = b.addInstallFile(initrd_path, "bin/initrd.tar");
 
     const initrd_step = b.step("initrd", "Build the initial ramdisk");
     initrd_step.dependOn(&initrd_artifact.step);
@@ -73,4 +73,14 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Run the operating system");
     run_step.dependOn(iso_step);
+
+    const clean_cmd = b.addSystemCommand(&.{"rm"});
+    clean_cmd.addArg("-rf");
+    clean_cmd.addArg(".zig-cache");
+    clean_cmd.addArg("zig-out");
+
+    const clean_step = b.step("clean", "Clean the project");
+    clean_step.dependOn(&clean_cmd.step);
+
+    b.default_step = iso_step;
 }
