@@ -149,5 +149,15 @@ pub fn build(b: *std.Build) void {
     const clean_step = b.step("clean", "Clean the project");
     clean_step.dependOn(&clean_cmd.step);
 
+    const vale_sync_cmd = b.addSystemCommand(&.{"vale"});
+    vale_sync_cmd.addArg("sync");
+
+    const vale_cmd = b.addSystemCommand(&.{"vale"});
+    vale_cmd.step.dependOn(&vale_sync_cmd.step);
+    vale_cmd.addFileArg(b.path("README.md"));
+
+    const lint_step = b.step("lint", "Lint the project");
+    lint_step.dependOn(&vale_cmd.step);
+
     b.default_step = iso_step;
 }
