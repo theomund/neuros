@@ -33,7 +33,7 @@ pub fn init() void {
 
     outb(PORT + 4, 0x0F);
 
-    const message = [_]u8{ 'N', 'e', 'u', 'r', 'O', 'S' };
+    const message = "NeurOS v0.1.0 (x86_64)\r\nCopyright (C) 2024 Theomund";
 
     for (message) |character| {
         write(character);
