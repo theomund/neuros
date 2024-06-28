@@ -14,27 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-const limine = @import("limine");
 const serial = @import("serial.zig");
-const shell = @import("shell.zig");
-const vga = @import("vga.zig");
 
-pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
-
-inline fn done() noreturn {
-    while (true) {
-        asm volatile ("hlt");
-    }
-}
-
-export fn _start() callconv(.C) noreturn {
-    if (!base_revision.is_supported()) {
-        @panic("Failed to use base revision.");
-    }
-
-    serial.init();
-    shell.init();
-    vga.init();
-
-    done();
+pub fn init() void {
+    serial.print("NeurOS v0.1.0 (x86_64)\r\nCopyright (C) 2024 Theomund");
 }

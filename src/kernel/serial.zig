@@ -32,12 +32,6 @@ pub fn init() void {
     }
 
     outb(PORT + 4, 0x0F);
-
-    const message = "NeurOS v0.1.0 (x86_64)\r\nCopyright (C) 2024 Theomund";
-
-    for (message) |character| {
-        write(character);
-    }
 }
 
 fn inb(address: u16) u8 {
@@ -71,4 +65,10 @@ fn transmit_empty() u8 {
 fn write(character: u8) void {
     while (transmit_empty() == 0) {}
     outb(PORT, character);
+}
+
+pub fn print(message: []const u8) void {
+    for (message) |character| {
+        write(character);
+    }
 }
