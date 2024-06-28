@@ -180,5 +180,16 @@ pub fn build(b: *std.Build) void {
     const debug_step = b.step("debug", "Run the GDB debugger");
     debug_step.dependOn(&debug_cmd.step);
 
+    const format_zig_cmd = b.addSystemCommand(&.{"zig"});
+    format_zig_cmd.addArg("fmt");
+    format_zig_cmd.addArg(".");
+
+    const format_nix_cmd = b.addSystemCommand(&.{"nix"});
+    format_nix_cmd.addArg("fmt");
+
+    const format_step = b.step("format", "Format the source code");
+    format_step.dependOn(&format_nix_cmd.step);
+    format_step.dependOn(&format_zig_cmd.step);
+
     b.default_step = iso_step;
 }
