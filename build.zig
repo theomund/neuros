@@ -129,6 +129,8 @@ pub fn build(b: *std.Build) void {
     const iso_step = b.step("iso", "Build the ISO");
     iso_step.dependOn(&iso_artifact.step);
 
+    const uefi = b.option(bool, "uefi", "Enable UEFI Firmware") orelse false;
+
     const run_cmd = b.addSystemCommand(&.{"qemu-system-x86_64"});
     run_cmd.step.dependOn(iso_step);
     run_cmd.addArg("-M");
@@ -139,6 +141,11 @@ pub fn build(b: *std.Build) void {
     run_cmd.addArg("zig-out/NeurOS.iso");
     run_cmd.addArg("-boot");
     run_cmd.addArg("d");
+    if (uefi) {
+        const ovmf_fd = std.posix.getenv("OVMF_FD").?;
+        run_cmd.addArg("-bios");
+        run_cmd.addArg(ovmf_fd);
+    }
 
     const run_step = b.step("run", "Run the operating system");
     run_step.dependOn(&run_cmd.step);

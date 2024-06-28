@@ -43,7 +43,7 @@
 
               shellHook = ''
                 export LIMINE_DATA=${limine}/share/limine
-                export OVMF=${OVMF.fd}/FV/OVMF.fd
+                export OVMF_FD=${OVMF.fd}/FV/OVMF.fd
                 echo "Welcome to the NeurOS development shell."
               '';
             };
