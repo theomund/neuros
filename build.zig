@@ -74,33 +74,31 @@ pub fn build(b: *std.Build) void {
     const limine_uefi_cd = b.fmt("{s}/limine-uefi-cd.bin", .{limine_data});
 
     const install_bin_cmd = b.addSystemCommand(&.{"install"});
-    install_bin_cmd.step.dependOn(kernel_step);
+    install_bin_cmd.addArg("-D");
+    install_bin_cmd.addArg("-t");
+    install_bin_cmd.addArg(b.exe_dir);
     install_bin_cmd.addArg("-m");
     install_bin_cmd.addArg("700");
     install_bin_cmd.addArg(limine_bios_cd);
     install_bin_cmd.addArg(limine_bios_sys);
     install_bin_cmd.addFileArg(limine_config);
     install_bin_cmd.addArg(limine_uefi_cd);
-    install_bin_cmd.addArg(b.exe_dir);
-
-    const efi_boot = b.fmt("{s}/EFI/BOOT", .{b.exe_dir});
-
-    const efi_dir_cmd = b.addSystemCommand(&.{"mkdir"});
-    efi_dir_cmd.addArg("-p");
-    efi_dir_cmd.addArg(efi_boot);
 
     const boot_ia32 = b.fmt("{s}/BOOTIA32.EFI", .{limine_data});
     const boot_x64 = b.fmt("{s}/BOOTX64.EFI", .{limine_data});
+    const efi_boot = b.fmt("{s}/EFI/BOOT", .{b.exe_dir});
 
     const install_efi_cmd = b.addSystemCommand(&.{"install"});
-    install_efi_cmd.step.dependOn(&efi_dir_cmd.step);
+    install_efi_cmd.addArg("-D");
+    install_efi_cmd.addArg("-t");
+    install_efi_cmd.addArg(efi_boot);
     install_efi_cmd.addArg("-m");
     install_efi_cmd.addArg("700");
     install_efi_cmd.addArg(boot_ia32);
     install_efi_cmd.addArg(boot_x64);
-    install_efi_cmd.addArg(efi_boot);
 
     const iso_cmd = b.addSystemCommand(&.{"xorriso"});
+    iso_cmd.step.dependOn(kernel_step);
     iso_cmd.step.dependOn(initrd_step);
     iso_cmd.step.dependOn(&install_bin_cmd.step);
     iso_cmd.step.dependOn(&install_efi_cmd.step);
