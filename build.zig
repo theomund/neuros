@@ -173,5 +173,12 @@ pub fn build(b: *std.Build) void {
     const lint_step = b.step("lint", "Lint the project");
     lint_step.dependOn(&vale_cmd.step);
 
+    const debug_cmd = b.addSystemCommand(&.{"gdb"});
+    debug_cmd.addArg("-ex");
+    debug_cmd.addArg("target remote localhost:1234");
+
+    const debug_step = b.step("debug", "Run the GDB debugger");
+    debug_step.dependOn(&debug_cmd.step);
+
     b.default_step = iso_step;
 }
