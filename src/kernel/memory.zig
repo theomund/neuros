@@ -15,32 +15,14 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 const limine = @import("limine");
-const logger = @import("logger.zig");
-const memory = @import("memory.zig");
 const serial = @import("serial.zig");
-const shell = @import("shell.zig");
 const std = @import("std");
-const vga = @import("vga.zig");
 
-pub const std_options: std.Options = .{ .log_level = .debug, .logFn = logger.log };
+pub export var memory_map_request: limine.MemoryMapRequest = .{};
 
-pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
-
-inline fn done() noreturn {
-    while (true) {
-        asm volatile ("hlt");
+pub fn init() void {
+    if (memory_map_request.response) |memory_map_response| {
+        const count = memory_map_response.entry_count;
+        std.log.scoped(.memory).debug("Detected {d} entries in the memory map.", .{count});
     }
-}
-
-export fn _start() callconv(.C) noreturn {
-    if (!base_revision.is_supported()) {
-        @panic("Failed to use base revision.");
-    }
-
-    serial.init();
-    shell.init();
-    vga.init();
-    memory.init();
-
-    done();
 }

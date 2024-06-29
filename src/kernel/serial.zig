@@ -14,24 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-const PORT = 0x3f8;
+const std = @import("std");
+
+const Context = struct {};
+const WriteError = error{};
+pub const Writer = std.io.GenericWriter(Context, WriteError, write);
+
+const port = 0x3f8;
 
 pub fn init() void {
-    outb(PORT + 1, 0x00);
-    outb(PORT + 3, 0x80);
-    outb(PORT + 0, 0x03);
-    outb(PORT + 1, 0x00);
-    outb(PORT + 3, 0x03);
-    outb(PORT + 2, 0xC7);
-    outb(PORT + 4, 0x0B);
-    outb(PORT + 4, 0x1E);
-    outb(PORT + 0, 0xAE);
+    outb(port + 1, 0x00);
+    outb(port + 3, 0x80);
+    outb(port + 0, 0x03);
+    outb(port + 1, 0x00);
+    outb(port + 3, 0x03);
+    outb(port + 2, 0xC7);
+    outb(port + 4, 0x0B);
+    outb(port + 4, 0x1E);
+    outb(port + 0, 0xAE);
 
-    if (inb(PORT + 0) != 0xAE) {
+    if (inb(port + 0) != 0xAE) {
         @panic("Failed to initialize serial port.");
     }
 
-    outb(PORT + 4, 0x0F);
+    outb(port + 4, 0x0F);
 }
 
 fn inb(address: u16) u8 {
@@ -50,25 +56,27 @@ fn outb(address: u16, value: u8) void {
 }
 
 fn received() u8 {
-    return inb(PORT + 5) & 1;
+    return inb(port + 5) & 1;
 }
 
 fn read() u8 {
     while (received() == 0) {}
-    return inb(PORT);
+    return inb(port);
 }
 
-fn transmit_empty() u8 {
-    return inb(PORT + 5) & 0x20;
+fn transmitEmpty() u8 {
+    return inb(port + 5) & 0x20;
 }
 
-fn write(character: u8) void {
-    while (transmit_empty() == 0) {}
-    outb(PORT, character);
+fn putc(character: u8) void {
+    while (transmitEmpty() == 0) {}
+    outb(port, character);
 }
 
-pub fn print(message: []const u8) void {
-    for (message) |character| {
-        write(character);
+fn write(context: Context, bytes: []const u8) WriteError!usize {
+    _ = context;
+    for (bytes) |byte| {
+        putc(byte);
     }
+    return bytes.len;
 }

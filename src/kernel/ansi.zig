@@ -14,33 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-const limine = @import("limine");
-const logger = @import("logger.zig");
-const memory = @import("memory.zig");
-const serial = @import("serial.zig");
-const shell = @import("shell.zig");
-const std = @import("std");
-const vga = @import("vga.zig");
-
-pub const std_options: std.Options = .{ .log_level = .debug, .logFn = logger.log };
-
-pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
-
-inline fn done() noreturn {
-    while (true) {
-        asm volatile ("hlt");
-    }
-}
-
-export fn _start() callconv(.C) noreturn {
-    if (!base_revision.is_supported()) {
-        @panic("Failed to use base revision.");
-    }
-
-    serial.init();
-    shell.init();
-    vga.init();
-    memory.init();
-
-    done();
-}
+pub const bold = "\x1b[1m";
+pub const blue = "\x1b[38;2;0;151;230m";
+pub const default = "\x1b[39m";
+pub const green = "\x1b[38;2;68;189;50m";
+pub const normal = "\x1b[0m";
+pub const red = "\x1b[38;2;232;65;24m";
+pub const yellow = "\x1b[38;2;251;197;49m";

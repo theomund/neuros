@@ -14,8 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+const ansi = @import("ansi.zig");
 const serial = @import("serial.zig");
 
 pub fn init() void {
-    serial.print("NeurOS v0.1.0 (x86_64)\r\nCopyright (C) 2024 Theomund");
+    const writer = serial.Writer{ .context = .{} };
+    try writer.print("{s}{s}NeurOS v0.1.0 (x86_64)\r\n{s}Copyright (C) 2024 Theomund{s}{s}\r\n\n", .{ ansi.bold, ansi.red, ansi.blue, ansi.normal, ansi.default });
 }
