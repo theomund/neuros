@@ -14,37 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-const initrd = @import("initrd.zig");
 const limine = @import("limine");
-const logger = @import("logger.zig");
-const memory = @import("memory.zig");
-const serial = @import("serial.zig");
-const shell = @import("shell.zig");
-const smp = @import("smp.zig");
 const std = @import("std");
-const vga = @import("vga.zig");
 
-pub const std_options: std.Options = .{ .log_level = .debug, .logFn = logger.log };
+pub export var module_request: limine.ModuleRequest = .{};
 
-pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
+const Log = std.log.scoped(.initrd);
 
-inline fn done() noreturn {
-    while (true) {
-        asm volatile ("hlt");
+pub fn init() void {
+    if (module_request.response) |module_response| {
+        const initrd = module_response.modules()[0];
+        Log.debug("Detected initial RAM disk module with {s} as its path.", .{initrd.path});
+        Log.info("Initialized the initial RAM disk (initrd) subsystem.", .{});
     }
-}
-
-export fn _start() callconv(.C) noreturn {
-    if (!base_revision.is_supported()) {
-        @panic("Failed to use base revision.");
-    }
-
-    serial.init();
-    shell.init();
-    vga.init();
-    memory.init();
-    smp.init();
-    initrd.init();
-
-    done();
 }
