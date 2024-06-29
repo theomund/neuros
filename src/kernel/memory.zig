@@ -24,6 +24,6 @@ pub fn init() void {
     if (memory_map_request.response) |memory_map_response| {
         const count = memory_map_response.entry_count;
         std.log.scoped(.memory).debug("Detected {d} entries in the memory map.", .{count});
-        std.log.scoped(.smp).info("Initialized the memory subsystem.", .{});
+        std.log.scoped(.memory).info("Initialized the memory subsystem.", .{});
     }
 }
