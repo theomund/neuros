@@ -15,15 +15,14 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 const limine = @import("limine");
-const serial = @import("serial.zig");
 const std = @import("std");
 
-pub export var memory_map_request: limine.MemoryMapRequest = .{};
+pub export var smp_request: limine.SmpRequest = .{};
 
 pub fn init() void {
-    if (memory_map_request.response) |memory_map_response| {
-        const count = memory_map_response.entry_count;
-        std.log.scoped(.memory).debug("Detected {d} entries in the memory map.", .{count});
-        std.log.scoped(.smp).info("Initialized the memory subsystem.", .{});
+    if (smp_request.response) |smp_response| {
+        const count = smp_response.cpu_count;
+        std.log.scoped(.smp).debug("Detected {d} core(s) in the CPU processor.", .{count});
+        std.log.scoped(.smp).info("Initialized the SMP subsystem.", .{});
     }
 }

@@ -19,6 +19,7 @@ const logger = @import("logger.zig");
 const memory = @import("memory.zig");
 const serial = @import("serial.zig");
 const shell = @import("shell.zig");
+const smp = @import("smp.zig");
 const std = @import("std");
 const vga = @import("vga.zig");
 
@@ -41,6 +42,7 @@ export fn _start() callconv(.C) noreturn {
     shell.init();
     vga.init();
     memory.init();
+    smp.init();
 
     done();
 }
