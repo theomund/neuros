@@ -19,10 +19,12 @@ const std = @import("std");
 
 pub export var smp_request: limine.SmpRequest = .{};
 
+const Log = std.log.scoped(.smp);
+
 pub fn init() void {
     if (smp_request.response) |smp_response| {
         const count = smp_response.cpu_count;
-        std.log.scoped(.smp).debug("Detected {d} core(s) in the CPU processor.", .{count});
-        std.log.scoped(.smp).info("Initialized the SMP subsystem.", .{});
+        Log.debug("Detected {d} core(s) in the CPU processor.", .{count});
+        Log.info("Initialized the SMP subsystem.", .{});
     }
 }

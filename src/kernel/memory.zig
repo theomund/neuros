@@ -20,10 +20,12 @@ const std = @import("std");
 
 pub export var memory_map_request: limine.MemoryMapRequest = .{};
 
+const Log = std.log.scoped(.memory);
+
 pub fn init() void {
     if (memory_map_request.response) |memory_map_response| {
         const count = memory_map_response.entry_count;
-        std.log.scoped(.memory).debug("Detected {d} entries in the memory map.", .{count});
-        std.log.scoped(.memory).info("Initialized the memory subsystem.", .{});
+        Log.debug("Detected {d} entries in the memory map.", .{count});
+        Log.info("Initialized the memory subsystem.", .{});
     }
 }
