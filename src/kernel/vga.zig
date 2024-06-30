@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,15 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#![no_std]
-#![no_main]
+const limine = @import("limine");
 
-use core::panic::PanicInfo;
+pub export var framebuffer_request: limine.FramebufferRequest = .{};
 
-#[no_mangle]
-fn main() {}
+pub fn init() void {
+    if (framebuffer_request.response) |framebuffer_response| {
+        if (framebuffer_response.framebuffer_count < 1) {
+            @panic("Failed to retrieve framebuffer.");
+        }
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+        const framebuffer = framebuffer_response.framebuffers()[0];
+
+        for (0..100) |i| {
+            const pixel_offset = i * framebuffer.pitch + i * 4;
+
+            @as(*u32, @ptrCast(@alignCast(framebuffer.address + pixel_offset))).* = 0xFFFFFFFF;
+        }
+    }
 }

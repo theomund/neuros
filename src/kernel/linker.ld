@@ -1,5 +1,5 @@
 /*
-  NeurOS - Hobbyist operating system written in Rust.
+  NeurOS - Hobbyist operating system written in Zig.
   Copyright (C) 2024 Theomund
 
   This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,10 @@ ENTRY(_start)
 
 PHDRS
 {
-    text    PT_LOAD    FLAGS((1 << 0) | (1 << 2)) ;
-    rodata  PT_LOAD    FLAGS((1 << 2)) ;
-    data    PT_LOAD    FLAGS((1 << 1) | (1 << 2)) ;
-    dynamic PT_DYNAMIC FLAGS((1 << 1) | (1 << 2)) ;
+    text    PT_LOAD    FLAGS(0x05);
+    rodata  PT_LOAD    FLAGS(0x04);
+    data    PT_LOAD    FLAGS(0x06);
+    dynamic PT_DYNAMIC FLAGS(0x06);
 }
 
 SECTIONS
@@ -37,16 +37,20 @@ SECTIONS
         *(.text .text.*)
     } :text
 
-    . += CONSTANT(MAXPAGESIZE);
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .rodata : {
         *(.rodata .rodata.*)
     } :rodata
 
-    . += CONSTANT(MAXPAGESIZE);
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .data : {
         *(.data .data.*)
+
+        KEEP(*(.requests_start_marker))
+        KEEP(*(.requests))
+        KEEP(*(.requests_end_marker))
     } :data
 
     .dynamic : {
@@ -59,7 +63,8 @@ SECTIONS
     } :data
 
     /DISCARD/ : {
-        *(.eh_frame)
+        *(.eh_frame*)
         *(.note .note.*)
+        *(.interp)
     }
 }

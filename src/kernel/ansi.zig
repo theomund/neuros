@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,14 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::debug;
-use crate::logger::{Level, LOGGER};
-use alloc::format;
-use limine::request::SmpRequest;
-
-static SMP_REQUEST: SmpRequest = SmpRequest::new();
-
-pub fn initialize() {
-    let count = SMP_REQUEST.get_response().unwrap().cpus().len();
-    debug!("Detected that the processor has {count} core(s).");
-}
+pub const bold = "\x1b[1m";
+pub const blue = "\x1b[38;2;0;151;230m";
+pub const default = "\x1b[39m";
+pub const green = "\x1b[38;2;68;189;50m";
+pub const normal = "\x1b[0m";
+pub const red = "\x1b[38;2;232;65;24m";
+pub const yellow = "\x1b[38;2;251;197;49m";

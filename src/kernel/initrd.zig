@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,40 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::scheduler::SCHEDULER;
+const limine = @import("limine");
+const std = @import("std");
 
-pub fn close() {
-    todo!("Implement system call.");
-}
+const Log = std.log.scoped(.initrd);
 
-pub fn exec() {
-    todo!("Implement system call.");
-}
+pub export var module_request: limine.ModuleRequest = .{};
 
-pub fn exit() {
-    todo!("Implement system call.");
-}
-
-pub fn fork() -> u64 {
-    SCHEDULER.lock().fork()
-}
-
-pub fn kill() {
-    todo!("Implement system call.");
-}
-
-pub fn open() {
-    todo!("Implement system call.");
-}
-
-pub fn read() {
-    todo!("Implement system call.");
-}
-
-pub fn wait() {
-    todo!("Implement system call.");
-}
-
-pub fn write() {
-    todo!("Implement system call.");
+pub fn init() void {
+    if (module_request.response) |module_response| {
+        const initrd = module_response.modules()[0];
+        Log.debug("Detected initial RAM disk module with {s} as its path.", .{initrd.path});
+        Log.info("Initialized the initial RAM disk (initrd) subsystem.", .{});
+    }
 }

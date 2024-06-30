@@ -1,5 +1,5 @@
 <!--
-  NeurOS - Hobbyist operating system written in Rust.
+  NeurOS - Hobbyist operating system written in Zig.
   Copyright (C) 2024 Theomund
 
   This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 # ![Project Logo](https://github.com/Theomund/NeurOS/assets/34360334/7b2e911a-429b-4d44-a4bb-131a8037cb97)
 
 ![License](https://img.shields.io/github/license/Theomund/NeurOS?style=for-the-badge&logo=gnu&logoColor=white)
-![Linux](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
-![Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Fkernel%2FCargo.toml&query=package.version&style=for-the-badge&label=version&logo=git&logoColor=white)
-![Channel](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FTheomund%2FNeurOS%2Fmain%2Frust-toolchain.toml&query=toolchain.channel&style=for-the-badge&logo=rust&label=toolchain&logoColor=white)
+![Build](https://img.shields.io/github/actions/workflow/status/Theomund/NeurOS/linux.yml?style=for-the-badge&logo=linux&logoColor=white)
+![Version](https://img.shields.io/badge/0.1.0-blue?style=for-the-badge&logo=git&logoColor=white&label=version&labelColor=gray)
+![Toolchain](https://img.shields.io/badge/0.13.0-orange?style=for-the-badge&logo=zig&logoColor=white&label=toolchain&labelColor=gray)
 
 > [!WARNING]
 > This project is currently in its early development stage. As a result, you
@@ -207,76 +207,48 @@ nix develop
 Run the following command to generate an ISO image:
 
 ```bash
-make all
+zig build
 ```
 
 This command will start the build process based on the configured settings
 and source code.
 
-## Testing
+## Running
 
-To test the compiled operating system in a virtual environment, run this
+To run the compiled operating system in a virtual machine, run this
 command:
 
 ```bash
-make run
+zig build run
 ```
 
-This command will start QEMU and run the operating system. To switch the
-firmware to UEFI, run the following command:
-
-```bash
-make run-uefi
-```
-
-To test a release build of the operating system, change the `PROFILE`
-variable to the appropriate value:
-
-```bash
-make run PROFILE=release
-```
+This command will start QEMU and run the operating system.
 
 ## Debugging
 
 To debug the operating system, open a terminal and run the following command:
 
 ```bash
-make run DEBUG=true
+zig build run -Ddebug=true
 ```
 
 This will start QEMU with the flags needed to use a debugger such
-as GDB. You can likewise debug UEFI setups by using this command:
-
-```bash
-make run-uefi DEBUG=true
-```
+as GDB.
 
 In another terminal, run the following command:
 
 ```bash
-make debug
+zig build debug
 ```
 
 This starts GDB with the correct symbol file and connection parameters.
-
-You are now able to set breakpoints at arbitrary locations:
-
-```bash
-(gdb) break _start
-Breakpoint 1 at 0xffffffff80018691: file kernel/src/main.rs, line 48.
-(gdb) continue
-Continuing.
-
-Breakpoint 1, kernel::_start () at kernel/src/main.rs:48
-48          memory::initialize();
-```
 
 ## Cleaning
 
 To clean the build artifacts and start fresh, use the following command:
 
 ```bash
-make clean 
+zig build clean
 ```
 
 This command removes compiled binaries and temporary files.

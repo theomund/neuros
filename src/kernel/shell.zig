@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-fn main() {
-    println!("cargo:rustc-link-arg=-Tuserland/init/linker.ld");
-    println!("cargo:rerun-if-changed=userland/init/linker.ld");
+const ansi = @import("ansi.zig");
+const serial = @import("serial.zig");
+
+pub fn init() void {
+    const writer = serial.Writer{ .context = .{} };
+    try writer.print("{s}{s}NeurOS v0.1.0 (x86_64)\r\n{s}Copyright (C) 2024 Theomund{s}{s}\r\n\n", .{ ansi.bold, ansi.red, ansi.blue, ansi.normal, ansi.default });
 }

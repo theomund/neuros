@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub const BLUE: &str = "\x1b[38;2;0;151;230m";
-pub const BOLD: &str = "\x1b[1m";
-pub const DEFAULT: &str = "\x1b[39m";
-pub const GREEN: &str = "\x1b[38;2;68;189;50m";
-pub const NORMAL: &str = "\x1b[0m";
-pub const ORANGE: &str = "\x1b[38;2;194;54;52m";
-pub const PURPLE: &str = "\x1b[38;2;140;122;230m";
-pub const RED: &str = "\x1b[38;2;232;65;24m";
-pub const YELLOW: &str = "\x1b[38;2;251;197;49m";
+.{
+    .name = "NeurOS",
+    .version = "0.1.0",
+    .paths = .{"."},
+    .dependencies = .{
+        .limine = .{
+            .url = "https://github.com/limine-bootloader/limine-zig/archive/7b29b6e6f6d35052f01ed3831085a39aae131705.tar.gz",
+            .hash = "1220f946f839eab2ec49dca1c805ce72ac3e3ef9c47b3afcdecd1c05a7b35f66d277",
+        },
+    },
+}

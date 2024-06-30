@@ -1,4 +1,4 @@
-// NeurOS - Hobbyist operating system written in Rust.
+// NeurOS - Hobbyist operating system written in Zig.
 // Copyright (C) 2024 Theomund
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,25 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::gdt;
-use x86_64::registers::control::{Efer, EferFlags};
-use x86_64::registers::model_specific::Star;
+const limine = @import("limine");
+const std = @import("std");
 
-pub fn initialize() {
-    Star::write(
-        gdt::get_user_code(),
-        gdt::get_user_data(),
-        gdt::get_kernel_code(),
-        gdt::get_kernel_data(),
-    )
-    .expect("Failed to write to STAR register");
+const Log = std.log.scoped(.smp);
 
-    unsafe {
-        Efer::write(
-            EferFlags::SYSTEM_CALL_EXTENSIONS
-                | EferFlags::LONG_MODE_ENABLE
-                | EferFlags::LONG_MODE_ACTIVE
-                | EferFlags::NO_EXECUTE_ENABLE,
-        );
+pub export var smp_request: limine.SmpRequest = .{};
+
+pub fn init() void {
+    if (smp_request.response) |smp_response| {
+        const count = smp_response.cpu_count;
+        Log.debug("Detected {d} core(s) in the CPU processor.", .{count});
+        Log.info("Initialized the SMP subsystem.", .{});
     }
 }
