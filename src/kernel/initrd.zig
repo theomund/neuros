@@ -17,9 +17,9 @@
 const limine = @import("limine");
 const std = @import("std");
 
-pub export var module_request: limine.ModuleRequest = .{};
-
 const Log = std.log.scoped(.initrd);
+
+pub export var module_request: limine.ModuleRequest = .{};
 
 pub fn init() void {
     if (module_request.response) |module_response| {

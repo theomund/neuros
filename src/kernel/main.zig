@@ -24,6 +24,8 @@ const smp = @import("smp.zig");
 const std = @import("std");
 const vga = @import("vga.zig");
 
+pub const Log = std.log.scoped(.kernel);
+
 pub const std_options: std.Options = .{ .log_level = .debug, .logFn = logger.log };
 
 pub export var base_revision: limine.BaseRevision = .{ .revision = 2 };
@@ -45,6 +47,8 @@ export fn _start() callconv(.C) noreturn {
     memory.init();
     smp.init();
     initrd.init();
+
+    Log.info("The operating system has been successfully initialized.", .{});
 
     done();
 }

@@ -17,9 +17,9 @@
 const limine = @import("limine");
 const std = @import("std");
 
-pub export var smp_request: limine.SmpRequest = .{};
-
 const Log = std.log.scoped(.smp);
+
+pub export var smp_request: limine.SmpRequest = .{};
 
 pub fn init() void {
     if (smp_request.response) |smp_response| {
