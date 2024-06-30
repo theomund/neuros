@@ -18,14 +18,23 @@ const limine = @import("limine");
 const serial = @import("serial.zig");
 const std = @import("std");
 
-pub export var memory_map_request: limine.MemoryMapRequest = .{};
-
 const Log = std.log.scoped(.memory);
+
+pub export var memory_map_request: limine.MemoryMapRequest = .{};
 
 pub fn init() void {
     if (memory_map_request.response) |memory_map_response| {
         const count = memory_map_response.entry_count;
         Log.debug("Detected {d} entries in the memory map.", .{count});
+        const entries = memory_map_response.entries();
+        var usable: u32 = 0;
+        for (entries) |entry| {
+            Log.debug("Found memory map entry of type {s}.", .{@tagName(entry.kind)});
+            if (entry.kind == limine.MemoryMapEntryType.usable) {
+                usable += 1;
+            }
+        }
+        Log.debug("Detected {d} usable memory map entries.", .{usable});
         Log.info("Initialized the memory subsystem.", .{});
     }
 }
